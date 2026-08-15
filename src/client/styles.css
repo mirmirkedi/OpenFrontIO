@@ -117,6 +117,32 @@ body {
    active page. This explicit rule wins over the home shell's display:flex. */
 .opentroop-home.hidden { display: none !important; }
 
+/* The stock web layout constrains wide screens and uses a different map
+   wallpaper. OpenTroop owns the complete canvas, including tablet landscape. */
+.opentroop-main-layout {
+  padding: 0 !important;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(34, 178, 255, 0.28), transparent 34rem),
+    linear-gradient(155deg, #07101e 0%, #0b1d32 47%, #060b14 100%);
+}
+
+.opentroop-main-scroll {
+  max-width: none !important;
+  min-height: 0;
+  padding: 0 !important;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  background:
+    linear-gradient(rgba(4, 14, 27, 0.06), rgba(4, 14, 27, 0.06)),
+    radial-gradient(circle at 50% 12%, rgba(34, 178, 255, 0.28), transparent 34rem),
+    linear-gradient(155deg, #07101e 0%, #0b1d32 47%, #060b14 100%);
+}
+
+.opentroop-main-scroll > .opentroop-home {
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
 .opentroop-home::before {
   position: absolute;
   z-index: -2;
@@ -351,6 +377,41 @@ body {
   .opentroop-home { min-height: 100%; padding-block: 28px; }
   .opentroop-home__content { max-width: 740px; }
   .opentroop-play-card { min-height: 390px; }
+}
+
+@media (orientation: landscape) and (max-height: 900px) {
+  .opentroop-main-scroll > .opentroop-home {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding-block: 12px;
+  }
+
+  .opentroop-home__content {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(330px, 1.1fr);
+    grid-template-rows: auto auto auto auto;
+    align-content: center;
+    justify-content: stretch;
+    gap: 8px clamp(24px, 4vw, 52px);
+    padding-block: 8px;
+    text-align: left;
+  }
+
+  .opentroop-home__topbar { min-height: 40px; }
+  .opentroop-home__brand img { height: 28px; }
+  .opentroop-home__eyebrow { justify-content: flex-start; grid-column: 1; grid-row: 1; }
+  .opentroop-home h1 { grid-column: 1; grid-row: 2; margin: 0; font-size: clamp(39px, 6.8vw, 58px); }
+  .opentroop-home__content > p { grid-column: 1; grid-row: 3; margin: 0; font-size: 13px; }
+  .opentroop-continue-button { min-height: 58px; padding-block: 9px; }
+  .opentroop-continue-button { grid-column: 1; grid-row: 4; align-self: end; }
+  .opentroop-home__content > game-mode-selector { display: block; grid-column: 2; grid-row: 1 / span 4; }
+  .opentroop-play-card { min-height: 250px; }
+  .opentroop-play-card__content { gap: 8px; padding: 20px; }
+  .opentroop-play-card h2 { font-size: 28px; }
+  .opentroop-play-card p { margin-top: 3px; font-size: 13px; }
+  .opentroop-play-button { min-height: 52px; font-size: 18px; }
+  .opentroop-home__footer { font-size: 9px; }
 }
 
 @media (max-height: 680px) {
