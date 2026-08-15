@@ -5,6 +5,7 @@ import { createGameRunner, GameRunner } from "../GameRunner";
 import {
   AttackClusteredPositionsResultMessage,
   InitializedMessage,
+  InitializationErrorMessage,
   MainThreadMessage,
   PlayerActionsResultMessage,
   PlayerBorderTilesResultMessage,
@@ -151,13 +152,25 @@ ctx.addEventListener("message", async (e: MessageEvent<MainThreadMessage>) => {
           message.clientID,
           mapLoader,
           gameUpdate,
-        ).then((gr) => {
-          sendMessage({
-            type: "initialized",
-            id: message.id,
-          } as InitializedMessage);
-          return gr;
-        });
+        )
+          .then((gr) => {
+            sendMessage({
+              type: "initialized",
+              id: message.id,
+            } as InitializedMessage);
+            return gr;
+          })
+          .catch((error: unknown) => {
+            const messageText =
+              error instanceof Error ? error.message : String(error);
+            console.error("Failed to initialize game runner:", error);
+            sendMessage({
+              type: "initialization_error",
+              id: message.id,
+              message: messageText,
+            } as InitializationErrorMessage);
+            throw error;
+          });
       } catch (error) {
         console.error("Failed to initialize game runner:", error);
         throw error;

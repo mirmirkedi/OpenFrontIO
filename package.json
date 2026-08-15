@@ -3,6 +3,10 @@
   "scripts": {
     "build-dev": "concurrently \"tsc --noEmit\" \"vite build --mode development\"",
     "build-prod": "concurrently --kill-others-on-fail \"tsc --noEmit\" \"vite build\"",
+    "build-opentroop": "cross-env GAME_ENV=prod OPENTROOP_APP=true DOMAIN=opentroop.io NUM_WORKERS=1 INSTANCE_ID=opentroop-mobile SERVER_HOST=opentroop.io TURNSTILE_SITE_KEY=1x00000000000000000000AA GIT_COMMIT=opentroop-mobile npm run build-prod && cross-env GAME_ENV=prod OPENTROOP_APP=true DOMAIN=opentroop.io NUM_WORKERS=1 INSTANCE_ID=opentroop-mobile SERVER_HOST=opentroop.io TURNSTILE_SITE_KEY=1x00000000000000000000AA GIT_COMMIT=opentroop-mobile tsx src/server/RenderStaticIndex.ts > static/index.rendered.html && mv static/index.rendered.html static/index.html",
+    "cap:sync": "npm run build-opentroop && cap sync android",
+    "android:debug": "npm run build-opentroop && cap sync android && cap build android --androidreleasetype APK",
+    "android:release": "npm run build-opentroop && cap sync android && cap build android --androidreleasetype AAB",
     "start:client": "vite",
     "start:server": "tsx src/server/Server.ts",
     "start:server-dev": "cross-env GAME_ENV=dev NUM_WORKERS=2 TURNSTILE_SITE_KEY=1x00000000000000000000AA API_KEY=WARNING_DEV_API_KEY_DO_NOT_USE_IN_PRODUCTION ADMIN_BOT_API_KEY=WARNING_DEV_ADMIN_BOT_KEY_DO_NOT_USE_IN_PRODUCTION DOMAIN=localhost GIT_COMMIT=DEV tsx src/server/Server.ts",
@@ -91,6 +95,9 @@
     "vitest-canvas-mock": "^1.1.4"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/api-logs": "^0.216.0",
     "@opentelemetry/exporter-logs-otlp-http": "^0.219.0",

@@ -1,6 +1,7 @@
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { assetUrl } from "../../core/AssetUrls";
+import { isOpenTroopApp } from "../AppMode";
 import "./NavAccountMenu";
 import { NavNotificationsController } from "./NavNotificationsController";
 import "./NavUtilityIcons";
@@ -49,6 +50,7 @@ export class DesktopNavBar extends LitElement {
   render() {
     window.currentPageId ??= "page-play";
     const currentPage = window.currentPageId;
+    const appMode = isOpenTroopApp();
 
     return html`
       <nav
@@ -58,8 +60,10 @@ export class DesktopNavBar extends LitElement {
           <div class="h-8">
             <img
               class="block h-full aspect-[1364/259]"
-              src=${assetUrl("images/OpenFrontLogo.svg")}
-              alt="OpenFront"
+              src=${assetUrl(
+                appMode ? "images/OpenTroopLogo.svg" : "images/OpenFrontLogo.svg",
+              )}
+              alt=${appMode ? "OpenTroop" : "OpenFront"}
             />
           </div>
           <div
@@ -75,7 +79,7 @@ export class DesktopNavBar extends LitElement {
           data-i18n="main.play"
         ></button>
         <!-- Desktop Navigation Menu Items -->
-        <div class="relative no-crazygames">
+        <div class=${appMode ? "hidden" : "relative no-crazygames"}>
           <button
             class="nav-menu-item ${currentPage === "page-item-store"
               ? "active"
@@ -96,19 +100,19 @@ export class DesktopNavBar extends LitElement {
             : ""}
         </div>
         <button
-          class="nav-menu-item ${currentPage === "page-inventory"
+          class="${appMode ? "hidden" : "nav-menu-item"} ${currentPage === "page-inventory"
             ? "active"
             : ""} text-white/70 hover:text-malibu-blue font-medium tracking-wider uppercase cursor-pointer transition-colors [&.active]:text-malibu-blue"
           data-page="page-inventory"
           data-i18n="main.inventory"
         ></button>
         <button
-          class="nav-menu-item text-white/70 hover:text-malibu-blue  font-medium tracking-wider uppercase cursor-pointer transition-colors [&.active]:text-malibu-blue "
+          class="${appMode ? "hidden" : "nav-menu-item"} text-white/70 hover:text-malibu-blue font-medium tracking-wider uppercase cursor-pointer transition-colors [&.active]:text-malibu-blue"
           data-page="page-leaderboard"
           data-i18n="main.leaderboard"
         ></button>
         <button
-          class="no-crazygames nav-menu-item text-white/70 hover:text-blue-500 font-medium tracking-wider uppercase cursor-pointer transition-colors [&.active]:text-blue-500"
+          class="${appMode ? "hidden" : "no-crazygames nav-menu-item"} text-white/70 hover:text-blue-500 font-medium tracking-wider uppercase cursor-pointer transition-colors [&.active]:text-blue-500"
           data-page="page-clan"
           data-i18n="main.clans"
         ></button>

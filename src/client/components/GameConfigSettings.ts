@@ -193,6 +193,8 @@ export interface GameConfigSettingsData {
   map: {
     selected: GameMapType;
     useRandom: boolean;
+    allowRandomMap?: boolean;
+    allowedMapIds?: string[];
     randomMapDivider?: boolean;
     showMedals?: boolean;
     mapWins?: Map<GameMapType, Set<Difficulty>>;
@@ -441,6 +443,8 @@ export class GameConfigSettings extends LitElement {
           html`<map-picker
             .selectedMap=${settings.map.selected}
             .useRandomMap=${settings.map.useRandom}
+            .allowRandomMap=${settings.map.allowRandomMap ?? true}
+            .allowedMapIds=${settings.map.allowedMapIds}
             .randomMapDivider=${settings.map.randomMapDivider ?? false}
             .showMedals=${settings.map.showMedals ?? false}
             .mapWins=${settings.map.mapWins ?? new Map()}

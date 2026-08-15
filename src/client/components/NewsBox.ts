@@ -4,6 +4,7 @@ import type { NewsItem } from "../../core/ApiSchemas";
 import { getNews } from "../Api";
 import { renderMarkdown } from "../Markdown";
 import { translateText } from "../Utils";
+import { isOpenTroopApp } from "../AppMode";
 
 export type { NewsItem };
 
@@ -55,6 +56,7 @@ export class NewsBox extends LitElement {
   }
 
   private async loadNews() {
+    if (isOpenTroopApp()) return;
     try {
       const allItems = await getNews();
       // Reset stale dismissed list when all items would be hidden
@@ -109,6 +111,7 @@ export class NewsBox extends LitElement {
   }
 
   render() {
+    if (isOpenTroopApp()) return nothing;
     if (this.items.length === 0) return nothing;
 
     const item = this.items[this.activeIndex];

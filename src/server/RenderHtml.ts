@@ -10,12 +10,14 @@ const APP_SHELL_CACHE_CONTROL =
   "public, max-age=0, s-maxage=300, stale-while-revalidate=86400, stale-if-error=86400";
 
 const appShellContentCache = new Map<string, Promise<string>>();
+const OPENTROOP_ONLINE_SCRIPTS =
+  /<!-- OPENTROOP-ONLINE-SCRIPTS-START -->[\s\S]*?<!-- OPENTROOP-ONLINE-SCRIPTS-END -->/g;
 
 export async function renderHtmlContent(htmlPath: string): Promise<string> {
   const htmlContent = await fs.readFile(htmlPath, "utf-8");
   const assetManifest = await getRuntimeAssetManifest();
   const cdnBase = ServerEnv.cdnBase();
-  return ejs.render(htmlContent, {
+  const rendered = ejs.render(htmlContent, {
     gitCommit: JSON.stringify(ServerEnv.gitCommit()),
     assetManifest: JSON.stringify(assetManifest),
     cdnBase: JSON.stringify(cdnBase),
@@ -29,8 +31,17 @@ export async function renderHtmlContent(htmlPath: string): Promise<string> {
     turnstileSiteKey: JSON.stringify(ServerEnv.turnstileSiteKey()),
     jwtAudience: JSON.stringify(ServerEnv.jwtAudience()),
     instanceId: JSON.stringify(ServerEnv.instanceId()),
+    openTroopApp: JSON.stringify(ServerEnv.openTroopApp()),
+    openTroopMapIds: JSON.stringify(ServerEnv.openTroopMapIds()),
+    serverHost: ServerEnv.serverHost()
+      ? JSON.stringify(ServerEnv.serverHost())
+      : undefined,
     manifestHref: buildAssetUrl("manifest.json", assetManifest, cdnBase),
-    faviconHref: buildAssetUrl("images/Favicon.svg", assetManifest, cdnBase),
+    faviconHref: buildAssetUrl(
+      ServerEnv.openTroopApp() ? "images/OpenTroopFavicon.svg" : "images/Favicon.svg",
+      assetManifest,
+      cdnBase,
+    ),
     gameplayScreenshotUrl: buildAssetUrl(
       "images/GameplayScreenshot.png",
       assetManifest,
@@ -48,6 +59,9 @@ export async function renderHtmlContent(htmlPath: string): Promise<string> {
     ),
     mobileLogoImageUrl: buildAssetUrl("images/OF.png", assetManifest, cdnBase),
   });
+  return ServerEnv.openTroopApp()
+    ? rendered.replace(OPENTROOP_ONLINE_SCRIPTS, "")
+    : rendered;
 }
 
 export async function getAppShellContent(htmlPath: string): Promise<string> {

@@ -1,6 +1,7 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement } from "lit/decorators.js";
 import { assetUrl } from "../../core/AssetUrls";
+import { isOpenTroopApp } from "../AppMode";
 import { NavNotificationsController } from "./NavNotificationsController";
 
 const MOBILE_ITEM =
@@ -65,6 +66,7 @@ export class MobileNavBar extends LitElement {
   render() {
     window.currentPageId ??= "page-play";
     const currentPage = window.currentPageId;
+    const appMode = isOpenTroopApp();
 
     return html`
       <!-- Border Segments (Custom right border with gap for button) -->
@@ -86,8 +88,10 @@ export class MobileNavBar extends LitElement {
         >
           <div class="flex flex-col items-center gap-1">
             <img
-              src=${assetUrl("images/OpenFrontLogo.svg")}
-              alt="OpenFront"
+              src=${assetUrl(
+                appMode ? "images/OpenTroopLogo.svg" : "images/OpenFrontLogo.svg",
+              )}
+              alt=${appMode ? "OpenTroop" : "OpenFront"}
               class="w-auto h-auto max-w-[220px] max-h-[4.5rem]"
             />
             <div
@@ -103,7 +107,7 @@ export class MobileNavBar extends LitElement {
           data-i18n="main.play"
         ></button>
         <div
-          class="no-crazygames nav-menu-item flex items-center w-full cursor-pointer"
+          class="${appMode ? "hidden" : "no-crazygames nav-menu-item"} flex items-center w-full cursor-pointer"
           data-page="page-item-store"
           @click=${this._notifications.onStoreClick}
         >
@@ -113,19 +117,19 @@ export class MobileNavBar extends LitElement {
             : ""}
         </div>
         <button
-          class="${MOBILE_ITEM} ${currentPage === "page-inventory"
+          class="${appMode ? "hidden" : MOBILE_ITEM} ${currentPage === "page-inventory"
             ? "active"
             : ""}"
           data-page="page-inventory"
           data-i18n="main.inventory"
         ></button>
         <button
-          class="${MOBILE_ITEM}"
+          class="${appMode ? "hidden" : MOBILE_ITEM}"
           data-page="page-leaderboard"
           data-i18n="main.leaderboard"
         ></button>
         <button
-          class="no-crazygames ${MOBILE_ITEM}"
+          class="${appMode ? "hidden" : `no-crazygames ${MOBILE_ITEM}`}"
           data-page="page-clan"
           data-i18n="main.clans"
         ></button>

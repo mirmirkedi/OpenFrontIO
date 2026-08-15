@@ -1,6 +1,7 @@
 import { LitElement, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { assetUrl } from "../core/AssetUrls";
+import { isOpenTroopApp } from "./AppMode";
 import "./LanguageModal";
 import { LanguageModal } from "./LanguageModal";
 import { formatDebugTranslation } from "./Utils";
@@ -251,7 +252,9 @@ export class LangSelector extends LitElement {
       "streaming-now",
     ];
 
-    document.title = this.translateText("main.title") ?? document.title;
+    if (!isOpenTroopApp()) {
+      document.title = this.translateText("main.title") ?? document.title;
+    }
 
     document.querySelectorAll("[data-i18n]").forEach((element) => {
       const key = element.getAttribute("data-i18n");

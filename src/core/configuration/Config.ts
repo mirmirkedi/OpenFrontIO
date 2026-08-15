@@ -34,6 +34,8 @@ declare global {
       turnstileSiteKey?: string;
       jwtAudience?: string;
       instanceId?: string;
+      openTroopApp?: boolean;
+      openTroopMapIds?: string[];
       // Desktop-only: explicit game-server host for the WebSocket origin.
       // Absent on the web build (client falls back to same-origin location).
       serverHost?: string;

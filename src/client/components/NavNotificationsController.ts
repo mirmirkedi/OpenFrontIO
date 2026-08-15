@@ -2,6 +2,7 @@ import { ReactiveController, ReactiveControllerHost } from "lit";
 import version from "resources/version.txt?raw";
 import { getCosmeticsHash } from "../Cosmetics";
 import { getGamesPlayed } from "../Utils";
+import { isOpenTroopApp } from "../AppMode";
 
 const HELP_SEEN_KEY = "helpSeen";
 const STORE_SEEN_HASH_KEY = "storeSeenHash";
@@ -47,6 +48,8 @@ class NavNotificationsStore {
   private load(): void {
     if (this.loaded) return;
     this.loaded = true;
+
+    if (isOpenTroopApp()) return;
 
     this._helpSeen = localStorage.getItem(HELP_SEEN_KEY) === "true";
 

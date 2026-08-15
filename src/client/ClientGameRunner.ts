@@ -10,6 +10,7 @@ import {
   PlayerCosmeticRefs,
   PlayerRecord,
   ServerMessage,
+  Turn,
 } from "../core/Schemas";
 import { createPartialGameRecord, findClosestBy, replacer } from "../core/Util";
 import {
@@ -100,6 +101,8 @@ export interface LobbyConfig {
   gameStartInfo?: GameStartInfo;
   // GameRecord exists when replaying an archived game.
   gameRecord?: GameRecord;
+  // Saved local turns to apply before continuing an interrupted offline game.
+  resumeTurns?: Turn[];
 }
 
 export interface JoinLobbyResult {

@@ -11,6 +11,7 @@ import {
   updateAccountNavButton,
 } from "../NavAccountButton";
 import { closeMobileSidebar } from "../Navigation";
+import { isOpenTroopApp } from "../AppMode";
 import { playerProfileUrl } from "../utilities/PlayerProfileUrl";
 import { copyToClipboard, showToast, translateText } from "../Utils";
 
@@ -316,6 +317,7 @@ export class NavAccountMenu extends LitElement {
   }
 
   render(): TemplateResult {
+    if (isOpenTroopApp()) return html``;
     return html`
       <div class="relative" data-account-nav>
         ${this.variant === "mobile"

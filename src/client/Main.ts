@@ -9,6 +9,7 @@ import {
   GameRecord,
   GameStartInfo,
   PublicGameInfo,
+  Turn,
 } from "../core/Schemas";
 import { toWireGameStartInfo } from "../core/Util";
 import { GameEnv } from "../core/configuration/Config";
@@ -17,12 +18,14 @@ import { UserSettings } from "../core/game/UserSettings";
 import "./AccountModal";
 import "./AccountSettingsModal";
 import { adGatekeeper } from "./AdGatekeeper";
+import { isOpenTroopApp } from "./AppMode";
 import { loadAdmiral, onAdmiralMeasured } from "./Admiral";
 import { getUserMe, invalidateUserMe } from "./Api";
 import { reauthAfterCrazyGamesChange, userAuth } from "./Auth";
 import "./ChangeUsernameModal";
 import "./ClanModal";
 import { joinLobby, type JoinLobbyResult } from "./ClientGameRunner";
+import { loadActiveLocalGame } from "./LocalPersistantStats";
 import {
   completeCosmeticPurchaseReturn,
   getPlayerCosmeticsRefs,
@@ -157,6 +160,7 @@ declare global {
     "matchmaking-requeue": CustomEvent<{ mode?: "1v1" | "2v2" } | undefined>;
     userMeResponse: CustomEvent<UserMeResponse | false>;
     "leave-lobby": CustomEvent;
+    "resume-local-game": CustomEvent;
     "game-starting": CustomEvent;
     "update-game-config": CustomEvent;
   }
@@ -169,6 +173,8 @@ export interface JoinLobbyEvent {
   gameStartInfo?: GameStartInfo;
   // GameRecord exists when replaying an archived game.
   gameRecord?: GameRecord;
+  // Saved offline turns to restore after a page/app reload.
+  resumeTurns?: Turn[];
   source?: "public" | "private" | "host" | "matchmaking" | "singleplayer";
   publicLobbyInfo?: GameInfo | PublicGameInfo;
 }
@@ -262,6 +268,7 @@ class Client {
     // so rendering the widget there alerts and rejects — and replays never
     // send a token anyway (see getTurnstileToken below).
     this.turnstileTokenPromise =
+      isOpenTroopApp() ||
       ClientEnv.instanceId() === "desktop" ||
       isReplayShellHost(window.location.hostname)
         ? null
@@ -299,7 +306,7 @@ class Client {
     const langSelector = document.querySelector(
       "lang-selector",
     ) as LangSelector;
-    if (!langSelector) {
+    if (!isOpenTroopApp() && !langSelector) {
       console.warn("Lang selector element not found");
     }
 
@@ -323,6 +330,10 @@ class Client {
     });
 
     document.addEventListener("join-lobby", this.handleJoinLobby.bind(this));
+    document.addEventListener(
+      "resume-local-game",
+      this.handleResumeLocalGame.bind(this),
+    );
     document.addEventListener("leave-lobby", this.handleLeaveLobby.bind(this));
     document.addEventListener("kick-player", this.handleKickPlayer.bind(this));
     document.addEventListener(
@@ -360,12 +371,12 @@ class Client {
       console.warn("Store modal element not found");
     }
 
-    this.storeModal.refresh();
+    if (!isOpenTroopApp()) this.storeModal.refresh();
 
     window.addEventListener("showPage", (e: any) => {
       if (typeof e?.detail === "string" && e.detail === "page-play") {
         setTimeout(() => {
-          this.storeModal.refresh();
+          if (!isOpenTroopApp()) this.storeModal.refresh();
         }, 50);
       }
     });
@@ -374,8 +385,9 @@ class Client {
       "token-login",
     ) as TokenLoginModal;
     if (
-      !this.tokenLoginModal ||
-      !(this.tokenLoginModal instanceof TokenLoginModal)
+      !isOpenTroopApp() &&
+      (!this.tokenLoginModal ||
+        !(this.tokenLoginModal instanceof TokenLoginModal))
     ) {
       console.warn("Token login modal element not found");
     }
@@ -384,14 +396,18 @@ class Client {
       "matchmaking-modal",
     ) as MatchmakingModal;
     if (
-      !this.matchmakingModal ||
-      !(this.matchmakingModal instanceof MatchmakingModal)
+      !isOpenTroopApp() &&
+      (!this.matchmakingModal ||
+        !(this.matchmakingModal instanceof MatchmakingModal))
     ) {
       console.warn("Matchmaking modal element not found");
     }
 
     this.rewardsModal = document.querySelector("rewards-modal") as RewardsModal;
-    if (!this.rewardsModal || !(this.rewardsModal instanceof RewardsModal)) {
+    if (
+      !isOpenTroopApp() &&
+      (!this.rewardsModal || !(this.rewardsModal instanceof RewardsModal))
+    ) {
       console.warn("Rewards modal element not found");
     }
 
@@ -399,13 +415,19 @@ class Client {
       "steam-link-modal",
     ) as SteamLinkModal;
     if (
-      !this.steamLinkModal ||
-      !(this.steamLinkModal instanceof SteamLinkModal)
+      !isOpenTroopApp() &&
+      (!this.steamLinkModal ||
+        !(this.steamLinkModal instanceof SteamLinkModal))
     ) {
       console.warn("Steam link modal element not found");
     }
 
     const onUserMe = async (userMeResponse: UserMeResponse | false) => {
+      if (isOpenTroopApp()) {
+        window.adsEnabled = false;
+        return;
+      }
+
       if (crazyGamesSDK.isOnCrazyGames()) {
         void updateCrazyGamesNavButton();
       } else {
@@ -414,7 +436,10 @@ class Client {
       const isAdFree =
         userMeResponse !== false && userMeResponse.player?.adfree === true;
       window.adsEnabled =
-        !isAdFree && !crazyGamesSDK.isOnCrazyGames() && !isDesktopShell();
+        !isOpenTroopApp() &&
+        !isAdFree &&
+        !crazyGamesSDK.isOnCrazyGames() &&
+        !isDesktopShell();
       // Ad-eligible users only: paid/adfree users must never load Admiral (its
       // adblock popup fires autonomously once the payload runs). Start watching
       // adblock state; once a blocker is ever detected the in-game ad is
@@ -499,7 +524,7 @@ class Client {
       }
     };
 
-    if ((await userAuth()) === false) {
+    if (isOpenTroopApp() || (await userAuth()) === false) {
       // Not logged in
       onUserMe(false);
     } else {
@@ -510,12 +535,14 @@ class Client {
 
     // Re-run auth when the player signs into CrazyGames mid-session. Logout
     // reloads the page, so only login needs handling here.
-    crazyGamesSDK.addAuthListener(() => {
-      invalidateUserMe();
-      reauthAfterCrazyGamesChange().then((result) =>
-        result === false ? onUserMe(false) : getUserMe().then(onUserMe),
-      );
-    });
+    if (!isOpenTroopApp()) {
+      crazyGamesSDK.addAuthListener(() => {
+        invalidateUserMe();
+        reauthAfterCrazyGamesChange().then((result) =>
+          result === false ? onUserMe(false) : getUserMe().then(onUserMe),
+        );
+      });
+    }
 
     const settingsModal = document.querySelector(
       "user-setting",
@@ -852,6 +879,22 @@ class Client {
     return mode;
   }
 
+  private handleResumeLocalGame() {
+    const activeGame = loadActiveLocalGame();
+    if (!activeGame) return;
+
+    document.dispatchEvent(
+      new CustomEvent<JoinLobbyEvent>("join-lobby", {
+        detail: {
+          gameID: activeGame.gameStartInfo.gameID,
+          gameStartInfo: activeGame.gameStartInfo,
+          resumeTurns: activeGame.turns,
+          source: "singleplayer",
+        },
+      }),
+    );
+  }
+
   private async handleJoinLobby(event: CustomEvent<JoinLobbyEvent>) {
     const lobby = event.detail;
     this.mostRecentJoinEvent = event.timeStamp;
@@ -871,11 +914,12 @@ class Client {
         lobbyInfo: lobby.publicLobbyInfo,
       });
     }
-    // Only update URL immediately for private lobbies, not public ones
-    if (lobby.source !== "public") {
+    // The offline app has no lobby server, so a local match URL must not be
+    // restored through the online lobby checker after a reload.
+    if (!isOpenTroopApp() && lobby.source !== "public") {
       this.updateJoinUrlForShare(lobby.gameID);
     }
-    const auth = await userAuth();
+    const auth = isOpenTroopApp() ? false : await userAuth();
     const playerRole = auth !== false ? (auth.claims.role ?? null) : null;
     // Ensure the one-shot Steam name-seed has settled before reading
     // getUsername(), mirroring how getClanCheck() runs in parallel with the
@@ -898,6 +942,7 @@ class Client {
           ? toWireGameStartInfo(lobby.gameRecord.info)
           : undefined),
       gameRecord: lobby.gameRecord,
+      resumeTurns: lobby.resumeTurns,
     });
 
     if (this.mostRecentJoinEvent !== event.timeStamp) {

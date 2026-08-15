@@ -17,23 +17,12 @@ const randomMap = assetUrl("images/RandomMap.webp");
 
 type MapTab = "featured" | "all" | "favorites";
 
-// Featured grid order: ranked maps first (1 = first), unranked alphabetical.
-const featuredMaps: MapInfo[] = maps
-  .filter((m) => m.categories.includes("featured"))
-  .sort(
-    (a, b) =>
-      (a.featuredRank ?? Number.MAX_SAFE_INTEGER) -
-      (b.featuredRank ?? Number.MAX_SAFE_INTEGER),
-  );
-
-function mapsInCategory(category: MapCategory): MapInfo[] {
-  return maps.filter((m) => m.categories.includes(category));
-}
-
 @customElement("map-picker")
 export class MapPicker extends LitElement {
   @property({ type: String }) selectedMap: GameMapType = GameMapType.World;
   @property({ type: Boolean }) useRandomMap = false;
+  @property({ type: Boolean }) allowRandomMap = true;
+  @property({ attribute: false }) allowedMapIds?: string[];
   @property({ type: Boolean }) showMedals = false;
   @property({ type: Boolean }) randomMapDivider = false;
   @property({ type: String }) searchQuery = "";
@@ -75,6 +64,31 @@ export class MapPicker extends LitElement {
     return mapCategoryOrder.filter((categoryKey) => categoryKey !== "featured");
   }
 
+  private get availableMaps(): MapInfo[] {
+    if (!this.allowedMapIds) return [...maps];
+    // The app bootstrap uses URL-friendly ids ("world"), while map metadata
+    // uses enum ids ("World"). Compare case-insensitively so the release
+    // allow-list cannot accidentally hide every map.
+    const allowedMapIds = new Set(
+      this.allowedMapIds.map((mapId) => mapId.toLowerCase()),
+    );
+    return maps.filter((map) => allowedMapIds.has(map.id.toLowerCase()));
+  }
+
+  private get featuredMaps(): MapInfo[] {
+    return this.availableMaps
+      .filter((m) => m.categories.includes("featured"))
+      .sort(
+        (a, b) =>
+          (a.featuredRank ?? Number.MAX_SAFE_INTEGER) -
+          (b.featuredRank ?? Number.MAX_SAFE_INTEGER),
+      );
+  }
+
+  private mapsInCategory(category: MapCategory): MapInfo[] {
+    return this.availableMaps.filter((m) => m.categories.includes(category));
+  }
+
   private toggleExpandAll() {
     this.expandedCategories =
       this.expandedCategories.size > 0
@@ -89,7 +103,7 @@ export class MapPicker extends LitElement {
   private get filteredMaps(): MapInfo[] {
     if (!this.searchQuery.trim()) return [];
     const query = this.searchQuery.trim().toLowerCase();
-    return maps.filter((m) => {
+    return this.availableMaps.filter((m) => {
       const name = translateText(m.translationKey).toLowerCase();
       const id = m.id.toLowerCase();
       return name.includes(query) || id.includes(query);
@@ -177,14 +191,14 @@ export class MapPicker extends LitElement {
   }
 
   private renderFeaturedTab() {
-    let featuredMapList = featuredMaps;
-    const selected = maps.find((m) => m.type === this.selectedMap);
+    let featuredMapList = this.featuredMaps;
+    const selected = this.availableMaps.find((m) => m.type === this.selectedMap);
     if (
       !this.useRandomMap &&
       selected !== undefined &&
-      !featuredMaps.includes(selected)
+      !this.featuredMaps.includes(selected)
     ) {
-      featuredMapList = [selected, ...featuredMaps];
+      featuredMapList = [selected, ...this.featuredMaps];
     }
     return html`<div class="w-full">
       ${this.renderSectionHeading(translateText("map_categories.featured"))}
@@ -195,7 +209,7 @@ export class MapPicker extends LitElement {
   private renderAllTab() {
     return html`<div class="space-y-3">
       ${this.allCategories.map((categoryKey) =>
-        this.renderCategoryBar(categoryKey, mapsInCategory(categoryKey)),
+        this.renderCategoryBar(categoryKey, this.mapsInCategory(categoryKey)),
       )}
     </div>`;
   }
@@ -245,7 +259,7 @@ export class MapPicker extends LitElement {
       </div>`;
     }
     const favoriteMaps = this.favorites
-      .map((favorite) => maps.find((m) => m.type === favorite))
+      .map((favorite) => this.availableMaps.find((m) => m.type === favorite))
       .filter((m) => m !== undefined);
     return html`<div class="w-full">
       ${this.renderSectionHeading(translateText("map_categories.favorites"))}
@@ -334,7 +348,8 @@ export class MapPicker extends LitElement {
                 ${this.activeTab === "all" ? this.renderExpandToggle() : null}`}
         </div>
         ${isSearching ? this.renderSearchResults() : this.renderActiveTab()}
-        <div
+        ${this.allowRandomMap
+          ? html`<div
           class="w-full ${this.randomMapDivider
             ? "pt-4 border-t border-white/5"
             : ""}"
@@ -369,7 +384,8 @@ export class MapPicker extends LitElement {
               </div>
             </button>
           </div>
-        </div>
+        </div>`
+          : null}
       </div>
     `;
   }

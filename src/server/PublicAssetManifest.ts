@@ -33,6 +33,8 @@ const ROOT_PUBLIC_FILES = new Set([
 
 const manifestCache = new Map<string, AssetManifest>();
 
+export type PublicAssetFilter = (relativePath: string) => boolean;
+
 // Bump this to force-invalidate all CDN-cached assets (e.g. after a bad deploy with wrong cache headers).
 const CACHE_BUST_VERSION = "3";
 
@@ -278,7 +280,10 @@ export function shouldKeepRootPublicFile(relativePath: string): boolean {
   return ROOT_PUBLIC_FILES.has(normalizeAssetPath(relativePath));
 }
 
-export function listHashedPublicAssetPaths(sourceDirs: string[]): string[] {
+export function listHashedPublicAssetPaths(
+  sourceDirs: string[],
+  filter: PublicAssetFilter = () => true,
+): string[] {
   const files = new Set<string>();
   for (const sourceDir of sourceDirs) {
     if (!fs.existsSync(sourceDir)) continue;
@@ -289,7 +294,10 @@ export function listHashedPublicAssetPaths(sourceDirs: string[]): string[] {
         exclude: ["**/.*", ".*"], // .gitignore etc (like dot: false)
       })) {
         if (dirent.isDirectory()) continue;
-        files.add(normalizeAssetPath(toRelativePosixPath(sourceDir, dirent))); // convert dirent (like posix:true)
+        const relativePath = normalizeAssetPath(
+          toRelativePosixPath(sourceDir, dirent),
+        );
+        if (filter(relativePath)) files.add(relativePath);
       }
     }
   }
@@ -311,14 +319,17 @@ export function listRootPublicFiles(resourcesDir: string): string[] {
     .sort();
 }
 
-export function buildPublicAssetManifest(sourceDirs: string[]): AssetManifest {
-  const cacheKey = sourceDirs.join("\0");
+export function buildPublicAssetManifest(
+  sourceDirs: string[],
+  filter: PublicAssetFilter = () => true,
+): AssetManifest {
+  const cacheKey = `${sourceDirs.join("\0")}\0${filter.toString()}`;
   const cached = manifestCache.get(cacheKey);
   if (cached) {
     return cached;
   }
 
-  const hashedPublicAssetPaths = listHashedPublicAssetPaths(sourceDirs);
+  const hashedPublicAssetPaths = listHashedPublicAssetPaths(sourceDirs, filter);
   const rawAssetPaths = hashedPublicAssetPaths.filter(
     (relativePath) => !isDerivedPublicAsset(relativePath),
   );

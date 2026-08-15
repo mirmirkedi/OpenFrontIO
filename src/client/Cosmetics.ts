@@ -30,6 +30,7 @@ import {
   purchaseWithCurrency,
 } from "./Api";
 import { showInGameAlert, showInGameConfirm } from "./InGameModal";
+import { isOpenTroopApp } from "./AppMode";
 import { isPlayingVerified } from "./UsernameInput";
 import { translateText } from "./Utils";
 
@@ -674,6 +675,7 @@ export function resolvedToPlayerPattern(
 }
 
 export async function getPlayerCosmeticsRefs(): Promise<PlayerCosmeticRefs> {
+  if (isOpenTroopApp()) return {};
   const userSettings = new UserSettings();
   // Resolve the profile first: getUserMe activates the per-player cosmetics
   // scope (UserSettings.setPlayerId), which must happen before selections are
@@ -808,6 +810,7 @@ export async function getPlayerCosmeticsRefs(): Promise<PlayerCosmeticRefs> {
 }
 
 export async function getPlayerCosmetics(): Promise<PlayerCosmetics> {
+  if (isOpenTroopApp()) return {};
   const refs = await getPlayerCosmeticsRefs();
   const cosmetics = await fetchCosmetics();
 

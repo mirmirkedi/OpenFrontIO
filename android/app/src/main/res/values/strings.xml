@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">OpenTroop</string>
+    <string name="title_activity_main">OpenTroop</string>
+    <string name="package_name">io.opentroop.game</string>
+    <string name="custom_url_scheme">io.opentroop.game</string>
+</resources>

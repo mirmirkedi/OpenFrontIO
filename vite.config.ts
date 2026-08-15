@@ -149,6 +149,23 @@ function randomWorkerCreateProxy(numWorkers: number): Plugin {
   };
 }
 
+// The Android build is deliberately self-contained: no ads, analytics,
+// authentication widget, or third-party game SDK should ship in its HTML.
+// HTML comments keep index.html valid for Vite/parse5 while this build-time
+// transform removes the marked blocks from the OpenTroop bundle.
+function stripOpenTroopOnlineScripts(): Plugin {
+  return {
+    name: "strip-opentroop-online-scripts",
+    apply: "build" as const,
+    transformIndexHtml(html) {
+      return html.replace(
+        /<!-- OPENTROOP-ONLINE-SCRIPTS-START -->[\s\S]*?<!-- OPENTROOP-ONLINE-SCRIPTS-END -->/g,
+        "",
+      );
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const isProduction = mode === "production";
@@ -157,7 +174,29 @@ export default defineConfig(({ mode }) => {
   const proprietaryDir = getProprietaryDir(__dirname);
   const sourceDirs = [resourcesDir, proprietaryDir];
   const assetManifest: AssetManifest = isProduction
-    ? buildPublicAssetManifest(sourceDirs)
+      ? buildPublicAssetManifest(sourceDirs, (relativePath) => {
+        if (env.OPENTROOP_APP !== "true") return true;
+        if (
+          relativePath.startsWith("images/OpenFront") ||
+          relativePath.startsWith("images/OF.") ||
+          relativePath === "images/Favicon.svg" ||
+          relativePath === "icons/icon512_maskable.png" ||
+          relativePath === "icons/icon512_rounded.png"
+        ) {
+          return false;
+        }
+        if (!relativePath.startsWith("maps/")) return true;
+        const mapIds = new Set(
+          (env.OPENTROOP_MAPS ?? "")
+            .split(",")
+            .map((value) => value.trim().toLowerCase())
+            .filter(Boolean),
+        );
+        // No allow-list means the offline build includes every bundled map.
+        return mapIds.size === 0 || [...mapIds].some((mapId) =>
+          relativePath.startsWith(`maps/${mapId}/`),
+        );
+      })
     : {};
   const cdnBase = env.CDN_BASE ?? "";
   const htmlAssetData = {
@@ -170,8 +209,21 @@ export default defineConfig(({ mode }) => {
     ),
     jwtAudience: JSON.stringify(env.DOMAIN ?? "localhost"),
     instanceId: JSON.stringify(env.INSTANCE_ID ?? "DEV_ID"),
+    openTroopApp: JSON.stringify(env.OPENTROOP_APP === "true"),
+    openTroopMapIds: JSON.stringify(
+      (env.OPENTROOP_MAPS ?? "")
+        .split(",")
+        .map((value) => value.trim().toLowerCase())
+        .filter(Boolean),
+    ),
     manifestHref: buildAssetUrl("manifest.json", assetManifest, cdnBase),
-    faviconHref: buildAssetUrl("images/Favicon.svg", assetManifest, cdnBase),
+    faviconHref: buildAssetUrl(
+      env.OPENTROOP_APP === "true"
+        ? "images/OpenTroopFavicon.svg"
+        : "images/Favicon.svg",
+      assetManifest,
+      cdnBase,
+    ),
     gameplayScreenshotUrl: buildAssetUrl(
       "images/GameplayScreenshot.png",
       assetManifest,
@@ -289,7 +341,13 @@ export default defineConfig(({ mode }) => {
             }),
           ]),
       ...(isProduction
-        ? [injectCdnBaseTemplate(), syncHashedPublicAssets()]
+        ? [
+            ...(env.OPENTROOP_APP === "true"
+              ? [stripOpenTroopOnlineScripts()]
+              : []),
+            injectCdnBaseTemplate(),
+            syncHashedPublicAssets(),
+          ]
         : []),
       tailwindcss(),
     ],

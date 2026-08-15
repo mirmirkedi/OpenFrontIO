@@ -1,6 +1,7 @@
 import { html, LitElement, nothing, type TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { ClientEnv } from "src/client/ClientEnv";
+import { isOpenTroopApp } from "./AppMode";
 import {
   Duos,
   GameMapType,
@@ -55,8 +56,10 @@ export class GameModeSelector extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.lobbySocket.start();
-    this.defaultLobbyTime = ClientEnv.gameCreationRate() / 1000;
+    if (!isOpenTroopApp()) {
+      this.lobbySocket.start();
+      this.defaultLobbyTime = ClientEnv.gameCreationRate() / 1000;
+    }
     window.addEventListener(
       "username-validity-change",
       this.handleValidityChange,
@@ -123,6 +126,8 @@ export class GameModeSelector extends LitElement {
   }
 
   render() {
+    if (isOpenTroopApp()) return this.renderOpenTroopHome();
+
     const ffa = this.lobbies?.games?.["ffa"]?.[0];
     const teams = this.lobbies?.games?.["team"]?.[0];
     const special = this.lobbies?.games?.["special"]?.[0];
@@ -235,6 +240,30 @@ export class GameModeSelector extends LitElement {
             this.openJoinLobby,
             "bg-surface hover:brightness-[1.08] active:brightness-[0.95] hover:scale-105 hover:shadow-[var(--shadow-action-card-hover)]",
             this.hostedLobbyCount(),
+          )}
+        </div>
+      </div>
+    `;
+  }
+
+  private renderOpenTroopHome() {
+    return html`
+      <div class="flex flex-col gap-4 w-full px-4 sm:px-0 mx-auto pb-4">
+        <div
+          class="rounded-2xl border border-malibu-blue/40 bg-surface/90 p-5 text-center shadow-[var(--shadow-malibu-blue)]"
+        >
+          <p class="text-xs font-bold uppercase tracking-[0.2em] text-malibu-blue">
+            OpenTroop
+          </p>
+          <p class="mt-2 text-sm text-white/65">
+            Build your nation and defeat the bots.
+          </p>
+        </div>
+        <div class="h-16">
+          ${this.renderSmallActionCard(
+            translateText("main.solo"),
+            this.openSinglePlayerModal,
+            "bg-malibu-blue hover:bg-aquarius active:bg-malibu-blue/80 hover:scale-y-105 hover:scale-x-[1.01]",
           )}
         </div>
       </div>

@@ -21,7 +21,9 @@ import {
 } from "../core/Util";
 import { getApiBase } from "./Api";
 import { getAuthHeader, getPersistentID } from "./Auth";
+import { isOpenTroopApp } from "./AppMode";
 import { LobbyConfig } from "./ClientGameRunner";
+import { saveActiveLocalGame } from "./LocalPersistantStats";
 import {
   GameSpeedDownIntentEvent,
   GameSpeedUpIntentEvent,
@@ -132,6 +134,13 @@ export class LocalServer {
     }
 
     this.startedAt = Date.now();
+    // Start from a saved offline snapshot before the client receives its
+    // first message. ClientGameRunner applies start.turns in order, rebuilding
+    // the worker state before live turns resume.
+    this.turns = [...(this.lobbyConfig.resumeTurns ?? [])];
+    if (isOpenTroopApp() && this.lobbyConfig.gameStartInfo) {
+      saveActiveLocalGame(this.lobbyConfig.gameStartInfo, this.turns);
+    }
     this.clientConnect();
     if (this.lobbyConfig.gameRecord) {
       this.replayTurns = decompressGameRecord(
@@ -148,7 +157,7 @@ export class LocalServer {
     this.clientMessage({
       type: "start",
       gameStartInfo: this.lobbyConfig.gameStartInfo,
-      turns: [],
+      turns: this.turns,
       lobbyCreatedAt: this.lobbyConfig.gameStartInfo.lobbyCreatedAt,
       // Don't send myClientID for replays — viewer has no player identity.
       myClientID: this.lobbyConfig.gameRecord ? undefined : this.clientID,
@@ -267,6 +276,9 @@ export class LocalServer {
       intents: this.intents,
     };
     this.turns.push(pastTurn);
+    if (isOpenTroopApp() && this.lobbyConfig.gameStartInfo) {
+      saveActiveLocalGame(this.lobbyConfig.gameStartInfo, this.turns);
+    }
     this.intents = [];
     this.clientMessage({
       type: "turn",
@@ -326,6 +338,7 @@ export class LocalServer {
     record: PartialGameRecord,
     unloading: boolean,
   ): Promise<void> {
+    if (isOpenTroopApp()) return;
     this.archiveInFlight = true;
     try {
       const authHeader = await getAuthHeader();

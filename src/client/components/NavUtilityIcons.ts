@@ -1,6 +1,7 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { NavNotificationsController } from "./NavNotificationsController";
+import { isOpenTroopApp } from "../AppMode";
 
 /**
  * The news bell and help "?" as icon buttons, with their notification dots.
@@ -56,9 +57,12 @@ export class NavUtilityIcons extends LitElement {
 
   render(): TemplateResult {
     const currentPage = window.currentPageId;
+    const appMode = isOpenTroopApp();
     return html`
       <div class="flex items-center gap-1">
-        <div class="relative">
+        ${appMode
+          ? ""
+          : html`<div class="relative">
           <button
             class="${this.buttonClass()} ${currentPage === "page-news"
               ? "active"
@@ -86,7 +90,7 @@ export class NavUtilityIcons extends LitElement {
           ${this._notifications.showNewsDot()
             ? this.renderDot("bg-red-500")
             : ""}
-        </div>
+        </div>`}
         <div class="relative">
           <button
             class="${this.buttonClass()} ${currentPage === "page-help"

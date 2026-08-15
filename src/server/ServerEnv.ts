@@ -83,6 +83,21 @@ export class ServerEnv {
   static cdnBase(): string {
     return process.env.CDN_BASE ?? "";
   }
+  static serverHost(): string | undefined {
+    const value = process.env.SERVER_HOST?.trim();
+    return value === "" ? undefined : value;
+  }
+  static openTroopApp(): boolean {
+    return process.env.OPENTROOP_APP === "true";
+  }
+  static openTroopMapIds(): string[] {
+    const configured = process.env.OPENTROOP_MAPS
+      ?.split(",")
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean);
+    // An unset allow-list deliberately means every packaged map is playable.
+    return configured ?? [];
+  }
   static jwtIssuer(): string {
     const audience = ServerEnv.jwtAudience();
     return audience === "localhost"

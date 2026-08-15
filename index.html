@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <title data-i18n="main.title">OpenFront (ALPHA)</title>
+    <title>OpenTroop</title>
     <link rel="manifest" href="<%- manifestHref %>" />
     <link rel="icon" type="image/svg+xml" href="<%- faviconHref %>" />
 
@@ -63,18 +63,18 @@
     </style>
 
     <!-- SEO -->
-    <link rel="canonical" href="https://openfront.io/" />
+    <link rel="canonical" href="https://opentroop.io/" />
     <meta
       name="description"
-      content="Conquer the world in this multiplayer battle royale! Expand your nation, eliminate opponents, and dominate the map in this fast-paced IO game."
+      content="Build your nation, defeat the bots, and conquer the world in OpenTroop."
     />
 
     <!-- Open Graph -->
-    <meta property="og:url" content="https://openfront.io/" />
-    <meta property="og:title" content="OpenFront - Battle Royale" />
+    <meta property="og:url" content="https://opentroop.io/" />
+    <meta property="og:title" content="OpenTroop - Bot Strategy Game" />
     <meta
       property="og:description"
-      content="Conquer the world in this multiplayer battle royale! Expand your nation, eliminate opponents, and dominate the map in this fast-paced IO game."
+      content="Build your nation, defeat the bots, and conquer the world in OpenTroop."
     />
     <meta property="og:image" content="<%- gameplayScreenshotUrl %>" />
     <meta property="og:type" content="game" />
@@ -90,6 +90,8 @@
         turnstileSiteKey: <%- turnstileSiteKey %>,
         jwtAudience: <%- jwtAudience %>,
         instanceId: <%- instanceId %>,<%- typeof serverHost !== "undefined" && serverHost ? "\n        serverHost: " + serverHost + "," : "" %>
+        openTroopApp: <%- openTroopApp %>,
+        openTroopMapIds: <%- openTroopMapIds %>,
       };
       document.documentElement.style.setProperty(
         "--background-image-url",
@@ -105,6 +107,7 @@
       );
     </script>
 
+    <!-- OPENTROOP-ONLINE-SCRIPTS-START -->
     <!-- CrazyGames SDK -->
     <script
       src="https://sdk.crazygames.com/crazygames-sdk-v3.js"
@@ -160,6 +163,7 @@
 
       gtag("config", "G-WQGQQ8RDN4");
     </script>
+    <!-- OPENTROOP-ONLINE-SCRIPTS-END -->
   </head>
 
   <body
@@ -471,13 +475,13 @@
       });
     </script>
 
+    <!-- OPENTROOP-ONLINE-SCRIPTS-START -->
     <!-- Analytics -->
     <script
       defer
       src="https://static.cloudflareinsights.com/beacon.min.js"
       data-cf-beacon='{"token": "03d93e6fefb349c28ee69b408fa25a13"}'
     ></script>
-    <script type="module" src="/src/client/Main.ts"></script>
     <footer>
       <script
         data-cfasync="false"
@@ -485,5 +489,7 @@
         src="//cdn.intergient.com/1025558/75940/ramp.js"
       ></script>
     </footer>
+    <!-- OPENTROOP-ONLINE-SCRIPTS-END -->
+    <script type="module" src="/src/client/Main.ts"></script>
   </body>
 </html>

@@ -19,6 +19,7 @@ import { hasLinkedAccount } from "./Api";
 import "./components/baseComponents/Button";
 import "./components/baseComponents/Modal";
 import { BaseModal } from "./components/BaseModal";
+import { isOpenTroopApp, openTroopMapIds } from "./AppMode";
 import "./components/GameConfigSettings";
 import { MEDAL_ORDER, medalIcon } from "./components/map/Medals";
 import "./components/ToggleInputCard";
@@ -44,10 +45,13 @@ import { terrainMapFileLoader } from "./TerrainMapFileLoader";
 const DEFAULT_OPTIONS = {
   selectedMap: GameMapType.World,
   selectedDifficulty: Difficulty.Easy,
-  bots: 400,
+  // The compact World setup keeps first launch smooth on mid-range Android
+  // devices while still providing a full bot match. Players can opt into the
+  // larger map and higher bot counts from the setup screen.
+  bots: isOpenTroopApp() ? 72 : 400,
   infiniteGold: false,
   infiniteTroops: false,
-  compactMap: false,
+  compactMap: isOpenTroopApp(),
   maxTimer: false,
   maxTimerValue: undefined as number | undefined,
   instantBuild: false,
@@ -408,6 +412,11 @@ export class SinglePlayerModal extends BaseModal {
               map: {
                 selected: this.selectedMap,
                 useRandom: this.useRandomMap,
+                allowRandomMap: !isOpenTroopApp(),
+                allowedMapIds:
+                  isOpenTroopApp() && openTroopMapIds().length > 0
+                    ? openTroopMapIds()
+                    : undefined,
                 showMedals: this.showAchievements,
                 mapWins: this.mapWins,
               },
@@ -566,6 +575,10 @@ export class SinglePlayerModal extends BaseModal {
   }
 
   private handleSelectRandomMap() {
+    if (isOpenTroopApp()) {
+      this.handleMapSelection(GameMapType.World);
+      return;
+    }
     this.useRandomMap = true;
     this.selectedMap = getRandomMapType();
     void this.loadNationCount();

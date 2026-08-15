@@ -85,6 +85,8 @@ export class WorkerClient {
         if (message.type === "initialized") {
           this.isInitialized = true;
           resolve();
+        } else if (message.type === "initialization_error") {
+          reject(new Error(`Game worker failed to initialize: ${message.message}`));
         }
       });
 
@@ -93,7 +95,10 @@ export class WorkerClient {
         id: messageId,
         gameStartInfo: this.gameStartInfo,
         clientID: this.clientID,
-        cdnBase: getCdnBase(),
+        // An inline worker has a blob: URL and therefore no HTTP origin for
+        // resolving paths such as "/_assets/maps/...". Give it the page
+        // origin when a CDN is not configured so its map fetches are absolute.
+        cdnBase: getCdnBase() || window.location.origin,
       });
 
       setTimeout(() => {

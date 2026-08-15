@@ -1,6 +1,8 @@
-import { LitElement, html } from "lit";
+import { LitElement, html, nothing } from "lit";
 import { customElement } from "lit/decorators.js";
 import { assetUrl } from "../../core/AssetUrls";
+import { isOpenTroopApp } from "../AppMode";
+import { loadActiveLocalGame } from "../LocalPersistantStats";
 import "./CosmeticBackground";
 import "./NavAccountMenu";
 import "./NavUtilityIcons";
@@ -15,13 +17,19 @@ export class PlayPage extends LitElement {
   }
 
   render() {
+    const appMode = isOpenTroopApp();
+    const hasSavedGame = appMode && loadActiveLocalGame() !== null;
     return html`
       <div
         id="page-play"
         class="flex flex-col gap-2 w-full px-0 lg:px-4 min-h-0"
       >
-        <token-login class="absolute"></token-login>
-        <rewards-modal class="absolute"></rewards-modal>
+        ${appMode
+          ? nothing
+          : html`
+              <token-login class="absolute"></token-login>
+              <rewards-modal class="absolute"></rewards-modal>
+            `}
 
         <!-- Mobile: Fixed top bar -->
         <div
@@ -59,8 +67,10 @@ export class PlayPage extends LitElement {
               class="col-start-2 flex items-center justify-center text-malibu-blue min-w-0"
             >
               <img
-                src=${assetUrl("images/OpenFrontLogo.svg")}
-                alt="OpenFront"
+                src=${assetUrl(
+                  appMode ? "images/OpenTroopLogo.svg" : "images/OpenFrontLogo.svg",
+                )}
+                alt=${appMode ? "OpenTroop" : "OpenFront"}
                 class="h-full w-auto"
               />
             </div>
@@ -97,9 +107,11 @@ export class PlayPage extends LitElement {
               class="relative bg-surface border-y border-white/10 overflow-visible flex items-center sm:min-h-[60px] sm:flex-1 sm:z-20 sm:border-y-0 sm:rounded-xl"
             >
               <!-- Selected skin/pattern fills the bubble like the player's territory in game. -->
-              <cosmetic-background
-                class="absolute inset-0 z-0 overflow-hidden sm:rounded-xl pointer-events-none"
-              ></cosmetic-background>
+              ${appMode
+                ? nothing
+                : html`<cosmetic-background
+                    class="absolute inset-0 z-0 overflow-hidden sm:rounded-xl pointer-events-none"
+                  ></cosmetic-background>`}
               <div
                 class="relative z-10 flex h-full w-full min-w-0 items-center bg-surface/80 p-1 sm:rounded-xl"
               >
@@ -112,18 +124,34 @@ export class PlayPage extends LitElement {
 
           <!-- Right column: Streaming Now (desktop only), stretched to the left column's
                full height so the top strip has no dead space. -->
-          <streaming-now
-            class="hidden lg:flex lg:h-full lg:flex-col w-full min-w-0"
-          ></streaming-now>
+          ${appMode
+            ? nothing
+            : html`<streaming-now
+                class="hidden lg:flex lg:h-full lg:flex-col w-full min-w-0"
+              ></streaming-now>`}
         </div>
+
+        ${hasSavedGame
+          ? html`
+              <button
+                class="mx-auto w-full max-w-2xl rounded-xl border border-malibu-blue/60 bg-malibu-blue px-6 py-4 text-xl font-bold text-white shadow-lg transition-colors hover:bg-malibu-blue/90"
+                @click=${() =>
+                  document.dispatchEvent(new CustomEvent("resume-local-game"))}
+              >
+                Continue game
+              </button>
+            `
+          : nothing}
 
         <game-mode-selector></game-mode-selector>
 
         <!-- Desktop gets the compact footer button instead. -->
-        <steam-wishlist
-          campaign="home_mobile"
-          class="block px-2 pb-4 lg:hidden"
-        ></steam-wishlist>
+        ${appMode
+          ? nothing
+          : html`<steam-wishlist
+              campaign="home_mobile"
+              class="block px-2 pb-4 lg:hidden"
+            ></steam-wishlist>`}
       </div>
     `;
   }

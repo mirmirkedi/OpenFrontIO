@@ -3,6 +3,7 @@ import { customElement, state } from "lit/decorators.js";
 import { LiveStream, StreamsFeed } from "../core/ApiSchemas";
 import { crazyGamesSDK } from "./CrazyGamesSDK";
 import { isDesktopShell } from "./DesktopShell";
+import { isOpenTroopApp } from "./AppMode";
 import { broadcastKey, streamsFeed, watchUrl } from "./StreamsFeed";
 import { translateText } from "./Utils";
 
@@ -188,7 +189,8 @@ export class FeaturedStream extends LitElement {
     // ads and is third-party content, which breaks CrazyGames' "SDK ads only" policy and
     // Steam's no-in-game-ads rules (and can't satisfy Twitch's parent-domain check in the
     // shell). Matches how the rest of the app suppresses promos off the open web.
-    if (crazyGamesSDK.isOnCrazyGames() || isDesktopShell()) return;
+    if (isOpenTroopApp() || crazyGamesSDK.isOnCrazyGames() || isDesktopShell())
+      return;
     // An ad-free user who chose "hide for today" stays hidden for the rest of that day
     // (only that button writes this key, so an ordinary close never suppresses a later visit).
     // A value from an earlier day is stale: drop it so the next day's stream shows again.

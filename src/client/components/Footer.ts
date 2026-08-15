@@ -1,6 +1,7 @@
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { assetUrl } from "../../core/AssetUrls";
+import { isOpenTroopApp } from "../AppMode";
 import "./SteamWishlistButton";
 
 @customElement("page-footer")
@@ -10,6 +11,17 @@ export class Footer extends LitElement {
   }
 
   render() {
+    if (isOpenTroopApp()) {
+      return html`
+        <footer
+          class="[.in-game_&]:hidden bg-zinc-900/90 backdrop-blur-md flex items-center justify-center py-3 text-xs text-white/45 w-full border-t border-white/10 shrink-0 relative z-50"
+        >
+          OpenTroop · Offline single-player
+          <lang-selector class="hidden"></lang-selector>
+        </footer>
+      `;
+    }
+
     return html`
       <footer
         class="[.in-game_&]:hidden bg-zinc-900/90 backdrop-blur-md flex flex-col items-center justify-center gap-1 pt-1 pb-3 text-white/50 w-full border-t border-white/10 shrink-0 relative z-50 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-center lg:gap-0"

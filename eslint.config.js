@@ -18,6 +18,8 @@ export default [
       "src/server/gatekeeper/**",
       "tests/pathfinding/playground/**",
       ".claude/**",
+      "android/**",
+      "capacitor.config.ts",
     ],
   },
   { files: ["**/*.{js,mjs,cjs,ts}"] },
