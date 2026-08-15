@@ -12,14 +12,7 @@ export class Footer extends LitElement {
 
   render() {
     if (isOpenTroopApp()) {
-      return html`
-        <footer
-          class="[.in-game_&]:hidden bg-zinc-900/90 backdrop-blur-md flex items-center justify-center py-3 text-xs text-white/45 w-full border-t border-white/10 shrink-0 relative z-50"
-        >
-          OpenTroop · Offline single-player
-          <lang-selector class="hidden"></lang-selector>
-        </footer>
-      `;
+      return html``;
     }
 
     return html`

@@ -1,5 +1,7 @@
 import { LitElement, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import { assetUrl } from "../core/AssetUrls";
+import { isOpenTroopApp } from "./AppMode";
 import { translateText } from "./Utils";
 
 @customElement("game-starting-modal")
@@ -13,6 +15,33 @@ export class GameStartingModal extends LitElement {
 
   render() {
     const isVisible = this.isVisible;
+    if (isOpenTroopApp()) {
+      return html`
+        <div
+          class="opentroop-loading fixed inset-0 z-[9999] transition-opacity duration-200 ${isVisible
+            ? "opacity-100 visible"
+            : "opacity-0 invisible"}"
+          role="status"
+          aria-live="polite"
+        >
+          <div class="opentroop-loading__glow" aria-hidden="true"></div>
+          <div class="opentroop-loading__panel">
+            <img
+              class="opentroop-loading__logo"
+              src=${assetUrl("images/OpenTroopLogo.svg")}
+              alt="OpenTroop"
+            />
+            <span class="opentroop-loading__eyebrow">BATTLE LOADING</span>
+            <h2>Preparing the battlefield</h2>
+            <p>Loading map and commanders.</p>
+            <div class="opentroop-loading__progress" aria-hidden="true">
+              <span></span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     return html`
       <div
         class="fixed inset-0 bg-black/30 backdrop-blur-[4px] z-[9998] transition-all duration-300 ${isVisible

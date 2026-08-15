@@ -27,7 +27,7 @@ import { modalHeader } from "./components/ui/ModalHeader";
 import { getPlayerCosmetics } from "./Cosmetics";
 import { crazyGamesSDK } from "./CrazyGamesSDK";
 import { JoinLobbyEvent } from "./Main";
-import { UsernameInput } from "./UsernameInput";
+import { genAnonUsername, UsernameInput } from "./UsernameInput";
 import {
   getBotsForCompactMap,
   getNationsForCompactMap,
@@ -259,6 +259,17 @@ export class SinglePlayerModal extends BaseModal {
   }
 
   protected renderHeaderSlot() {
+    if (isOpenTroopApp()) {
+      return modalHeader({
+        title: "BATTLE SETUP",
+        onBack: () => this.close(),
+        ariaLabel: translateText("common.back"),
+        leftClassName: "opentroop-setup-header__left",
+        buttonClassName: "opentroop-setup-header__back",
+        titleClassName: "opentroop-setup-header__title",
+      });
+    }
+
     return modalHeader({
       title: translateText("main.solo") || "Solo",
       onBack: () => this.close(),
@@ -403,7 +414,7 @@ export class SinglePlayerModal extends BaseModal {
     return html`
       <div class="opentroop-setup-shell flex flex-col h-full">
         <div
-          class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-4 pb-6 mr-1 mx-auto w-full max-w-5xl"
+          class="opentroop-setup-scroll flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-4 pb-6 mr-1 mx-auto w-full max-w-5xl"
         >
           ${isOpenTroopApp()
             ? html`
@@ -871,8 +882,8 @@ export class SinglePlayerModal extends BaseModal {
             players: [
               {
                 clientID,
-                username: usernameInput.getUsername(),
-                clanTag: usernameInput.getClanTag() ?? null,
+                username: usernameInput?.getUsername() ?? genAnonUsername(),
+                clanTag: usernameInput?.getClanTag() ?? null,
                 cosmetics: await getPlayerCosmetics(),
               },
             ],

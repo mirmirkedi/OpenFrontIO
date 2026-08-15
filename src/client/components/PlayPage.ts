@@ -22,6 +22,13 @@ export class PlayPage extends LitElement {
     if (appMode) {
       return html`
         <main id="page-play" class="opentroop-home">
+          <!-- Keep the translation provider mounted in app mode. The visible
+               language selector lives in the legacy footer, which OpenTroop
+               intentionally removes. -->
+          <lang-selector class="hidden" aria-hidden="true"></lang-selector>
+          <!-- The offline lobby uses this shared identity source when it
+               creates a local match; app mode has no visible profile row. -->
+          <username-input class="hidden" aria-hidden="true"></username-input>
           <div class="opentroop-home__aurora" aria-hidden="true"></div>
           <header class="opentroop-home__topbar">
             <div class="opentroop-home__brand">
@@ -68,10 +75,6 @@ export class PlayPage extends LitElement {
 
             <game-mode-selector></game-mode-selector>
           </section>
-
-          <footer class="opentroop-home__footer">
-            <span>BOT BATTLES</span><i></i><span>OFFLINE READY</span>
-          </footer>
         </main>
       `;
     }

@@ -52,6 +52,10 @@ export class DesktopNavBar extends LitElement {
     const currentPage = window.currentPageId;
     const appMode = isOpenTroopApp();
 
+    // OpenTroop renders its own in-game style top bar on the home screen;
+    // keeping the legacy web navigation above it wastes tablet landscape space.
+    if (appMode) return html``;
+
     return html`
       <nav
         class="hidden lg:flex w-full bg-zinc-900/90 backdrop-blur-md items-center justify-center gap-8 py-4 shrink-0 z-50 relative"

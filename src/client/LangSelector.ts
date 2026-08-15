@@ -224,6 +224,8 @@ export class LangSelector extends LitElement {
       "settings-modal",
       "username-input",
       "game-mode-selector",
+      "game-config-settings",
+      "map-picker",
       "graphics-preset-selector",
       "user-setting",
       "o-modal",
