@@ -102,6 +102,7 @@ import "./styles/core/variables.css";
 import "./styles/layout/container.css";
 import "./styles/layout/header.css";
 import "./styles/modal/chat.css";
+import { installUiClickSound } from "./sound/UiClickSound";
 
 declare global {
   interface Window {
@@ -209,6 +210,7 @@ class Client {
     // Keep every mobile-app-only skin scoped away from the original web game.
     if (isOpenTroopApp()) {
       document.body.classList.add("opentroop-app");
+      installUiClickSound(this.eventBus, this.userSettings);
       // A Capacitor WebView reload can preserve a fixed custom element for a
       // frame while bootstrapping the lobby underneath it. App launch always
       // starts at the lobby, so clear any stale result overlay immediately.
