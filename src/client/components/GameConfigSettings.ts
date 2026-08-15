@@ -23,6 +23,7 @@ import {
 } from "../../core/game/Game";
 import { TeamCountConfig } from "../../core/Schemas";
 import { translateText } from "../Utils";
+import { assetUrl } from "../../core/AssetUrls";
 import "./Difficulties";
 import "./FluentSlider";
 import "./map/MapPicker";
@@ -67,7 +68,7 @@ function renderTextCardButton(
   active: boolean,
   onClick: () => void,
   cardExtraClass: string,
-  iconSvg?: SVGTemplateResult,
+  watermarkIcon?: string,
 ): TemplateResult {
   return html`
     <button
@@ -77,7 +78,7 @@ function renderTextCardButton(
       )} flex items-center justify-center"
       @click=${onClick}
     >
-      ${iconSvg ? renderWatermarkIcon(iconSvg) : nothing}
+      ${watermarkIcon ? renderWatermarkIcon(watermarkIcon) : nothing}
       <span class="${CARD_LABEL_CLASS} ${stateTextClass(active)}">
         ${label}
       </span>
@@ -85,20 +86,14 @@ function renderTextCardButton(
   `;
 }
 
-function renderWatermarkIcon(iconSvg: SVGTemplateResult): TemplateResult {
+function renderWatermarkIcon(iconUrl: string): TemplateResult {
   return html`
-    <svg
+    <img
       class="game-config-watermark"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.35"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      src=${iconUrl}
+      alt=""
       aria-hidden="true"
-    >
-      ${iconSvg}
-    </svg>
+    />
   `;
 }
 
@@ -171,28 +166,28 @@ const ENABLES_ICON = svg`<path
   clip-rule="evenodd"
 />`;
 
-const OPTION_WATERMARKS: Record<string, SVGTemplateResult> = {
-  "game_settings.instant_build": svg`<path d="M13.3 2.5 5.8 13h5.1l-.9 8.5L18.2 11h-5.1l.2-8.5Z" />`,
-  "game_settings.random_spawn": svg`<rect x="3.5" y="3.5" width="17" height="17" rx="3" /><circle cx="8" cy="8" r=".7" fill="currentColor" /><circle cx="16" cy="16" r=".7" fill="currentColor" /><circle cx="12" cy="12" r=".7" fill="currentColor" />`,
-  "game_settings.infinite_gold": svg`<circle cx="12" cy="12" r="8.5" /><path d="M9 9.2c.5-1 1.5-1.5 3-1.5 1.7 0 2.8.8 2.8 2s-1 1.8-2.8 2.2-2.8 1-2.8 2.2 1.1 2 2.8 2 2.6-.6 3-1.6" /><path d="M12 6.2v11.6" />`,
-  "game_settings.infinite_troops": svg`<circle cx="9" cy="8" r="3" /><circle cx="16.5" cy="9.5" r="2.3" /><path d="M3.5 19.5c.4-3.1 2.2-4.8 5.5-4.8s5.1 1.7 5.5 4.8M14 14.8c3.1-.2 5.2 1.3 6 4.7" />`,
-  "game_settings.compact_map": svg`<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" /><path d="M9 9 4 4M15 9l5-5M15 15l5 5M9 15l-5 5" />`,
-  "game_settings.water_nukes": svg`<path d="M12 3.5c3.3 4.1 5.2 6.8 5.2 9.6a5.2 5.2 0 1 1-10.4 0C6.8 10.3 8.7 7.6 12 3.5Z" /><path d="M9.5 14.5c.3 1.1 1.1 1.8 2.3 2" />`,
-  "game_settings.doomsday_clock": svg`<circle cx="12" cy="12" r="8.5" /><path d="M12 7v5l3.2 2M8 2.8 6.2 4.2M16 2.8l1.8 1.4" />`,
+const OPTION_WATERMARKS: Record<string, string> = {
+  "game_settings.instant_build": assetUrl("images/BuildIconWhite.svg"),
+  "game_settings.random_spawn": assetUrl("images/ReplayRegularIconWhite.svg"),
+  "game_settings.infinite_gold": assetUrl("images/GoldCoinIcon.svg"),
+  "game_settings.infinite_troops": assetUrl("images/TroopIconWhite.svg"),
+  "game_settings.compact_map": assetUrl("images/GridIconWhite.svg"),
+  "game_settings.water_nukes": assetUrl("images/NukeIconWhite.svg"),
+  "game_settings.doomsday_clock": assetUrl("images/DoomsdayClockSkull.svg"),
 };
 
-const UNIT_WATERMARKS: Partial<Record<UnitType, SVGTemplateResult>> = {
-  [UnitType.City]: svg`<path d="M4 20V9h6v11M10 20V4h5v16M15 20v-8h5v8" /><path d="M6.5 12h1M6.5 15h1M12 7h1M12 10h1M12 13h1M17 15h1M17 18h1" />`,
-  [UnitType.DefensePost]: svg`<path d="m12 3 7 3v5.2c0 4.2-2.8 7.7-7 9.8-4.2-2.1-7-5.6-7-9.8V6l7-3Z" /><path d="M12 8v6M9 11h6" />`,
-  [UnitType.Port]: svg`<path d="M4 18h16M6 18v-4h12v4M8 14V9h8v5M5 21c2.3-1.3 4.7-1.3 7 0 2.3-1.3 4.7-1.3 7 0" /><path d="M12 9V4M9.5 6.5 12 4l2.5 2.5" />`,
-  [UnitType.Warship]: svg`<path d="m3 15 3 3h11l4-3-3-1-2-5H8l-2 5-3 1Z" /><path d="M10 9V6h4v3M12 6V3" />`,
-  [UnitType.TransportShip]: svg`<path d="m3 15 3 3h12l3-3-3-1-1.5-5h-8L7 14l-4 1Z" /><path d="M8 9V6h7v3M4 21c2-1 4-1 6 0s4 1 6 0 3-1 4 0" />`,
-  [UnitType.MissileSilo]: svg`<path d="M7 20V9a5 5 0 0 1 10 0v11M4 20h16M9 13h6M9 16h6" />`,
-  [UnitType.SAMLauncher]: svg`<path d="M5 19h14M7 19l2-6h6l2 6M10 13l2-8 2 8M12 5l5-3M12 5 8 3" />`,
-  [UnitType.AtomBomb]: svg`<circle cx="12" cy="12" r="7.5" /><circle cx="12" cy="12" r="2" /><path d="M12 4.5v5.2M5.5 15.8l4.5-2.6M18.5 15.8 14 13.2" />`,
-  [UnitType.HydrogenBomb]: svg`<path d="M8 4h8l-1 5.2a6 6 0 1 1-6 0L8 4Z" /><path d="M9 4h6M12 9v6M9.5 12h5" />`,
-  [UnitType.MIRV]: svg`<path d="M12 20V8M12 8 8 4M12 8l4-4M8 4v5M16 4v5" /><path d="M5 20h14M8 17h8" />`,
-  [UnitType.Factory]: svg`<path d="M4 20V9l5 3V9l5 3V7h6v13H4Z" /><path d="M8 16h1M12 16h1M16 11h1M16 15h1" />`,
+const UNIT_WATERMARKS: Partial<Record<UnitType, string>> = {
+  [UnitType.City]: assetUrl("images/CityIconWhite.svg"),
+  [UnitType.DefensePost]: assetUrl("images/ShieldIconWhite.svg"),
+  [UnitType.Port]: assetUrl("images/PortIcon.svg"),
+  [UnitType.Warship]: assetUrl("images/BattleshipIconWhite.svg"),
+  [UnitType.TransportShip]: assetUrl("images/BoatIconWhite.svg"),
+  [UnitType.MissileSilo]: assetUrl("images/MissileSiloIconWhite.svg"),
+  [UnitType.SAMLauncher]: assetUrl("images/SamLauncherIconWhite.svg"),
+  [UnitType.AtomBomb]: assetUrl("images/NukeIconWhite.svg"),
+  [UnitType.HydrogenBomb]: assetUrl("images/MushroomCloudIconWhite.svg"),
+  [UnitType.MIRV]: assetUrl("images/MIRVIcon.svg"),
+  [UnitType.Factory]: assetUrl("images/FactoryIconWhite.svg"),
 };
 
 function renderSectionHeader(
