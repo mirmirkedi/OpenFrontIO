@@ -1,5 +1,6 @@
 import version from "resources/version.txt?raw";
 import { ClientEnv } from "src/client/ClientEnv";
+import { assetUrl } from "../core/AssetUrls";
 import { isTemporaryUsername, UserMeResponse } from "../core/ApiSchemas";
 import { EventBus } from "../core/EventBus";
 import {
@@ -287,6 +288,15 @@ class Client {
     // Wait for components to render before setting version
     await customElements.whenDefined("mobile-nav-bar");
     await customElements.whenDefined("desktop-nav-bar");
+
+    // A separately licensed display face keeps WorldFront's main title bold
+    // and game-like without shipping OpenFront's proprietary typeface.
+    const worldFrontDisplayFont = new FontFace(
+      "WorldFront Display",
+      `url(${assetUrl("fonts/RussoOne-Regular.ttf")})`,
+    );
+    document.fonts.add(worldFrontDisplayFont);
+    worldFrontDisplayFont.load().catch(() => {});
 
     const versionElements = document.querySelectorAll(
       "#game-version, .game-version-display",
