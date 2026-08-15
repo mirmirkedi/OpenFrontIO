@@ -627,7 +627,9 @@ export class UserSettings {
   }
 
   soundEffectsVolume(): number {
-    return this.getFloat("settings.soundEffectsVolume", 0);
+    // Effects should be audible on a fresh install. Users can still mute them
+    // explicitly from Settings, which is persisted separately.
+    return this.getFloat("settings.soundEffectsVolume", 0.4);
   }
 
   setSoundEffectsVolume(volume: number): void {

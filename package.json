@@ -10,6 +10,7 @@
     "android:release": "npm run build-worldfront && cap sync android && cap build android --androidreleasetype AAB",
     "start:client": "vite",
     "start:server": "tsx src/server/Server.ts",
+    "start:worldfront": "GAME_ENV=prod NUM_WORKERS=1 DOMAIN=localhost SERVER_HOST=localhost INSTANCE_ID=worldfront-mobile OPENTROOP_APP=true TURNSTILE_SITE_KEY=1x00000000000000000000AA GIT_COMMIT=worldfront-mobile tsx src/server/Server.ts",
     "start:server-dev": "cross-env GAME_ENV=dev NUM_WORKERS=2 TURNSTILE_SITE_KEY=1x00000000000000000000AA API_KEY=WARNING_DEV_API_KEY_DO_NOT_USE_IN_PRODUCTION ADMIN_BOT_API_KEY=WARNING_DEV_ADMIN_BOT_KEY_DO_NOT_USE_IN_PRODUCTION DOMAIN=localhost GIT_COMMIT=DEV tsx src/server/Server.ts",
     "dev": "cross-env GAME_ENV=dev concurrently \"npm run start:client\" \"npm run start:server-dev\"",
     "dev:host": "cross-env GAME_ENV=dev VITE_HOST=lan concurrently \"npm run start:client\" \"npm run start:server-dev\"",
