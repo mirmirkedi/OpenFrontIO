@@ -48,8 +48,7 @@
     "account": "Account",
     "help": "Hiuf",
     "menu": "Menü",
-    "troubleshooting": "Fählerbehäbig",
-    "go_to_troubleshooting": "Gang zu üsere Fehlerbehebigssitte"
+    "troubleshooting": "Fählerbehäbig"
   },
   "news": {
     "github_link": "uf GitHub",
@@ -86,22 +85,6 @@
   "help_modal": {
     "video_tutorial": "Video-Aleitig",
     "video_tutorial_title": "OpenFront.io Aleitig",
-    "hotkeys": "Tastaturbelegige",
-    "table_key": "Schlüssu",
-    "table_action": "Aktion",
-    "action_esc": "Schliesst s Menü. Bircht d Bouvorschou ab.",
-    "action_enter": "Bout e Einheit ungerem Muszeiger",
-    "action_alt_view": "Alternativi Asicht (Bode/Länder)",
-    "action_coordinate_grid": "Koordinateraster-Overlay umschalute",
-    "action_attack_altclick": "Agriff usfüehre (wenn Linksklick ufs \"öffne Menü\" gsteut isch)",
-    "action_build": "Baumenü ufmache",
-    "action_emote": "Emote-Menü ufmache",
-    "action_center": "Karte ufe Spiler zentriere",
-    "action_zoom": "Asicht vergrössere/verchlinere",
-    "action_move_camera": "Kamera bewege",
-    "action_ratio_change": "Agriffsrate verringere/erhöhe",
-    "action_reset_gfx": "Grafike zrüggsetze",
-    "action_auto_upgrade": "Automatisch s nöchschte Gebäude verbessere",
     "ui_section": "Spieuoberflächi",
     "ui_leaderboard": "Ranglischte",
     "ui_your_team": "Dis Team:",
@@ -169,7 +152,6 @@
     "build_mirv": "Mehrfach Zieu Rageete - MIRV",
     "build_mirv_desc": "Die stärchschti bombe im Spiel. Teilt sech i chlineri bombene wo es risigs territorium düe zerstöre. Duet nume dä Spieler beschädige wo du zersch hesch dermit acklickt- Wird vom nächstglägene Raggetesilo abgfüret und landet im territorium wo si isch bout worde.",
     "player_icons": "Spieler-Icons",
-    "troubleshooting_desc": "Wenn du Leistigsproblem, Abstürz oder angeri Problem bim Spiele vo OpenFront hesch, bsuech bitte üsi sitte zur Fehlerbehebig und Diagnose vo hüfige problem:",
     "icon_desc": "Beispüu für einigi ingame Icons, wo du wirsch gseh und was sie bedüte:",
     "icon_crown": "Krone - Nummer 1. Das isch der Top-Spieler ir Ranglsichte.",
     "icon_traitor": "Verbrochene Schild - Verräter. Dä Spieler het e Verbündete agriffe.",
@@ -178,7 +160,6 @@
     "icon_request": "Umschlag - Allianzafrog. Dä Spieler het dir e Allianzafrog gschickt.",
     "info_enemy_panel": "Gägner Info fäud",
     "exit_confirmation": "Bisch du dir würklech sicher, dass du s Spieu wosch verlasse?",
-    "bomb_direction": "Atom / Wasserstoffbombe Bogerichtig",
     "icon_alt_player_leaderboard": "Spieler-Rangliste-Symbou",
     "icon_alt_team_leaderboard": "Team-Rangliste-Symbou"
   },

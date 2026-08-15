@@ -19,18 +19,6 @@
     "wiki": "lipu sona"
   },
   "help_modal": {
-    "hotkeys": "ilo luka",
-    "table_key": "ilo luka",
-    "table_action": "pali",
-    "action_alt_view": "o ante lukin (sijelo ma/ma jan)",
-    "action_attack_altclick": "(ilo luka soto li open e lipu ken la) o utala",
-    "action_build": "o open e lipu pali",
-    "action_emote": "o open e lipu pi tawa musi",
-    "action_center": "o lukin e jan musi",
-    "action_zoom": "o lukin suli anu lili",
-    "action_move_camera": "o tawa e lukin",
-    "action_ratio_change": "o suli anu lili e nanpa utala",
-    "action_reset_gfx": "o pini e ante tawa sitelen",
     "ui_section": "ilo sona musi",
     "ui_leaderboard": "lipu pi jan utala",
     "ui_leaderboard_desc": "lipu pi jan utala li pana e sona ni pi jan utala wawa: nimi en suli ma en mani.",

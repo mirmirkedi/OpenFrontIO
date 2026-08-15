@@ -19,18 +19,6 @@
     "wiki": "Wiki"
   },
   "help_modal": {
-    "hotkeys": "Tasti di scelta rapida",
-    "table_key": "Tasto",
-    "table_action": "Azione",
-    "action_alt_view": "Vista alternata (terreno/paesi)",
-    "action_attack_altclick": "Attacco (quando il clic sinistro è impostato per aprire il menu)",
-    "action_build": "Apri il menu di costruzione",
-    "action_emote": "Apri menu emote",
-    "action_center": "Centra camera sul giocatore",
-    "action_zoom": "Zoom avanti/indietro",
-    "action_move_camera": "Muovi la camera",
-    "action_ratio_change": "Diminuisci/Aumenta Il rapporto di attacco",
-    "action_reset_gfx": "Resetta grafica",
     "ui_section": "Interfaccia Di Gioco",
     "ui_leaderboard": "Classifica",
     "ui_leaderboard_desc": "Mostra i migliori giocatori del gioco e i loro nomi, % di territorio occupato, oro e truppe. Utilizzando Mostra tutto vedi tutti i giocatori in gioco. Se non vuoi vedere la Classifica, fai clic su Nascondi.",

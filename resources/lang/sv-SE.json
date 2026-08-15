@@ -31,18 +31,6 @@
     "title": "Ändringslogg"
   },
   "help_modal": {
-    "hotkeys": "Kortkommandon",
-    "table_key": "Tangent",
-    "table_action": "Åtgärd",
-    "action_alt_view": "Alternativ vy (Terräng/Länder)",
-    "action_attack_altclick": "Anfall (när vänsterklick för meny är aktiverat)",
-    "action_build": "Öppna byggmenyn",
-    "action_emote": "Öppna emote-menyn",
-    "action_center": "Centrera kameran på spelaren",
-    "action_zoom": "Zooma in/ut",
-    "action_move_camera": "Flytta kameran",
-    "action_ratio_change": "Ändra anfallsförhållande",
-    "action_reset_gfx": "Återställ grafik",
     "ui_section": "Spelgränssnitt",
     "ui_leaderboard": "Topplista",
     "ui_your_team": "Ditt lag:",

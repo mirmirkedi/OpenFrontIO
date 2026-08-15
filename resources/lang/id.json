@@ -48,8 +48,7 @@
     "account": "Akun",
     "help": "Bantuan",
     "menu": "Menu",
-    "troubleshooting": "Penyelesaian masalah",
-    "go_to_troubleshooting": "Pergi ke halaman penyelesaian masalah kami"
+    "troubleshooting": "Penyelesaian masalah"
   },
   "news": {
     "github_link": "di GitHub",
@@ -86,22 +85,6 @@
   "help_modal": {
     "video_tutorial": "Video Panduan",
     "video_tutorial_title": "Panduan OpenFront.io",
-    "hotkeys": "Tombol pintas",
-    "table_key": "Kunci",
-    "table_action": "Tindakan",
-    "action_esc": "Menutup menu. Membatalkan pratinjau pembangunan unit.",
-    "action_enter": "Membangun unit di posisi kursor",
-    "action_alt_view": "Ganti Tampilan (Medan / Negara)",
-    "action_coordinate_grid": "Tampilkan/Sembunyikan grid koordinat",
-    "action_attack_altclick": "Serang (saat klik kiri diatur untuk membuka menu)",
-    "action_build": "Buka menu Pembangunan",
-    "action_emote": "Buka menu Ekspresi",
-    "action_center": "Pusatkan kamera pada pemain",
-    "action_zoom": "Perkecil / Perbesar tampilan",
-    "action_move_camera": "Pindahkan kamera",
-    "action_ratio_change": "Kurangi / Tingkatkan rasio serangan",
-    "action_reset_gfx": "Atur ulang grafis",
-    "action_auto_upgrade": "Tingkatkan bangunan terdekat secara otomatis",
     "ui_section": "UI Permainan",
     "ui_leaderboard": "Papan Peringkat",
     "ui_your_team": "Tim anda:",
@@ -169,7 +152,6 @@
     "build_mirv": "MIRV",
     "build_mirv_desc": "Bom paling kuat di dalam permainan. Akan terpecah menjadi bom-bom yang lebih kecil dan mencakup area wilayah yang sangat luas. Hanya memberikan kerusakan kepada pemain yang pertama kali kamu klik saat membangunnya.\nSenjata ini muncul dari Silo Rudal terdekat dan akan mendarat di area yang pertama kali kamu klik saat membangunnya.",
     "player_icons": "Ikon Pemain",
-    "troubleshooting_desc": "Jika Anda mengalami masalah performa, crash, atau masalah lain saat memainkan OpenFront, silakan kunjungi halaman Penyelesaian Masalah kami untuk mendapatkan bantuan dalam mendiagnosis dan memperbaiki masalah umum:",
     "icon_desc": "Berikut beberapa ikon yang akan kamu temui di dalam permainan beserta artinya:",
     "icon_crown": "Mahkota – Peringkat 1. Pemain teratas di papan peringkat.",
     "icon_traitor": "Perisai Retak – Pengkhianat. Pemain ini menyerang sekutu.",
@@ -178,7 +160,6 @@
     "icon_request": "Amplop – Permintaan Aliansi. Pemain ini mengirim permintaan aliansi kepadamu.",
     "info_enemy_panel": "Panel Info Musuh",
     "exit_confirmation": "Apakah yakin keluar dari game?",
-    "bomb_direction": "Arah busur bom atom/hidrogen",
     "icon_alt_player_leaderboard": "Ikon Papan Peringkat Pemain",
     "icon_alt_team_leaderboard": "Ikon Papan Peringkat Tim"
   },

@@ -48,8 +48,7 @@
     "account": "Compte",
     "help": "Ajuda",
     "menu": "Menú",
-    "troubleshooting": "Resolució de problemes",
-    "go_to_troubleshooting": "Ves a la nostra pàgina per resolució problemes"
+    "troubleshooting": "Resolució de problemes"
   },
   "news": {
     "github_link": "a GitHub",
@@ -86,19 +85,6 @@
   "help_modal": {
     "video_tutorial": "Vídeo Tutorial",
     "video_tutorial_title": "Tutorial de OpenFront.io",
-    "hotkeys": "Tecles d'accés ràpid",
-    "table_key": "Clau",
-    "table_action": "Acció",
-    "action_alt_view": "Vista alternativa (terreny/països)",
-    "action_attack_altclick": "Ataca (quan el clic esquerre està configurat per obrir el menú)",
-    "action_build": "Obrir menú de construcció",
-    "action_emote": "Obrir menú de reaccions",
-    "action_center": "Enfocar càmera al jugador",
-    "action_zoom": "Allunyar/apropar",
-    "action_move_camera": "Moure càmera",
-    "action_ratio_change": "Reduir/Augmentar la ràtio d'atac",
-    "action_reset_gfx": "Restablir gràfics",
-    "action_auto_upgrade": "Millora automàtica de l'estructura més propera",
     "ui_section": "Interfície del joc",
     "ui_leaderboard": "Taulell de classificació",
     "ui_your_team": "El teu equip:",
@@ -166,7 +152,6 @@
     "build_mirv": "MIRV",
     "build_mirv_desc": "La bomba més poderosa del joc. Es trenca en nombroses bombes petites que cobriran un vast terreny. Només danya al jugador que has seleccionat. Surt del Llançador de Míssils més proper i cau a on has clicat per llançar-la.",
     "player_icons": "Icones de jugador",
-    "troubleshooting_desc": "Si experimenteu problemes de rendiment, bloquejos o altres problemes mentre jugueu a OpenFront, visiteu la nostra pàgina de resolució de problemes per obtenir ajuda per diagnosticar i solucionar els problemes més comuns:",
     "icon_desc": "Exemples d'algunes de les icones del joc que trobaràs i què volen dir:",
     "icon_crown": "Corona - Número 1. Aquest és el jugador número u de la classificació.",
     "icon_traitor": "Escut trencat - Traïdor. Aquest jugador ha atacat un aliat.",
@@ -175,7 +160,6 @@
     "icon_request": "Sobre - Sol·licitud d'aliança. Aquest jugador t'ha enviat una sol·licitud d'aliança.",
     "info_enemy_panel": "Tauler d'informació de l'enemic",
     "exit_confirmation": "Estàs segur que vols sortir de la partida?",
-    "bomb_direction": "Direcció de l'arc de la bomba",
     "icon_alt_player_leaderboard": "Icona del Taulell de classificació",
     "icon_alt_team_leaderboard": "Icona de la classificació de l'equip"
   },

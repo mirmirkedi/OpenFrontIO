@@ -70,19 +70,6 @@
     "title": "Sürüm Notları"
   },
   "help_modal": {
-    "hotkeys": "Kısayol Tuşları",
-    "table_key": "Tuş",
-    "table_action": "İşlem",
-    "action_alt_view": "Alternatif görünüm (arazi/ülkeler)",
-    "action_attack_altclick": "Saldır (sol tıklama menü açmaya ayarlıysa)",
-    "action_build": "İnşa menüsünü aç",
-    "action_emote": "İfade menüsünü aç",
-    "action_center": "Kamerayı oyuncuya ortala",
-    "action_zoom": "Uzaklaştır/Yakınlaştır",
-    "action_move_camera": "Kamerayı haraket ettir",
-    "action_ratio_change": "Saldırı oranını Azalt/Artır",
-    "action_reset_gfx": "Grafikleri sıfırla",
-    "action_auto_upgrade": "En yakın binayı oto-yükselt",
     "ui_section": "Oyun Arayüzü",
     "ui_leaderboard": "Lider Tablosu",
     "ui_your_team": "Takımın:",
@@ -160,8 +147,7 @@
     "icon_embargo": "Üstü çizili Dolar - Ambargo. Bu oyuncu sizinle ticareti otomatik veya manuel olarak durdurmuş.",
     "icon_request": "Zarf - İttifak isteği. Bu oyuncu size ittifak isteği göndermiş.",
     "info_enemy_panel": "Düşman bilgi paneli",
-    "exit_confirmation": "Oyundan çıkmak istediğine emin misin?",
-    "bomb_direction": "Atom / Hidrojen bombası yay yönü"
+    "exit_confirmation": "Oyundan çıkmak istediğine emin misin?"
   },
   "single_modal": {
     "title": "Tekli",

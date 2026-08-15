@@ -48,8 +48,7 @@
     "account": "Konto",
     "help": "Abi",
     "menu": "Menüü",
-    "troubleshooting": "Tõrkeotsing",
-    "go_to_troubleshooting": "Mine meie tõrkeotsingu lehele"
+    "troubleshooting": "Tõrkeotsing"
   },
   "news": {
     "github_link": "GitHub'is",
@@ -86,19 +85,6 @@
   "help_modal": {
     "video_tutorial": "Videoõpetus",
     "video_tutorial_title": "OpenFront.io õpetus",
-    "hotkeys": "Kiirklahvid",
-    "table_key": "Klahv",
-    "table_action": "Tegevus",
-    "action_alt_view": "Alternatiivne vaade (maastik/riigid)",
-    "action_attack_altclick": "Ründa (kui vasak klõps on seatud menüü avamiseks)",
-    "action_build": "Ava ehitiste menüü",
-    "action_emote": "Ava emotsioonide menüü",
-    "action_center": "Keskenda kaamera mängijale",
-    "action_zoom": "Suumi välja/sisse",
-    "action_move_camera": "Liiguta kaamerat",
-    "action_ratio_change": "Rünnaku suhte vähendamine/suurendamine",
-    "action_reset_gfx": "Graafikate lähtestamine",
-    "action_auto_upgrade": "Lähima ehitise automaatne uuendamine",
     "ui_section": "Mängu UI",
     "ui_leaderboard": "Edetabel",
     "ui_your_team": "Sinu tiim:",
@@ -166,7 +152,6 @@
     "build_mirv": "MIRV",
     "build_mirv_desc": "Mängu kõige võimsam pomm. Jaguneb väiksemateks pommideks, mis katavad väga suure ala. Kahjustab ainult seda mängijat, kellele peale esimesena klõpsasid. Tekib lähimast raketisilost ja langeb piirkonda, kuhu algselt klõpsasid.",
     "player_icons": "Mängija ikoonid",
-    "troubleshooting_desc": "Kui sul tekib OpenFronti mängimise ajal jõudlusprobleeme, krahhe või muid tõrkeid, külasta palun meie tõrkeotsingu lehte, et saada abi levinud probleemide tuvastamisel ja lahendamisel:",
     "icon_desc": "Näited mõningatest mängusisestest ikoonidest, millega võid kokku puutuda, ja nende tähendused:",
     "icon_crown": "Kroon - Esimene koht edetabelil.",
     "icon_traitor": "Katkine kilp - Reetur. See mängija on rünnanud oma liitlast.",
@@ -175,7 +160,6 @@
     "icon_request": "Ümbrik – liidupäring. See mängija on sulle saatnud liidupäringu.",
     "info_enemy_panel": "Vaenlase infopaneel",
     "exit_confirmation": "Kas oled kindel, et soovid mängust lahkuda?",
-    "bomb_direction": "Tuuma- või vesinikupommi kaare suund",
     "icon_alt_player_leaderboard": "Mängija edetabeli ikoon",
     "icon_alt_team_leaderboard": "Tiimi edetabeli ikoon"
   },

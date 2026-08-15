@@ -16,18 +16,6 @@
     "wiki": "Wiki"
   },
   "help_modal": {
-    "hotkeys": "Prečice",
-    "table_key": "Taster",
-    "table_action": "Efekat",
-    "action_alt_view": "Alternativni prikaz (teren / države)",
-    "action_attack_altclick": "Napad (ukoliko je levi klik podešen da otvara izbornik)",
-    "action_build": "Otvara izbornik za izgradnju",
-    "action_emote": "Otvori izbornik emotikona",
-    "action_center": "Centrira kameru na igrača",
-    "action_zoom": "Približi / udalji",
-    "action_move_camera": "Pomera kameru",
-    "action_ratio_change": "Povećava / umanjuje razmjer napada",
-    "action_reset_gfx": "Resetovanje grafike",
     "ui_section": "Korisnički interfejs igre",
     "ui_leaderboard": "Ljestvica",
     "ui_leaderboard_desc": "Prikazuje vodeće igrače partije - njihova imena, procenat ukupne teritorije i zlato.",

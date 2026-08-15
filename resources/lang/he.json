@@ -78,7 +78,6 @@
     "store": "חנות",
     "terms_of_service": "תנאים והגבלות",
     "user_avatar_alt": "הדמות של {username}",
-    "go_to_troubleshooting": "עבור לדף פתרון הבעיות שלנו",
     "troubleshooting": "פתרון בעיות"
   },
   "news": {
@@ -87,18 +86,6 @@
     "title": "פרטי הגרסה"
   },
   "help_modal": {
-    "hotkeys": "מקשי קיצור",
-    "table_key": "מקש",
-    "table_action": "פעולה",
-    "action_alt_view": "צפיה חלופית (שטח\\מדינות)",
-    "action_attack_altclick": "תקוף (כשלחצן עכבר שמאלי פותח תפריט)",
-    "action_build": "פתח תפריט בניה",
-    "action_emote": "פתח תפריט אימוג'ים",
-    "action_center": "מרכז מצלמה על השחקן",
-    "action_zoom": "התקרב\\התרחק",
-    "action_move_camera": "הזז מצלמה",
-    "action_ratio_change": "הקטן\\הגדל יחס תקיפה",
-    "action_reset_gfx": "אפס גרפיקה",
     "ui_section": "ממשק המשחק",
     "ui_leaderboard": "לוח מובילים",
     "ui_your_team": "הקבוצה שלך:",

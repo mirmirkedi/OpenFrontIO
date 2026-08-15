@@ -16,18 +16,6 @@
     "wiki": "विकी"
   },
   "help_modal": {
-    "hotkeys": "हट की]",
-    "table_key": "Key",
-    "table_action": "कार्य",
-    "action_alt_view": "वैकल्पिक दृश्य (भूगोल/देश)",
-    "action_attack_altclick": "हमला (जब बाएं क्लिक को मेनू खोलने के लिए सेट किया गया हो)",
-    "action_build": "निर्माण मेनू खोलें",
-    "action_emote": "इमोजी मेन्यू खोलें",
-    "action_center": "कैमरा खिलाड़ी पर फोकस करें",
-    "action_zoom": "जूम आउट/इन करें",
-    "action_move_camera": "कैमरा हिलाएं",
-    "action_ratio_change": "आक्रमण अनुपात घटाएं/वृद्धि करें",
-    "action_reset_gfx": "ग्राफिक्स को रीसेट करें",
     "ui_section": "Game UI",
     "ui_leaderboard": "लीडरबोर्ड",
     "ui_leaderboard_desc": "खेल के शीर्ष खिलाड़ियों और उनके नाम, स्वामित्व वाली ज़मीन और सोने का प्रतिशत दिखाता है।",

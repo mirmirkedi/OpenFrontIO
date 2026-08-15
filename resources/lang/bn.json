@@ -16,18 +16,6 @@
     "wiki": "উইকি"
   },
   "help_modal": {
-    "hotkeys": "হট-কী",
-    "table_key": "Key",
-    "table_action": "কাজ",
-    "action_alt_view": "বিকল্প দৃশ্য (ভূখণ্ড/দেশ)",
-    "action_attack_altclick": "আক্রমণ (যখন বাম ক্লিক মেনু খুলতে সেট করা হয়)",
-    "action_build": "নির্মাণ মেনু খুলুন",
-    "action_emote": "ইমোজি মেনু খুলুন",
-    "action_center": "ক্যামেরা খেলোয়াড়ে ফোকাস করুন",
-    "action_zoom": "জুম আউট/ইন করুন",
-    "action_move_camera": "ক্যামেরা সরান",
-    "action_ratio_change": "আক্রমণ অনুপাত কমান/বাড়ান",
-    "action_reset_gfx": "গ্রাফিক্স রিসেট করুন",
     "ui_section": "Game UI",
     "ui_leaderboard": "লিডারবোর্ড",
     "ui_leaderboard_desc": "খেলার শীর্ষ খেলোয়াড় এবং তাদের নাম, মালিকানাধীন জমি এবং সোনার শতাংশ দেখায়।",

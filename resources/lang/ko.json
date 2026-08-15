@@ -48,8 +48,7 @@
     "account": "계정",
     "help": "도움말",
     "menu": "메뉴",
-    "troubleshooting": "문제 해결하기",
-    "go_to_troubleshooting": "문제 해결 페이지로 이동"
+    "troubleshooting": "문제 해결하기"
   },
   "news": {
     "github_link": " (깃허브)",
@@ -86,19 +85,6 @@
   "help_modal": {
     "video_tutorial": "동영상 튜토리얼",
     "video_tutorial_title": "오픈프론트 튜토리얼",
-    "hotkeys": "단축키",
-    "table_key": "키",
-    "table_action": "동작",
-    "action_alt_view": "지도 보기 전환 (지형/국가)",
-    "action_attack_altclick": "공격 (좌클릭을 메뉴 열기로 설정한 경우)",
-    "action_build": "건설 메뉴 열기",
-    "action_emote": "감정표현 메뉴 열기",
-    "action_center": "플레이어를 화면 가운데로",
-    "action_zoom": "확대 / 축소",
-    "action_move_camera": "카메라 움직이기",
-    "action_ratio_change": "공격 비율 낮추기 / 높이기",
-    "action_reset_gfx": "그래픽 초기화",
-    "action_auto_upgrade": "가장 가까운 건물 자동 업그레이드",
     "ui_section": "게임 UI",
     "ui_leaderboard": "순위표",
     "ui_your_team": "나의 팀:",
@@ -166,7 +152,6 @@
     "build_mirv": "다탄두 미사일",
     "build_mirv_desc": "게임 내에서 가장 강력한 폭탄입니다. 여러 개의 작은 폭탄으로 분리되어 넓은 지역을 동시에 공격합니다. 처음 클릭한 플레이어에게만 피해를 줍니다. 가장 가까운 미사일 사일로에서 발사되며, 처음 클릭한 지역에 착륙합니다.",
     "player_icons": "플레이어 아이콘",
-    "troubleshooting_desc": "오픈프론트 플레이 중 성능 문제, 충돌 또는 기타 문제가 발생하는 경우, 일반적인 문제의 진단 및 해결에 대한 도움을 받으려면 문제 해결 페이지를 방문하세요.",
     "icon_desc": "게임 내에서 볼 수 있는 아이콘 중 일부와 그 의미는 다음과 같습니다.",
     "icon_crown": "왕관 - 1등. 순위에서 최상위 플레이어를 의미합니다.",
     "icon_traitor": "깨진 방패 - 배신자. 이 플레이어는 동맹을 공격했습니다.",
@@ -175,7 +160,6 @@
     "icon_request": "봉투 - 동맹 요청. 이 플레이어가 당신에게 동맹을 요청했습니다.",
     "info_enemy_panel": "적 정보판",
     "exit_confirmation": "정말 게임을 종료 하시겠습니까?",
-    "bomb_direction": "원자 / 수소 폭탄 궤적 방향",
     "icon_alt_player_leaderboard": "플레이어 순위표 아이콘",
     "icon_alt_team_leaderboard": "팀 순위표 아이콘"
   },

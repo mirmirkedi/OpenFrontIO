@@ -19,18 +19,6 @@
     "wiki": "Wiki"
   },
   "help_modal": {
-    "hotkeys": "Atajos de Teclado",
-    "table_key": "Tecla",
-    "table_action": "Acción",
-    "action_alt_view": "Vista alternativa (terreno/países)",
-    "action_attack_altclick": "Ataque (cuando el botón izquierdo está configurado para abrir el menú)",
-    "action_build": "Abrir menú de construcción",
-    "action_emote": "Abrir menú de emojis",
-    "action_center": "Centrar cámara en jugador",
-    "action_zoom": "Ampliar/acercar",
-    "action_move_camera": "Mover cámara",
-    "action_ratio_change": "Disminuir/Incrementar proporción de ataque",
-    "action_reset_gfx": "Reiniciar gráficos",
     "ui_section": "IU de juego",
     "ui_leaderboard": "Clasificación",
     "ui_leaderboard_desc": "Muestra a los mejores jugadores de la partida y sus nombres, % tierra en propiedad, oro y tropas. Usando \"Mostrar todos\" puedes ver todos los jugadores de la partida. Si no quieres ver la tabla de posiciones, haz clic en Ocultar.",

@@ -58,19 +58,6 @@
     "title": "Release-opmerkingen"
   },
   "help_modal": {
-    "hotkeys": "Sneltoetsen",
-    "table_key": "Sneltoets",
-    "table_action": "Actie",
-    "action_alt_view": "Weergave wisselen (terrein/landen)",
-    "action_attack_altclick": "Aanvallen (als linkermuisknop is ingesteld op menu openen)",
-    "action_build": "Open bouwmenu",
-    "action_emote": "Open emoji-menu",
-    "action_center": "Camera centreren op speler",
-    "action_zoom": "In-/uitzoomen",
-    "action_move_camera": "Camera bewegen",
-    "action_ratio_change": "Aanvalsverhouding verlagen/verhogen",
-    "action_reset_gfx": "Grafische instellingen herstellen",
-    "action_auto_upgrade": "Auto-upgrade het dichtstbijzijnde gebouw",
     "ui_section": "Spel-UI",
     "ui_leaderboard": "Leidersbord",
     "ui_your_team": "Jouw team:",
@@ -148,8 +135,7 @@
     "icon_embargo": "Dollar stopbord - Embargo. Deze speler heeft de handel met jou gestopt, automatisch of handmatig.",
     "icon_request": "Envelop - Alliantieverzoek. Deze speler stuurde je een verzoek om bondgenoten te worden.",
     "info_enemy_panel": "Infopaneel vijand",
-    "exit_confirmation": "Weet je zeker dat je dit spel wilt verlaten?",
-    "bomb_direction": "Atoom- / waterstofbom boogrichting"
+    "exit_confirmation": "Weet je zeker dat je dit spel wilt verlaten?"
   },
   "single_modal": {
     "title": "Solo",
