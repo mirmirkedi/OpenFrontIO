@@ -3,6 +3,7 @@ import { customElement, state } from "lit/decorators.js";
 import { assetUrl } from "../../../core/AssetUrls";
 import { EventBus } from "../../../core/EventBus";
 import { GameType } from "../../../core/game/Game";
+import { isOpenTroopApp } from "../../AppMode";
 import { createNextLobby } from "../../Api";
 import { ClientEnv } from "../../ClientEnv";
 import "../../components/DoomsdayClockPanel";
@@ -374,7 +375,7 @@ export class GameRightSidebar extends LitElement implements Controller {
           <img src=${settingsIcon} alt="settings" width="20" height="20" />
         </div>
 
-        ${document.fullscreenEnabled && !this.onCrazyGames
+        ${document.fullscreenEnabled && !this.onCrazyGames && !isOpenTroopApp()
           ? html`<div
               class="cursor-pointer"
               @click=${this.onFullscreenButtonClick}

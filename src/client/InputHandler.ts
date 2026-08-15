@@ -749,6 +749,10 @@ export class InputHandler {
       return;
     }
 
+    // Tapping the battlefield returns to the uncluttered command view. Each
+    // HUD layer decides whether it currently has a transient panel to close.
+    this.eventBus.emit(new CloseViewEvent());
+
     this.pointerDown = true;
     this.pointers.set(event.pointerId, event);
 

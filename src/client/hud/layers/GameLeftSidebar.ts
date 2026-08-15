@@ -5,6 +5,7 @@ import { assetUrl } from "../../../core/AssetUrls";
 import type { EventBus } from "../../../core/EventBus";
 import { GameMode, type Team } from "../../../core/game/Game";
 import type { Controller } from "../../Controller";
+import { CloseViewEvent } from "../../InputHandler";
 import { Platform } from "../../Platform";
 import { themeProvider } from "../../theme/ThemeProvider";
 import { getTranslatedPlayerTeamLabel, translateText } from "../../Utils";
@@ -57,6 +58,11 @@ export class GameLeftSidebar extends LitElement implements Controller {
     });
     this.eventBus?.on(ImmunityBarVisibleEvent, (e) => {
       this.immunityBarVisible = e.visible;
+    });
+    this.eventBus?.on(CloseViewEvent, () => {
+      if (!this.isPlayerStatsShown && !this.isTeamStatsShown) return;
+      this.isPlayerStatsShown = false;
+      this.isTeamStatsShown = false;
     });
     if (this.isTeamGame) {
       this.isPlayerTeamLabelVisible = true;

@@ -2,7 +2,7 @@ import { html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { EventBus } from "../../../core/EventBus";
 import { Controller } from "../../Controller";
-import { ReplaySpeedChangeEvent } from "../../InputHandler";
+import { CloseViewEvent, ReplaySpeedChangeEvent } from "../../InputHandler";
 import {
   defaultReplaySpeedMultiplier,
   ReplaySpeedMultiplier,
@@ -40,6 +40,9 @@ export class ReplayPanel extends LitElement implements Controller {
       this.eventBus.on(ShowReplayPanelEvent, (event: ShowReplayPanelEvent) => {
         this.visible = event.visible;
         this.isSingleplayer = event.isSingleplayer;
+      });
+      this.eventBus.on(CloseViewEvent, () => {
+        if (this.visible) this.visible = false;
       });
       this.eventBus.on(
         ReplaySpeedChangeEvent,
