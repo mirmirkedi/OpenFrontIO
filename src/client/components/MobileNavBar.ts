@@ -68,6 +68,10 @@ export class MobileNavBar extends LitElement {
     const currentPage = window.currentPageId;
     const appMode = isOpenTroopApp();
 
+    // WorldFront renders its own full-screen mobile shell. Keeping the legacy
+    // web drawer mounted here makes WebView show a second, offset lobby.
+    if (appMode) return html``;
+
     return html`
       <!-- Border Segments (Custom right border with gap for button) -->
       <div

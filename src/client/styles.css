@@ -136,6 +136,15 @@ body {
     linear-gradient(155deg, #07101e 0%, #0b1d32 47%, #060b14 100%);
 }
 
+/* The Android shell owns its full-screen navigation. Do not leave the
+   legacy web drawer mounted beside it; on WebView this looks like a second
+   copy of the lobby offset to the left. */
+.opentroop-app #sidebar-menu,
+.opentroop-app #mobile-menu-backdrop,
+.opentroop-app desktop-nav-bar {
+  display: none !important;
+}
+
 .opentroop-main-scroll {
   max-width: none !important;
   min-height: 0;
