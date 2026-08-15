@@ -647,7 +647,9 @@ body {
   letter-spacing: 0.1em;
 }
 .opentroop-setup-scroll {
-  overscroll-behavior: contain;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: auto;
   scrollbar-gutter: stable;
 }
 
