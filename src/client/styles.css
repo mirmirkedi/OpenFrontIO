@@ -537,6 +537,75 @@ body {
 @keyframes opentroop-loading-pulse { to { opacity: .38; } }
 @media (prefers-reduced-motion: reduce) { .opentroop-loading__progress i { animation: none !important; } }
 
+/* In-game HUD: this only skins the existing controls. Input, game-state and
+   rendering logic stay inside their original components. */
+.opentroop-app.in-game {
+  background: #020912;
+}
+.opentroop-app.in-game div:has(> control-panel) {
+  border: 1px solid rgba(104, 210, 255, .32);
+  background: linear-gradient(180deg, rgba(8, 37, 62, .94), rgba(3, 17, 30, .96)) !important;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, .34), inset 0 1px rgba(167, 233, 255, .14);
+}
+.opentroop-app.in-game control-panel > div {
+  padding: 8px 10px;
+}
+.opentroop-app.in-game control-panel [class*="border-yellow"] {
+  border-color: rgba(255, 211, 91, .9);
+  border-radius: 8px;
+  background: rgba(109, 72, 10, .22);
+}
+.opentroop-app.in-game control-panel [class*="border-green"],
+.opentroop-app.in-game control-panel [class*="border-orange"] {
+  border-radius: 8px;
+  background: rgba(4, 22, 35, .74);
+}
+.opentroop-app.in-game game-right-sidebar aside {
+  min-height: 46px;
+  gap: 12px;
+  border: 1px solid rgba(116, 219, 255, .28);
+  border-top: 0;
+  border-right: 0;
+  border-radius: 0 0 0 16px;
+  background: linear-gradient(135deg, rgba(5, 33, 55, .96), rgba(2, 16, 29, .96)) !important;
+  box-shadow: -8px 7px 20px rgba(0, 0, 0, .25), inset 0 1px rgba(177, 235, 255, .12);
+}
+.opentroop-app.in-game game-right-sidebar aside > div.cursor-pointer {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border: 1px solid rgba(131, 218, 255, .17);
+  border-radius: 8px;
+  background: rgba(1, 15, 26, .42);
+}
+.opentroop-app.in-game game-right-sidebar aside > div.cursor-pointer:active { transform: scale(.92); }
+.opentroop-app.in-game game-left-sidebar aside {
+  padding: 8px;
+  border: 1px solid rgba(116, 219, 255, .28);
+  border-top: 0;
+  border-left: 0;
+  border-radius: 0 0 16px 0;
+  background: linear-gradient(225deg, rgba(5, 33, 55, .96), rgba(2, 16, 29, .96)) !important;
+  box-shadow: 8px 7px 20px rgba(0, 0, 0, .25), inset 0 1px rgba(177, 235, 255, .12);
+}
+.opentroop-app.in-game game-left-sidebar [role="button"] {
+  padding: 5px;
+  border-color: rgba(128, 218, 255, .24) !important;
+  border-radius: 8px;
+  background: rgba(1, 15, 26, .42) !important;
+}
+@media (max-width: 639px) {
+  .opentroop-app.in-game div:has(> control-panel) {
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 18px 18px 0 0;
+  }
+  .opentroop-app.in-game game-right-sidebar aside { min-height: 42px; gap: 8px; }
+  .opentroop-app.in-game game-right-sidebar aside > div.cursor-pointer { width: 27px; height: 27px; }
+}
+
 @media (max-width: 520px) {
   .opentroop-setup-intro { margin-bottom: 14px; padding: 16px; border-radius: 16px; }
   .opentroop-setup-intro h2 { font-size: 26px; }

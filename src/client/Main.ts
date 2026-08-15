@@ -206,6 +206,11 @@ class Client {
   async initialize(): Promise<void> {
     crazyGamesSDK.maybeInit();
 
+    // Keep every mobile-app-only skin scoped away from the original web game.
+    if (isOpenTroopApp()) {
+      document.body.classList.add("opentroop-app");
+    }
+
     // Register modals with the URL router. Lobby modals (join/host) and
     // matchmaking are intentionally omitted — they own their own URL state
     // (path-based) or none at all.
