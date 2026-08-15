@@ -185,14 +185,23 @@ export const MAX_HOSTED_LOBBIES = 10;
 // deadline; relisting starts a fresh one.
 export const HOSTED_LOBBY_AUTO_START_MS = 5 * 60 * 1000;
 
-// Bounds duplicate MIN/MAX_USERNAME_LENGTH, which can't be imported here:
-// validations/username.ts imports this schema, so the dependency only runs
-// one way. Keep them in step — UsernameValidation.test.ts asserts it.
+// Deliberately looser than MAX_USERNAME_LENGTH, which caps what the form will
+// accept at 20. This schema also reads data at rest: it backs PlayerSchema,
+// so every archived GameRecord embeds names written under the rules of its
+// era. Lowering the bound doesn't rewrite those records — it makes them
+// unparseable, which dead-ends replay links (JoinLobbyModal parses before the
+// gitCommit check, so a failure never reaches the versioned-shell fallback)
+// and share previews (GamePreviewBuilder). Widen freely; never narrow.
+//
+// The charset accepts everything AccountUsernameSchema can produce, hyphens
+// included, so a verified account name is always representable on the wire —
+// verified play skips free-form validation, so an unrepresentable name would
+// reach the server and be closed with 1002.
 export const UsernameSchema = z
   .string()
-  .regex(/^(?=.*\S)[a-zA-Z0-9_ üÜ.]+$/u)
+  .regex(/^(?=.*\S)[a-zA-Z0-9_\- üÜ.]+$/u)
   .min(3)
-  .max(20);
+  .max(27);
 
 export const ClanTagSchema = z
   .string()
