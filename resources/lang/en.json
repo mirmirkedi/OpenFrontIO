@@ -1001,19 +1001,6 @@
     "win_score_tooltip": "Weighted wins based on clan participation and match difficulty",
     "your_ranking": "Your Ranking"
   },
-  "worldfront": {
-    "active_battle": "ACTIVE BATTLE",
-    "continue_game": "Continue game",
-    "home_description": "Choose a battlefield, outsmart the bots, and build your empire.",
-    "home_eyebrow": "SOLO CAMPAIGN",
-    "home_title": "Command the world.",
-    "play_badge": "WORLD DOMINATION",
-    "play_description": "Play against bots on any map.",
-    "play_title": "Ready for battle?",
-    "setup_description": "Pick a map and challenge. You will choose your own starting territory after the battle begins.",
-    "setup_header": "BATTLE SETUP",
-    "setup_title": "Choose your battlefield."
-  },
   "main": {
     "account": "Account",
     "clans": "Clans",
@@ -1894,5 +1881,17 @@
     "you_won": "You Won!",
     "your_team": "Your team won!",
     "youtube_tutorial": "Need some help?"
+  },
+  "worldfront": {
+    "active_battle": "ACTIVE BATTLE",
+    "continue_game": "Continue game",
+    "home_description": "Choose a battlefield, outsmart the bots, and build your empire.",
+    "home_eyebrow": "SOLO CAMPAIGN",
+    "home_title": "Command the world.",
+    "language": "Language",
+    "play_badge": "WORLD DOMINATION",
+    "play_description": "Play against bots on any map.",
+    "play_title": "Ready for battle?",
+    "setup_header": "BATTLE SETUP"
   }
 }

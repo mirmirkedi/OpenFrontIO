@@ -28,12 +28,11 @@
     "home_description": "Bir savaş alanı seç, botları alt et ve imparatorluğunu kur.",
     "home_eyebrow": "TEKLİ SEFER",
     "home_title": "Dünyaya hükmet.",
+    "language": "Dil",
     "play_badge": "DÜNYA HAKİMİYETİ",
     "play_description": "İstediğin haritada botlara karşı oyna.",
     "play_title": "Savaşa hazır mısın?",
-    "setup_description": "Haritanı ve zorluk seviyeni seç. Savaş başladıktan sonra kendi başlangıç bölgeni seçeceksin.",
-    "setup_header": "SAVAŞ AYARLARI",
-    "setup_title": "Savaş alanını seç."
+    "setup_header": "SAVAŞ AYARLARI"
   },
   "main": {
     "title": "OpenFront (ALFA)",
