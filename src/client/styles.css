@@ -654,22 +654,18 @@ body {
 }
 
 .opentroop-setup-shell game-config-settings section {
-  padding: 16px;
-  border: 1px solid rgba(171, 223, 255, 0.1);
-  border-radius: 18px;
-  background: linear-gradient(
-    135deg,
-    rgba(19, 43, 65, 0.72),
-    rgba(7, 16, 29, 0.72)
-  );
-  box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
+  padding: 14px;
+  border: 1px solid rgba(145, 201, 231, 0.14);
+  border-radius: 12px;
+  background: #0d2133;
+  box-shadow: none;
 }
 
 .opentroop-setup-shell game-config-settings section + section {
-  margin-top: 18px;
+  margin-top: 14px;
 }
 .opentroop-setup-shell game-config-settings section > div:first-child {
-  border-bottom-color: rgba(121, 211, 255, 0.16);
+  border-bottom-color: rgba(145, 201, 231, 0.18);
 }
 .opentroop-setup-shell map-picker .map-picker-tabs {
   border-radius: 14px;
@@ -678,6 +674,40 @@ body {
   color: #e7f7ff;
   font-size: 15px;
   letter-spacing: 0.1em;
+}
+
+/* Keep setup controls closer to a native game settings screen: clear rows,
+   restrained states, and no decorative card glow. The home screen and battle
+   HUD intentionally keep their own visual language. */
+.opentroop-setup-shell game-config-settings .game-config-card {
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.opentroop-setup-shell game-config-settings .game-config-card:not(.game-config-card--active) {
+  background-color: #152737 !important;
+  border-color: rgba(145, 201, 231, 0.16) !important;
+}
+
+.opentroop-setup-shell game-config-settings .game-config-card--active {
+  background-color: #164665 !important;
+  border-color: #2d9bd2 !important;
+  box-shadow: inset 0 0 0 1px rgba(121, 211, 255, 0.1) !important;
+}
+
+.opentroop-setup-shell game-config-settings .game-config-card:hover {
+  background-color: #1a3448 !important;
+}
+
+.opentroop-setup-shell game-config-settings .game-config-card--active:hover {
+  background-color: #185071 !important;
+}
+
+.opentroop-setup-shell game-config-settings .grid {
+  gap: 12px;
 }
 
 /* Small semantic watermarks make compact setup cards scannable without
@@ -1060,11 +1090,11 @@ body {
     font-size: 26px;
   }
   .opentroop-setup-shell game-config-settings section {
-    padding: 13px;
-    border-radius: 15px;
+    padding: 12px;
+    border-radius: 11px;
   }
   .opentroop-setup-shell game-config-settings section + section {
-    margin-top: 14px;
+    margin-top: 12px;
   }
   .opentroop-setup-shell map-picker > div {
     gap: 18px;
