@@ -1,7 +1,9 @@
 import { LitElement, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { assetUrl } from "../core/AssetUrls";
+import { GameMapType } from "../core/game/Game";
 import { isOpenTroopApp } from "./AppMode";
+import { terrainMapFileLoader } from "./TerrainMapFileLoader";
 import { translateText } from "./Utils";
 
 @customElement("game-starting-modal")
@@ -16,6 +18,8 @@ export class GameStartingModal extends LitElement {
   render() {
     const isVisible = this.isVisible;
     if (isOpenTroopApp()) {
+      const mapPreview =
+        terrainMapFileLoader.getMapData(GameMapType.World).webpPath;
       return html`
         <div
           class="opentroop-loading fixed inset-0 z-[9999] transition-opacity duration-200 ${isVisible
@@ -24,18 +28,20 @@ export class GameStartingModal extends LitElement {
           role="status"
           aria-live="polite"
         >
-          <div class="opentroop-loading__glow" aria-hidden="true"></div>
-          <div class="opentroop-loading__panel">
-            <img
-              class="opentroop-loading__logo"
-              src=${assetUrl("images/OpenTroopLogo.svg")}
-              alt="OpenTroop"
-            />
-            <span class="opentroop-loading__eyebrow">BATTLE LOADING</span>
-            <h2>Preparing the battlefield</h2>
-            <p>Loading map and commanders.</p>
+          <img
+            class="opentroop-loading__map"
+            src=${mapPreview}
+            alt=""
+            aria-hidden="true"
+          />
+          <div class="opentroop-loading__shade" aria-hidden="true"></div>
+          <div class="opentroop-loading__mission">
+            <div class="opentroop-loading__crest">
+              <img src=${assetUrl("images/OpenTroopLogo.svg")} alt="OpenTroop" />
+            </div>
+            <span>DEPLOYING</span>
             <div class="opentroop-loading__progress" aria-hidden="true">
-              <span></span>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
             </div>
           </div>
         </div>
