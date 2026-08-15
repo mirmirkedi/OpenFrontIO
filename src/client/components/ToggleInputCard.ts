@@ -1,7 +1,39 @@
-import { LitElement, PropertyValues, html, nothing } from "lit";
+import {
+  LitElement,
+  PropertyValues,
+  SVGTemplateResult,
+  html,
+  nothing,
+  svg,
+} from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { translateText } from "../Utils";
 import { CARD_LABEL_CLASS, INPUT_CLASS, cardClass } from "./InputCardStyles";
+
+const INPUT_WATERMARKS: Record<string, SVGTemplateResult> = {
+  "game_settings.max_timer": svg`<circle cx="12" cy="12" r="8.5" /><path d="M12 7v5l3.2 2M8 2.8 6.2 4.2M16 2.8l1.8 1.4" />`,
+  "game_settings.gold_multiplier": svg`<circle cx="12" cy="12" r="8.5" /><path d="M9 9.2c.5-1 1.5-1.5 3-1.5 1.7 0 2.8.8 2.8 2s-1 1.8-2.8 2.2-2.8 1-2.8 2.2 1.1 2 2.8 2 2.6-.6 3-1.6M12 6.2v11.6" />`,
+  "game_settings.starting_gold": svg`<path d="M5 9h14v10H5zM7 9V6h10v3M9 13h6M9 16h4" />`,
+  "game_settings.custom_alliances": svg`<circle cx="8" cy="12" r="3.5" /><circle cx="16" cy="12" r="3.5" /><path d="M10.8 10.5h2.4M10.8 13.5h2.4" />`,
+};
+
+function renderInputWatermark(iconSvg?: SVGTemplateResult) {
+  if (!iconSvg) return nothing;
+  return html`
+    <svg
+      class="game-config-watermark"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.35"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      ${iconSvg}
+    </svg>
+  `;
+}
 
 @customElement("toggle-input-card")
 export class ToggleInputCard extends LitElement {
@@ -93,7 +125,13 @@ export class ToggleInputCard extends LitElement {
 
   render() {
     return html`
-      <div class="${cardClass(this.checked)}">
+      <div
+        class="${cardClass(
+          this.checked,
+          `game-config-card ${this.checked ? "game-config-card--active" : ""}`,
+        )}"
+      >
+        ${renderInputWatermark(INPUT_WATERMARKS[this.labelKey])}
         <button
           type="button"
           aria-pressed=${this.checked}
