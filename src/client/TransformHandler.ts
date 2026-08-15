@@ -58,6 +58,8 @@ export class TransformHandler {
 
   public updateCanvasBoundingRect() {
     this._boundingRect = this.canvas.getBoundingClientRect();
+    this.scale = Math.max(this.getMinimumScale(), this.scale);
+    this.clampOffsets();
   }
 
   boundingRect(): DOMRect {
@@ -66,6 +68,11 @@ export class TransformHandler {
 
   width(): number {
     return this.boundingRect().width;
+  }
+
+  /** Keep the full map width filling the viewport at maximum zoom-out. */
+  private getMinimumScale(): number {
+    return Math.max(0.2, this.boundingRect().width / this.game.width());
   }
   hasChanged(): boolean {
     return this.changed;
@@ -210,7 +217,10 @@ export class TransformHandler {
       return;
     }
     this.target = new Cell(nameLocation.x, nameLocation.y);
-    this.targetScale = event.zoom ?? null;
+    this.targetScale =
+      event.zoom === undefined
+        ? null
+        : Math.max(this.getMinimumScale(), event.zoom);
     this.intervalID = setInterval(() => this.goTo(), GOTO_INTERVAL_MS);
   }
 
@@ -304,7 +314,7 @@ export class TransformHandler {
     this.scale /= zoomFactor;
 
     // Clamp the scale to prevent extreme zooming
-    this.scale = Math.max(0.2, Math.min(20, this.scale));
+    this.scale = Math.max(this.getMinimumScale(), Math.min(20, this.scale));
 
     const canvasCoords = this.screenToCanvasCoordinates(event.x, event.y);
 
