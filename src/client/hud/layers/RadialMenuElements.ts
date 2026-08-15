@@ -593,7 +593,7 @@ export const attackMenuElement: MenuElement = {
   id: Slot.Attack,
   name: "radial_attack",
   disabled: (params: MenuElementParams) => params.game.inSpawnPhase(),
-  icon: swordIcon,
+  icon: targetIcon,
   color: COLORS.attack,
 
   subMenu: (params: MenuElementParams) => {
