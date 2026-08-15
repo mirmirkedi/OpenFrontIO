@@ -36,7 +36,6 @@ export class PlayPage extends LitElement {
                 src=${assetUrl("images/OpenTroopLogo.svg")}
                 alt="OpenTroop"
               />
-              <span>OFFLINE COMMAND</span>
             </div>
             <button
               class="opentroop-icon-button"

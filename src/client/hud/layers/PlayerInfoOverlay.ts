@@ -352,6 +352,9 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
 
   private renderPlayerInfo(player: PlayerView) {
     const myPlayer = this.game.myPlayer();
+    // The hover card is also used for the local territory. A clear label is
+    // faster to recognize than the generated anonymous player name.
+    const displayName = myPlayer?.id() === player.id() ? "You" : player.displayName();
     const isFriendly = myPlayer?.isFriendly(player);
     const isAllied = myPlayer?.isAlliedWith(player);
     const traitorTicks = player.getTraitorRemainingTicks();
@@ -381,7 +384,7 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
     const playerTeam = getTranslatedPlayerTeamLabel(player.team());
 
     const { fontSize, isAllianceWrapped } = this.getNameFontSize({
-      nameLength: player.displayName().length,
+      nameLength: displayName.length,
       iconCount: playerIcons.length,
       hasFlag: !!player.cosmetics.flag,
       hasBetrayal: traitorTicks > 0,
@@ -495,7 +498,7 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
               <span
                 class="font-mono inline-block leading-[1.2] wrap-anywhere"
                 style="font-size: ${fontSize}"
-                >${player.displayName()}</span
+                >${displayName}</span
               >
             </div>
             ${this.getRelationSmiley(player, myPlayer)}
