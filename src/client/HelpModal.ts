@@ -169,6 +169,10 @@ export class HelpModal extends BaseModal {
               </button>
             </div>
           </section>
+          <section class="mt-8 border-t border-white/10 pt-5 text-center">
+            <p class="mb-1 text-xs font-semibold text-white/60">WorldFront is based on OpenFront.</p>
+            <p class="mb-0 text-xs text-white/40">Open-source code licensed under AGPL-3.0.</p>
+          </section>
           <!-- Hotkeys Section -->
           <div class="flex items-center gap-3 mb-3">
             <div class="text-blue-400">

@@ -65,7 +65,7 @@ export class DesktopNavBar extends LitElement {
             <img
               class="block h-full aspect-[1364/259]"
               src=${assetUrl(
-                appMode ? "images/OpenTroopLogo.svg" : "images/OpenFrontLogo.svg",
+                appMode ? "images/WorldFrontLogo.svg" : "images/OpenFrontLogo.svg",
               )}
               alt=${appMode ? "WorldFront" : "OpenFront"}
             />

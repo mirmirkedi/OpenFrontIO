@@ -38,7 +38,7 @@ export async function renderHtmlContent(htmlPath: string): Promise<string> {
       : undefined,
     manifestHref: buildAssetUrl("manifest.json", assetManifest, cdnBase),
     faviconHref: buildAssetUrl(
-      ServerEnv.openTroopApp() ? "images/OpenTroopFavicon.svg" : "images/Favicon.svg",
+      ServerEnv.openTroopApp() ? "images/WorldFrontFavicon.svg" : "images/Favicon.svg",
       assetManifest,
       cdnBase,
     ),

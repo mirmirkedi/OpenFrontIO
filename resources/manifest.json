@@ -3,13 +3,13 @@
     {
       "purpose": "maskable",
       "sizes": "512x512",
-      "src": "/icons/opentroop512_maskable.png",
+      "src": "/icons/worldfront512_maskable.png",
       "type": "image/png"
     },
     {
       "purpose": "any",
       "sizes": "512x512",
-      "src": "/icons/opentroop512_rounded.png",
+      "src": "/icons/worldfront512_rounded.png",
       "type": "image/png"
     }
   ],
@@ -18,8 +18,8 @@
   "display": "standalone",
   "dir": "auto",
   "lang": "en",
-  "name": "OpenTroop.io",
-  "short_name": "OpenTroop",
+  "name": "WorldFront",
+  "short_name": "WorldFront",
   "start_url": "/",
   "id": "/"
 }

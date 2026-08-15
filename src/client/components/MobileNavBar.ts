@@ -89,7 +89,7 @@ export class MobileNavBar extends LitElement {
           <div class="flex flex-col items-center gap-1">
             <img
               src=${assetUrl(
-                appMode ? "images/OpenTroopLogo.svg" : "images/OpenFrontLogo.svg",
+                appMode ? "images/WorldFrontLogo.svg" : "images/OpenFrontLogo.svg",
               )}
               alt=${appMode ? "WorldFront" : "OpenFront"}
               class="w-auto h-auto max-w-[220px] max-h-[4.5rem]"

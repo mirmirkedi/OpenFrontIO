@@ -6,7 +6,7 @@
 @theme {
   --default-ring-width: 3px;
   --default-ring-color: var(--color-malibu-blue);
-  --font-display: "OpenFront", Inter, Arial, sans-serif;
+  --font-display: Inter, Arial, sans-serif;
 
   /* Openfront.io brand palette — see Openfront_Brand_Guidelines.pdf §4 */
   --color-malibu-blue: #0084d1;
@@ -380,6 +380,16 @@ body {
 
 .opentroop-home__footer { justify-content: center; gap: 10px; }
 .opentroop-home__footer i { width: 4px; height: 4px; border-radius: 50%; background: #3aaee8; }
+
+.worldfront-attribution {
+  width: 100%;
+  margin: 4px auto 0;
+  color: rgba(218, 239, 255, 0.38);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
 
 @media (min-width: 700px) {
   .opentroop-home { min-height: 100%; padding-block: 28px; }

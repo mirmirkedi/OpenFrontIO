@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0c365b"/><stop offset="1" stop-color="#06111f"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#2bb8f4" stop-opacity=".48"/><stop offset="1" stop-color="#2bb8f4" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="480" height="320" fill="url(#bg)"/>
+  <circle cx="240" cy="160" r="165" fill="url(#glow)"/>
+  <g fill="none" stroke="#66d9ff" stroke-linecap="round">
+    <circle cx="240" cy="150" r="58" stroke-width="8"/>
+    <path d="M182 150h116M240 92c21 20 31 39 31 58s-10 38-31 58M240 92c-21 20-31 39-31 58s10 38 31 58M198 112c22 13 62 13 84 0M198 188c22-13 62-13 84 0" stroke-width="5"/>
+    <path d="m221 160 18-18 27 27" stroke="#fff" stroke-width="10" stroke-linejoin="round"/>
+  </g>
+  <text x="240" y="250" fill="#f6fbff" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="800" text-anchor="middle">World<tspan fill="#45c7ff">Front</tspan></text>
+</svg>

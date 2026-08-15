@@ -173,12 +173,17 @@ export default defineConfig(({ mode }) => {
   const resourcesDir = getResourcesDir(__dirname);
   const proprietaryDir = getProprietaryDir(__dirname);
   const sourceDirs = [resourcesDir, proprietaryDir];
+  // WorldFront must not package OpenFront's separately licensed visual
+  // assets. Its Android build uses only openly licensed resources plus its
+  // own original assets under resources/.
+  const appSourceDirs = env.OPENTROOP_APP === "true" ? [resourcesDir] : sourceDirs;
   const assetManifest: AssetManifest = isProduction
-      ? buildPublicAssetManifest(sourceDirs, (relativePath) => {
+      ? buildPublicAssetManifest(appSourceDirs, (relativePath) => {
         if (env.OPENTROOP_APP !== "true") return true;
         if (
           relativePath.startsWith("images/OpenFront") ||
           relativePath.startsWith("images/OF.") ||
+          relativePath.startsWith("icons/opentroop") ||
           relativePath === "images/Favicon.svg" ||
           relativePath === "icons/icon512_maskable.png" ||
           relativePath === "icons/icon512_rounded.png"
@@ -219,7 +224,7 @@ export default defineConfig(({ mode }) => {
     manifestHref: buildAssetUrl("manifest.json", assetManifest, cdnBase),
     faviconHref: buildAssetUrl(
       env.OPENTROOP_APP === "true"
-        ? "images/OpenTroopFavicon.svg"
+        ? "images/WorldFrontFavicon.svg"
         : "images/Favicon.svg",
       assetManifest,
       cdnBase,
@@ -268,7 +273,7 @@ export default defineConfig(({ mode }) => {
       // assetManifest and expects every key to resolve to a file in resources/
       // or proprietary/. Vite's bundle output (assets/...) doesn't, so it's
       // merged in after.
-      createHashedPublicAssetFiles(sourceDirs, outDir, assetManifest);
+      createHashedPublicAssetFiles(appSourceDirs, outDir, assetManifest);
       // Track Vite's own bundle output (vendor chunks, JS, CSS, workers under
       // static/assets/) in the manifest so the deploy-time R2 upload covers
       // them alongside the hashed source assets. Skip non-assets/ emits like

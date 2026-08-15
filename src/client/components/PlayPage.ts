@@ -33,7 +33,7 @@ export class PlayPage extends LitElement {
           <header class="opentroop-home__topbar">
             <div class="opentroop-home__brand">
               <img
-                src=${assetUrl("images/OpenTroopLogo.svg")}
+                src=${assetUrl("images/WorldFrontLogo.svg")}
                 alt="WorldFront"
               />
             </div>
@@ -74,6 +74,7 @@ export class PlayPage extends LitElement {
 
             <game-mode-selector></game-mode-selector>
           </section>
+          <p class="worldfront-attribution">Based on OpenFront</p>
         </main>
       `;
     }
@@ -126,7 +127,7 @@ export class PlayPage extends LitElement {
             >
               <img
                 src=${assetUrl(
-                  appMode ? "images/OpenTroopLogo.svg" : "images/OpenFrontLogo.svg",
+                  appMode ? "images/WorldFrontLogo.svg" : "images/OpenFrontLogo.svg",
                 )}
                 alt=${appMode ? "WorldFront" : "OpenFront"}
                 class="h-full w-auto"
