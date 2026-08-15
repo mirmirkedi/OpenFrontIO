@@ -142,6 +142,7 @@ export class SpawnExecution implements Execution {
 
       if (
         !this.mg.isLand(center) ||
+        this.mg.isImpassable(center) ||
         this.mg.hasOwner(center) ||
         this.mg.isBorder(center)
       ) {
@@ -171,7 +172,11 @@ export class SpawnExecution implements Execution {
       }
 
       const tiles = getSpawnTiles(this.mg, center, true);
-      if (!tiles) {
+      // A compact-map tile can be land but still impassable. In that case the
+      // filtered spawn footprint is an empty array (truthy), which previously
+      // marked the player as spawned with zero territory and immediately
+      // triggered a defeat. A valid spawn must always own at least one tile.
+      if (!tiles || tiles.length === 0) {
         // if some of the spawn tile is outside of the land, we want to find another spawn tile
         continue;
       }

@@ -12,6 +12,7 @@ import {
 } from "../../../core/game/Game";
 import { TileRef } from "../../../core/game/GameMap";
 import { Controller } from "../../Controller";
+import { isOpenTroopApp } from "../../AppMode";
 import {
   CloseViewEvent,
   MouseDownEvent,
@@ -280,6 +281,34 @@ export class BuildMenu extends LitElement implements Controller {
       font-weight: bold;
       font-size: 14px;
     }
+    .opentroop-build-menu {
+      border: 1px solid rgba(117, 216, 255, .42);
+      border-radius: 18px;
+      background: linear-gradient(160deg, rgba(9, 45, 72, .98), rgba(2, 16, 29, .99));
+      box-shadow: 0 18px 52px rgba(0, 0, 0, .55), inset 0 1px rgba(211, 246, 255, .16);
+    }
+    .opentroop-build-title {
+      width: 100%;
+      margin: 0 0 8px;
+      color: #80dcff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .18em;
+      text-align: center;
+    }
+    .opentroop-build-menu .build-button {
+      border-color: rgba(121, 211, 255, .22);
+      background: rgba(1, 17, 29, .72);
+      box-shadow: inset 0 1px rgba(255, 255, 255, .05);
+    }
+    .opentroop-build-menu .build-button:not(:disabled):hover {
+      border-color: rgba(103, 210, 255, .66);
+      background: rgba(13, 91, 139, .44);
+    }
+    .opentroop-build-menu .build-count-chip {
+      border-color: rgba(121, 211, 255, .28);
+      background: #08283e;
+    }
 
     @media (max-width: 768px) {
       .build-menu {
@@ -314,6 +343,17 @@ export class BuildMenu extends LitElement implements Controller {
     }
 
     @media (max-width: 480px) {
+      .opentroop-build-menu {
+        top: auto;
+        bottom: max(10px, env(safe-area-inset-bottom));
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-width: none;
+        max-height: min(64dvh, 540px);
+        transform: none;
+        border-radius: 20px;
+      }
       .build-menu {
         padding: 8px;
         max-height: 70vh;
@@ -404,11 +444,15 @@ export class BuildMenu extends LitElement implements Controller {
   }
 
   render() {
+    const openTroopApp = isOpenTroopApp();
     return html`
       <div
-        class="build-menu ${this._hidden ? "hidden" : ""}"
+        class="build-menu ${openTroopApp ? "opentroop-build-menu" : ""} ${this._hidden ? "hidden" : ""}"
         @contextmenu=${(e: MouseEvent) => e.preventDefault()}
       >
+        ${openTroopApp
+          ? html`<div class="opentroop-build-title">BUILD</div>`
+          : null}
         ${this.filteredBuildTable.map(
           (row) => html`
             <div class="build-row">

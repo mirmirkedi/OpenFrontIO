@@ -215,6 +215,7 @@ export interface GameConfigSettingsData {
       value: number;
       labelKey: string;
       disabledKey: string;
+      max?: number;
     };
     nations?: {
       value: number;
@@ -570,7 +571,7 @@ export class GameConfigSettings extends LitElement {
               >
                 <fluent-slider
                   min="0"
-                  max="400"
+                  max=${settings.options.bots.max ?? 400}
                   step="1"
                   .value=${settings.options.bots.value}
                   labelKey=${settings.options.bots.labelKey}

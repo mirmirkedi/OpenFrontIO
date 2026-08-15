@@ -26,6 +26,7 @@ import "./components/ToggleInputCard";
 import { modalHeader } from "./components/ui/ModalHeader";
 import { getPlayerCosmetics } from "./Cosmetics";
 import { crazyGamesSDK } from "./CrazyGamesSDK";
+import { clearActiveLocalGame } from "./LocalPersistantStats";
 import { JoinLobbyEvent } from "./Main";
 import { genAnonUsername, UsernameInput } from "./UsernameInput";
 import {
@@ -48,13 +49,17 @@ const DEFAULT_OPTIONS = {
   // The compact World setup keeps first launch smooth on mid-range Android
   // devices while still providing a full bot match. Players can opt into the
   // larger map and higher bot counts from the setup screen.
-  bots: isOpenTroopApp() ? 72 : 400,
+  // Compact mobile maps cannot reliably place a human, 18 nations and dozens
+  // of tribes at once. Eight tribes still gives a full 26-opponent battle on
+  // the World preset while reserving safe spawn room on every supported map.
+  bots: isOpenTroopApp() ? 8 : 400,
   infiniteGold: false,
   infiniteTroops: false,
   compactMap: isOpenTroopApp(),
   maxTimer: false,
   maxTimerValue: undefined as number | undefined,
   instantBuild: false,
+  // Players choose their opening territory by default, on mobile and web.
   randomSpawn: false,
   useRandomMap: false,
   gameMode: GameMode.FFA,
@@ -70,6 +75,8 @@ const DEFAULT_OPTIONS = {
   doomsdayClock: false,
   doomsdayClockSpeed: "normal" as DoomsdayClockSpeed,
 } as const;
+
+const OPENTROOP_MAX_BOTS = 8;
 
 // A map earns achievements only if it has nations to conquer — the same rule
 // MapDisplay uses to decide whether to draw medals. Maps without nations (e.g.
@@ -456,6 +463,7 @@ export class SinglePlayerModal extends BaseModal {
                   value: this.bots,
                   labelKey: "game_settings.bots",
                   disabledKey: "common.disabled",
+                  max: isOpenTroopApp() ? OPENTROOP_MAX_BOTS : undefined,
                 },
                 nations: {
                   value: this.nations,
@@ -707,7 +715,8 @@ export class SinglePlayerModal extends BaseModal {
   private handleBotsChange = (e: Event) => {
     const customEvent = e as CustomEvent<{ value: number }>;
     const value = customEvent.detail.value;
-    if (isNaN(value) || value < 0 || value > 400) {
+    const maxBots = isOpenTroopApp() ? OPENTROOP_MAX_BOTS : 400;
+    if (isNaN(value) || value < 0 || value > maxBots) {
       return;
     }
     this.bots = value;
@@ -872,6 +881,9 @@ export class SinglePlayerModal extends BaseModal {
     await usernameInput?.whenSeeded();
 
     await crazyGamesSDK.requestMidgameAd();
+    // The Continue Game action is the only route allowed to restore saved
+    // turns. Starting a new battle always discards any older local snapshot.
+    clearActiveLocalGame();
 
     this.dispatchEvent(
       new CustomEvent("join-lobby", {

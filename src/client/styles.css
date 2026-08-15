@@ -595,6 +595,46 @@ body {
   border-radius: 8px;
   background: rgba(1, 15, 26, .42) !important;
 }
+.opentroop-result {
+  position: fixed;
+  inset: 0;
+  z-index: 10010;
+  display: grid;
+  place-items: center;
+  padding: max(22px, env(safe-area-inset-top)) 22px max(22px, env(safe-area-inset-bottom));
+  background: rgba(1, 8, 15, .76);
+  backdrop-filter: blur(6px);
+}
+.opentroop-result.hidden {
+  display: none;
+  pointer-events: none;
+}
+/* WinModal is a direct body child. Never let a stale controller overlay the
+   lobby after a local game has been left or after the WebView refreshes. */
+.opentroop-app:not(.in-game) .opentroop-result {
+  display: none !important;
+  pointer-events: none !important;
+}
+.opentroop-result__panel {
+  width: min(100%, 440px);
+  padding: 34px 24px 24px;
+  border: 1px solid rgba(112, 215, 255, .38);
+  border-radius: 22px;
+  background: linear-gradient(160deg, rgba(12, 55, 86, .98), rgba(3, 17, 31, .99));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .56), inset 0 1px rgba(221, 249, 255, .15);
+  text-align: center;
+}
+.opentroop-result__eyebrow { color: #73d9ff; font-size: 11px; font-weight: 950; letter-spacing: .2em; }
+.opentroop-result h2 { margin: 11px 0 8px; color: #fff; font-size: clamp(32px, 9vw, 48px); font-weight: 950; line-height: .96; }
+.opentroop-result p { margin: 0; color: rgba(224, 244, 255, .7); font-size: 15px; }
+.opentroop-result__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 28px; }
+.opentroop-result__actions button { min-height: 52px; border: 1px solid rgba(214, 247, 255, .64); border-radius: 14px; background: linear-gradient(180deg, #31b6fa, #0075bf); box-shadow: inset 0 1px rgba(255,255,255,.32), 0 4px 0 #003e70; color: white; font-size: 13px; font-weight: 950; letter-spacing: .09em; }
+.opentroop-result__actions button:active { transform: translateY(3px); box-shadow: inset 0 1px rgba(255,255,255,.2), 0 1px 0 #003e70; }
+.opentroop-result__actions .opentroop-result__secondary { border-color: rgba(143, 205, 232, .28); background: rgba(2, 20, 35, .7); box-shadow: none; color: #cbeafb; }
+.opentroop-app settings-modal .modal-overlay { background: rgba(1, 8, 15, .75) !important; backdrop-filter: blur(6px); }
+.opentroop-app settings-modal .modal-overlay > div { border-color: rgba(103, 210, 255, .34) !important; border-radius: 18px !important; background: linear-gradient(160deg, #0b304c, #061522) !important; box-shadow: 0 20px 60px rgba(0,0,0,.46); }
+.opentroop-app settings-modal .modal-overlay > div > div:first-child { border-bottom-color: rgba(115, 215, 255, .18) !important; }
+.opentroop-app settings-modal button:hover { background-color: rgba(72, 172, 220, .13) !important; }
 @media (max-width: 639px) {
   .opentroop-app.in-game div:has(> control-panel) {
     border-right: 0;

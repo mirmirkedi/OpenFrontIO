@@ -209,6 +209,12 @@ class Client {
     // Keep every mobile-app-only skin scoped away from the original web game.
     if (isOpenTroopApp()) {
       document.body.classList.add("opentroop-app");
+      // A Capacitor WebView reload can preserve a fixed custom element for a
+      // frame while bootstrapping the lobby underneath it. App launch always
+      // starts at the lobby, so clear any stale result overlay immediately.
+      document.body.classList.remove("in-game");
+      (document.querySelector("win-modal") as { hide?: () => void } | null)
+        ?.hide?.();
     }
 
     // Register modals with the URL router. Lobby modals (join/host) and

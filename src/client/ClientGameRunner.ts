@@ -132,6 +132,11 @@ export function joinLobby(
   const transport = new Transport(lobbyConfig, eventBus);
 
   let currentGameRunner: ClientGameRunner | null = null;
+  // Creating the WebGL renderer and worker is asynchronous. A player can
+  // leave a local match while that work is still pending; without this latch
+  // the abandoned runner would start afterwards and continue ticking shared
+  // HUD elements (including WinModal) over the next match or the lobby.
+  let stopped = false;
 
   const onconnect = async () => {
     // Drop the tag if the ownership check failed; the server re-checks anyway.
@@ -145,6 +150,7 @@ export function joinLobby(
   let terrainLoad: Promise<TerrainMapData> | null = null;
 
   const onmessage = (message: ServerMessage) => {
+    if (stopped) return;
     if (message.type === "lobby_info") {
       // Server tells us our assigned clientID
       clientID = message.myClientID;
@@ -184,6 +190,10 @@ export function joinLobby(
         terrainMapFileLoader,
       )
         .then((r) => {
+          if (stopped) {
+            r.stop();
+            return;
+          }
           currentGameRunner = r;
           r.start();
         })
@@ -280,6 +290,7 @@ export function joinLobby(
         return false;
       }
       console.log("leaving game");
+      stopped = true;
       if (currentGameRunner) {
         currentGameRunner.stop();
         currentGameRunner = null;
@@ -858,6 +869,10 @@ export class ClientGameRunner {
     this.renderer.initialize();
     this.input.initialize();
     this.worker.start((gu: GameUpdateViewData | ErrorUpdate) => {
+      // terminate() cannot retract a message already queued by the Worker.
+      // Ignore such late updates after a player leaves, otherwise an old
+      // game's HUD/WinModal can render over the next match or the lobby.
+      if (!this.isActive) return;
       if (this.lobby.gameStartInfo === undefined) {
         throw new Error("missing gameStartInfo");
       }

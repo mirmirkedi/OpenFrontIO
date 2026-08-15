@@ -10,6 +10,7 @@ import { EventBus } from "../../../core/EventBus";
 import { RankedType } from "../../../core/game/Game";
 import { GameUpdateType } from "../../../core/game/GameUpdates";
 import { getUserMe } from "../../Api";
+import { isOpenTroopApp } from "../../AppMode";
 import "../../components/CosmeticCard";
 import { cosmeticSelectionLabel } from "../../components/CosmeticPresentation";
 import "../../components/PurchaseButton";
@@ -61,6 +62,39 @@ export class WinModal extends LitElement implements Controller {
   }
 
   render() {
+    if (isOpenTroopApp()) {
+      return html`
+        <div
+          class="opentroop-result ${this.isVisible ? "opentroop-result--visible" : "hidden"}"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div class="opentroop-result__panel">
+            <span class="opentroop-result__eyebrow"
+              >${this.isWin ? "VICTORY" : "BATTLE OVER"}</span
+            >
+            <h2>${this._title || ""}</h2>
+            <p>
+              ${this.isWin
+                ? "The battlefield is yours."
+                : "Your command has ended."}
+            </p>
+            <div class="opentroop-result__actions ${this.showButtons ? "" : "hidden"}">
+              <button @click=${() => this._handleExit()}>MAIN MENU</button>
+              <button
+                class="opentroop-result__secondary"
+                @click=${() => this.hide()}
+              >
+                ${this.game?.myPlayer()?.isAlive()
+                  ? "CONTINUE"
+                  : "SPECTATE"}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     return html`
       <div
         class="${this.isVisible
@@ -83,7 +117,7 @@ export class WinModal extends LitElement implements Controller {
             width="block"
             class="flex-1"
             translationKey="win_modal.exit"
-            @click=${this._handleExit}
+            @click=${() => this._handleExit()}
           ></o-button>
           ${this.isRankedGame
             ? html`
@@ -92,7 +126,7 @@ export class WinModal extends LitElement implements Controller {
                   width="block"
                   class="flex-1"
                   translationKey="win_modal.requeue"
-                  @click=${this._handleRequeue}
+                  @click=${() => this._handleRequeue()}
                 ></o-button>
               `
             : null}
@@ -103,7 +137,7 @@ export class WinModal extends LitElement implements Controller {
             .title=${this.game?.myPlayer()?.isAlive()
               ? translateText("win_modal.keep")
               : translateText("win_modal.spectate")}
-            @click=${this.hide}
+            @click=${() => this.hide()}
           ></o-button>
         </div>
       </div>
@@ -251,6 +285,9 @@ export class WinModal extends LitElement implements Controller {
   }
 
   async show() {
+    if (isOpenTroopApp() && !document.body.classList.contains("in-game")) {
+      return;
+    }
     crazyGamesSDK.gameplayStop();
     await this.loadPatternContent();
     // Check if this is a ranked game
@@ -272,6 +309,21 @@ export class WinModal extends LitElement implements Controller {
 
   private _handleExit() {
     this.hide();
+    if (isOpenTroopApp()) {
+      // In the Capacitor shell a relative navigation can show the home page
+      // without tearing down fixed in-game overlays. Explicitly leave the
+      // local runner, clear the in-game state and reveal the lobby instead.
+      document.dispatchEvent(
+        new CustomEvent("leave-lobby", {
+          detail: { cause: "match-finished" },
+          bubbles: true,
+          composed: true,
+        }),
+      );
+      document.body.classList.remove("in-game");
+      window.showPage?.("page-play");
+      return;
+    }
     window.location.href = "/";
   }
 
@@ -295,6 +347,10 @@ export class WinModal extends LitElement implements Controller {
   init() {}
 
   tick() {
+    if (isOpenTroopApp() && !document.body.classList.contains("in-game")) {
+      if (this.isVisible) this.hide();
+      return;
+    }
     const myPlayer = this.game.myPlayer();
     if (
       !this.hasShownDeathModal &&
