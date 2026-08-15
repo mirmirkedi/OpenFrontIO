@@ -2,6 +2,7 @@ import { html, LitElement, nothing, type TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { ClientEnv } from "src/client/ClientEnv";
 import { isOpenTroopApp } from "./AppMode";
+import { assetUrl } from "../core/AssetUrls";
 import {
   Duos,
   GameMapType,
@@ -248,23 +249,27 @@ export class GameModeSelector extends LitElement {
 
   private renderOpenTroopHome() {
     return html`
-      <div class="flex flex-col gap-4 w-full px-4 sm:px-0 mx-auto pb-4">
-        <div
-          class="rounded-2xl border border-malibu-blue/40 bg-surface/90 p-5 text-center shadow-[var(--shadow-malibu-blue)]"
-        >
-          <p class="text-xs font-bold uppercase tracking-[0.2em] text-malibu-blue">
-            OpenTroop
-          </p>
-          <p class="mt-2 text-sm text-white/65">
-            Build your nation and defeat the bots.
-          </p>
-        </div>
-        <div class="h-16">
-          ${this.renderSmallActionCard(
-            translateText("main.solo"),
-            this.openSinglePlayerModal,
-            "bg-malibu-blue hover:bg-aquarius active:bg-malibu-blue/80 hover:scale-y-105 hover:scale-x-[1.01]",
-          )}
+      <div class="opentroop-play-card">
+        <img
+          class="opentroop-play-card__map"
+          src=${assetUrl("images/TerrainMapFrontPage.png")}
+          alt=""
+        />
+        <div class="opentroop-play-card__shade"></div>
+        <div class="opentroop-play-card__content">
+          <div class="opentroop-play-card__badge">WORLD DOMINATION</div>
+          <div>
+            <h2>Ready for battle?</h2>
+            <p>Play against bots on any map.</p>
+          </div>
+          <button
+            class="opentroop-play-button"
+            @click=${this.openSinglePlayerModal}
+            ?disabled=${!this.inputValid}
+          >
+            <span class="opentroop-play-button__triangle"></span>
+            <span>Play</span>
+          </button>
         </div>
       </div>
     `;

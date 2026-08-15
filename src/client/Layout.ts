@@ -1,6 +1,9 @@
 import { Platform } from "./Platform";
+import { isOpenTroopApp } from "./AppMode";
 
 export function initLayout() {
+  // OpenTroop has a dedicated game-home header rather than the web sidebar.
+  if (isOpenTroopApp()) return;
   // Wait for play-page component to render before setting up hamburger menu
   customElements.whenDefined("play-page").then(() => {
     const hb = document.getElementById("hamburger-btn");

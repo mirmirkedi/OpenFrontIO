@@ -401,10 +401,19 @@ export class SinglePlayerModal extends BaseModal {
     ];
 
     return html`
-      <div class="flex flex-col h-full">
+      <div class="opentroop-setup-shell flex flex-col h-full">
         <div
-          class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-6 pt-4 pb-6 mr-1 mx-auto w-full max-w-5xl"
+          class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-4 pb-6 mr-1 mx-auto w-full max-w-5xl"
         >
+          ${isOpenTroopApp()
+            ? html`
+                <div class="opentroop-setup-intro">
+                  <span>NEW BATTLE</span>
+                  <h2>Set the battlefield.</h2>
+                  <p>Pick a map, choose your challenge, then command your troops.</p>
+                </div>
+              `
+            : null}
           <game-config-settings
             class="block"
             .sectionGapClass=${"space-y-6"}
@@ -496,7 +505,7 @@ export class SinglePlayerModal extends BaseModal {
         </div>
 
         <!-- Footer Action -->
-        <div class="p-6 border-t border-white/10 bg-black/20 shrink-0">
+        <div class="opentroop-setup-footer p-4 sm:p-6 border-t border-white/10 bg-black/20 shrink-0">
           ${hasLinkedAccount(this.userMeResponse) && this.hasOptionsChanged()
             ? html`<div
                 class="mb-4 px-4 py-3 rounded-xl bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-bold uppercase tracking-wider text-center"
@@ -504,13 +513,20 @@ export class SinglePlayerModal extends BaseModal {
                 ${translateText("single_modal.options_changed_no_achievements")}
               </div>`
             : null}
-          <o-button
-            variant="primary"
-            width="block"
-            size="lg"
-            translationKey="game_settings.start"
-            @click=${this.startGame}
-          ></o-button>
+          ${isOpenTroopApp()
+            ? html`<button
+                class="opentroop-start-battle"
+                @click=${this.startGame}
+              >
+                <span>⚔</span> START BATTLE
+              </button>`
+            : html`<o-button
+                variant="primary"
+                width="block"
+                size="lg"
+                translationKey="game_settings.start"
+                @click=${this.startGame}
+              ></o-button>`}
         </div>
       </div>
     `;

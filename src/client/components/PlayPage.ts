@@ -19,6 +19,62 @@ export class PlayPage extends LitElement {
   render() {
     const appMode = isOpenTroopApp();
     const hasSavedGame = appMode && loadActiveLocalGame() !== null;
+    if (appMode) {
+      return html`
+        <main id="page-play" class="opentroop-home">
+          <div class="opentroop-home__aurora" aria-hidden="true"></div>
+          <header class="opentroop-home__topbar">
+            <div class="opentroop-home__brand">
+              <img
+                src=${assetUrl("images/OpenTroopLogo.svg")}
+                alt="OpenTroop"
+              />
+              <span>OFFLINE COMMAND</span>
+            </div>
+            <button
+              class="opentroop-icon-button"
+              aria-label="Help"
+              @click=${() => window.showPage?.("page-help")}
+            >
+              ?
+            </button>
+          </header>
+
+          <section class="opentroop-home__content">
+            <div class="opentroop-home__eyebrow">
+              <span></span> SOLO CAMPAIGN <span></span>
+            </div>
+            <h1>Command the world.</h1>
+            <p>Choose a battlefield, outsmart the bots, and build your empire.</p>
+
+            ${hasSavedGame
+              ? html`
+                  <button
+                    class="opentroop-continue-button"
+                    @click=${() =>
+                      document.dispatchEvent(
+                        new CustomEvent("resume-local-game"),
+                      )}
+                  >
+                    <span class="opentroop-continue-button__icon">↻</span>
+                    <span>
+                      <small>ACTIVE BATTLE</small>
+                      <strong>Continue game</strong>
+                    </span>
+                    <span aria-hidden="true">›</span>
+                  </button>
+                `
+              : nothing}
+
+            <game-mode-selector></game-mode-selector>
+          </section>
+
+          <footer class="opentroop-home__footer">
+            <span>BOT BATTLES</span><i></i><span>OFFLINE READY</span>
+          </footer>
+        </main>
+      `;
+    }
     return html`
       <div
         id="page-play"
@@ -130,18 +186,6 @@ export class PlayPage extends LitElement {
                 class="hidden lg:flex lg:h-full lg:flex-col w-full min-w-0"
               ></streaming-now>`}
         </div>
-
-        ${hasSavedGame
-          ? html`
-              <button
-                class="mx-auto w-full max-w-2xl rounded-xl border border-malibu-blue/60 bg-malibu-blue px-6 py-4 text-xl font-bold text-white shadow-lg transition-colors hover:bg-malibu-blue/90"
-                @click=${() =>
-                  document.dispatchEvent(new CustomEvent("resume-local-game"))}
-              >
-                Continue game
-              </button>
-            `
-          : nothing}
 
         <game-mode-selector></game-mode-selector>
 

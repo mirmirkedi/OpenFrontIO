@@ -313,7 +313,7 @@ class Client {
     this.usernameInput = document.querySelector(
       "username-input",
     ) as UsernameInput;
-    if (!this.usernameInput) {
+    if (!isOpenTroopApp() && !this.usernameInput) {
       console.warn("Username input element not found");
     }
 

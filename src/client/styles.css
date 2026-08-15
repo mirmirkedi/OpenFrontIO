@@ -94,6 +94,317 @@ body {
     env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
+/* OpenTroop's native-game home screen. The layout deliberately uses bounded
+   content widths and safe-area aware spacing rather than device-specific px
+   positioning, so phones, tablets and foldables keep the same hierarchy. */
+.opentroop-home {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-height: 100%;
+  min-height: 100dvh;
+  flex-direction: column;
+  overflow: hidden;
+  padding: clamp(18px, 4vw, 40px) clamp(18px, 5vw, 72px)
+    max(18px, env(safe-area-inset-bottom));
+  color: #fff;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(34, 178, 255, 0.28), transparent 30rem),
+    linear-gradient(155deg, #07101e 0%, #0b1d32 47%, #060b14 100%);
+}
+
+/* Navigation applies Tailwind's .hidden when the battle setup becomes the
+   active page. This explicit rule wins over the home shell's display:flex. */
+.opentroop-home.hidden { display: none !important; }
+
+.opentroop-home::before {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  content: "";
+  opacity: 0.3;
+  background-image:
+    linear-gradient(rgba(91, 211, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 211, 255, 0.09) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+
+.opentroop-home__aurora {
+  position: absolute;
+  z-index: -1;
+  top: 22%;
+  left: 50%;
+  width: min(80vw, 680px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(38px);
+  opacity: 0.48;
+  background: radial-gradient(circle, rgba(0, 151, 235, 0.65), transparent 65%);
+  pointer-events: none;
+}
+
+.opentroop-home__topbar,
+.opentroop-home__footer {
+  display: flex;
+  width: 100%;
+  max-width: 680px;
+  align-items: center;
+  justify-content: space-between;
+  margin-inline: auto;
+}
+
+.opentroop-home__brand {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.opentroop-home__brand img {
+  width: min(42vw, 178px);
+  height: 34px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.opentroop-home__brand span,
+.opentroop-home__footer {
+  color: rgba(224, 242, 255, 0.58);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.opentroop-icon-button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(187, 232, 255, 0.2);
+  border-radius: 14px;
+  background: rgba(5, 14, 25, 0.58);
+  color: #d8f3ff;
+  font-size: 20px;
+  font-weight: 900;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.opentroop-icon-button:active { transform: scale(0.93); }
+
+.opentroop-home__content {
+  display: flex;
+  width: 100%;
+  max-width: 680px;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(18px, 3vh, 30px);
+  margin: auto;
+  padding-block: clamp(22px, 6vh, 54px);
+  text-align: center;
+}
+
+.opentroop-home__eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: #66cfff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.19em;
+}
+
+.opentroop-home__eyebrow span {
+  width: 24px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.opentroop-home h1 {
+  max-width: 610px;
+  margin: -12px auto 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(42px, 10vw, 78px);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+  text-shadow: 0 6px 0 rgba(0, 0, 0, 0.16);
+}
+
+.opentroop-home__content > p {
+  max-width: 430px;
+  margin: -12px auto 0;
+  color: rgba(223, 241, 255, 0.72);
+  font-size: clamp(14px, 2.8vw, 17px);
+  line-height: 1.45;
+}
+
+.opentroop-continue-button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border: 1px solid rgba(255, 211, 93, 0.52);
+  border-radius: 18px;
+  background: linear-gradient(110deg, rgba(106, 70, 10, 0.92), rgba(55, 38, 13, 0.88));
+  box-shadow: inset 0 1px rgba(255, 243, 191, 0.22), 0 10px 28px rgba(0, 0, 0, 0.25);
+  color: #fff6d2;
+  text-align: left;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+
+.opentroop-continue-button:active { transform: scale(0.985); filter: brightness(0.92); }
+.opentroop-continue-button__icon { font-size: 28px; font-weight: 900; color: #ffd55f; }
+.opentroop-continue-button small { display: block; color: #ffd878; font-size: 9px; font-weight: 900; letter-spacing: 0.14em; }
+.opentroop-continue-button strong { display: block; margin-top: 2px; font-size: 17px; }
+
+.opentroop-play-card {
+  position: relative;
+  overflow: hidden;
+  min-height: min(49vh, 410px);
+  border: 1px solid rgba(113, 211, 255, 0.44);
+  border-radius: clamp(24px, 5vw, 34px);
+  background: #0c243a;
+  box-shadow: inset 0 1px rgba(224, 250, 255, 0.2), 0 20px 45px rgba(0, 0, 0, 0.38), 0 0 0 4px rgba(0, 132, 209, 0.08);
+}
+
+.opentroop-play-card__map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.84;
+  filter: saturate(1.08) contrast(1.05);
+}
+
+.opentroop-play-card__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(2, 11, 21, 0.08) 0%, rgba(5, 16, 28, 0.15) 34%, rgba(4, 12, 22, 0.96) 100%);
+}
+
+.opentroop-play-card__content {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-height: inherit;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: clamp(22px, 5vw, 34px);
+  text-align: left;
+}
+
+.opentroop-play-card__badge {
+  width: fit-content;
+  padding: 6px 9px;
+  border: 1px solid rgba(112, 215, 255, 0.46);
+  border-radius: 999px;
+  background: rgba(5, 27, 45, 0.82);
+  color: #a7e7ff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.opentroop-play-card h2 { margin: 0; font-size: clamp(27px, 7vw, 40px); font-weight: 900; line-height: 0.95; }
+.opentroop-play-card p { margin: 7px 0 0; color: rgba(231, 246, 255, 0.72); font-size: 14px; }
+
+.opentroop-play-button {
+  display: flex;
+  width: 100%;
+  min-height: 62px;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  margin-top: 5px;
+  border: 1px solid rgba(214, 247, 255, 0.62);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #34b8fa, #0083d4 58%, #0064b2);
+  box-shadow: inset 0 2px rgba(255, 255, 255, 0.34), inset 0 -4px rgba(0, 48, 112, 0.4), 0 7px 0 #003b70, 0 12px 22px rgba(0, 92, 180, 0.38);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.opentroop-play-button:active { transform: translateY(4px); box-shadow: inset 0 2px rgba(255,255,255,.25), inset 0 -2px rgba(0,48,112,.35), 0 3px 0 #003b70, 0 7px 15px rgba(0,92,180,.32); }
+.opentroop-play-button:disabled { opacity: 0.45; filter: grayscale(0.5); }
+.opentroop-play-button__triangle { width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 13px solid currentColor; }
+
+.opentroop-home__footer { justify-content: center; gap: 10px; }
+.opentroop-home__footer i { width: 4px; height: 4px; border-radius: 50%; background: #3aaee8; }
+
+@media (min-width: 700px) {
+  .opentroop-home { min-height: 100%; padding-block: 28px; }
+  .opentroop-home__content { max-width: 740px; }
+  .opentroop-play-card { min-height: 390px; }
+}
+
+@media (max-height: 680px) {
+  .opentroop-home__content { padding-block: 16px; gap: 14px; }
+  .opentroop-play-card { min-height: 270px; }
+  .opentroop-home h1 { font-size: clamp(38px, 9vw, 56px); }
+}
+
+.opentroop-setup-intro {
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid rgba(108, 212, 255, 0.26);
+  border-radius: 20px;
+  background: linear-gradient(120deg, rgba(0, 100, 170, 0.24), rgba(10, 24, 42, 0.6));
+}
+.opentroop-setup-intro span { color: #64cef9; font-size: 10px; font-weight: 900; letter-spacing: 0.16em; }
+.opentroop-setup-intro h2 { margin: 6px 0; font-size: clamp(25px, 6vw, 34px); font-weight: 900; line-height: 1; }
+.opentroop-setup-intro p { max-width: 440px; margin: 0; color: rgba(225, 244, 255, 0.68); font-size: 14px; line-height: 1.45; }
+
+.opentroop-setup-shell game-config-settings section {
+  padding: 16px;
+  border: 1px solid rgba(171, 223, 255, 0.1);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(19, 43, 65, 0.72), rgba(7, 16, 29, 0.72));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.opentroop-setup-shell game-config-settings section + section { margin-top: 18px; }
+.opentroop-setup-shell game-config-settings section > div:first-child { border-bottom-color: rgba(121, 211, 255, 0.16); }
+.opentroop-setup-shell map-picker .map-picker-tabs { border-radius: 14px; }
+
+.opentroop-setup-footer {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(5, 11, 20, 0.78), rgba(4, 10, 18, 0.98));
+}
+
+.opentroop-start-battle {
+  display: flex;
+  width: 100%;
+  min-height: 58px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgba(218, 247, 255, 0.62);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #39bcfc, #007fd1 58%, #005fa8);
+  box-shadow: inset 0 2px rgba(255,255,255,.32), inset 0 -4px rgba(0, 44, 100, .4), 0 5px 0 #003a6b;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+.opentroop-start-battle:active { transform: translateY(3px); box-shadow: inset 0 2px rgba(255,255,255,.24), inset 0 -2px rgba(0,44,100,.35), 0 2px 0 #003a6b; }
+
 * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
