@@ -34,7 +34,7 @@ export class PlayPage extends LitElement {
             <div class="opentroop-home__brand">
               <img
                 src=${assetUrl("images/OpenTroopLogo.svg")}
-                alt="OpenTroop"
+                alt="WorldFront"
               />
             </div>
             <button
@@ -128,7 +128,7 @@ export class PlayPage extends LitElement {
                 src=${assetUrl(
                   appMode ? "images/OpenTroopLogo.svg" : "images/OpenFrontLogo.svg",
                 )}
-                alt=${appMode ? "OpenTroop" : "OpenFront"}
+                alt=${appMode ? "WorldFront" : "OpenFront"}
                 class="h-full w-auto"
               />
             </div>

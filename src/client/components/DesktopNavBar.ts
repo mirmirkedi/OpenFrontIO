@@ -67,7 +67,7 @@ export class DesktopNavBar extends LitElement {
               src=${assetUrl(
                 appMode ? "images/OpenTroopLogo.svg" : "images/OpenFrontLogo.svg",
               )}
-              alt=${appMode ? "OpenTroop" : "OpenFront"}
+              alt=${appMode ? "WorldFront" : "OpenFront"}
             />
           </div>
           <div

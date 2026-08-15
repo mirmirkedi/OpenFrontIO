@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "io.opentroop.game",
-  appName: "OpenTroop",
+  appId: "io.worldfront.game",
+  appName: "WorldFront",
   webDir: "static",
   bundledWebRuntime: false,
   android: {

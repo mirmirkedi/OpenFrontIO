@@ -1,4 +1,4 @@
-package io.opentroop.game;
+package io.worldfront.game;
 
 import com.getcapacitor.BridgeActivity;
 

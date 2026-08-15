@@ -91,7 +91,7 @@ export class MobileNavBar extends LitElement {
               src=${assetUrl(
                 appMode ? "images/OpenTroopLogo.svg" : "images/OpenFrontLogo.svg",
               )}
-              alt=${appMode ? "OpenTroop" : "OpenFront"}
+              alt=${appMode ? "WorldFront" : "OpenFront"}
               class="w-auto h-auto max-w-[220px] max-h-[4.5rem]"
             />
             <div

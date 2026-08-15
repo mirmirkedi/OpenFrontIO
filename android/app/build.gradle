@@ -12,10 +12,10 @@ def hasReleaseSigning = [
 ].every { value -> value != null && !value.trim().isEmpty() }
 
 android {
-    namespace = "io.opentroop.game"
+    namespace = "io.worldfront.game"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "io.opentroop.game"
+        applicationId "io.worldfront.game"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

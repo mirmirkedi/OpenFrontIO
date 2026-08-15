@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 140" role="img" aria-labelledby="title desc">
-  <title id="title">OpenTroop</title>
-  <desc id="desc">OpenTroop game logo</desc>
+  <title id="title">WorldFront</title>
+  <desc id="desc">WorldFront game logo</desc>
   <defs>
     <linearGradient id="shield" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#56d7ff"/>
@@ -12,5 +12,5 @@
     <path d="M60 22 84 31v25c0 17-9 28-24 36-15-8-24-19-24-36V31Z" fill="url(#shield)"/>
     <path d="m60 31 7 14 15 2-11 11 3 15-14-7-14 7 3-15-11-11 15-2Z" fill="#071026"/>
   </g>
-  <text x="145" y="93" fill="#f4f8ff" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800" letter-spacing="-2">Open<tspan fill="#56d7ff">Troop</tspan></text>
+  <text x="145" y="93" fill="#f4f8ff" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800" letter-spacing="-2">World<tspan fill="#56d7ff">Front</tspan></text>
 </svg>

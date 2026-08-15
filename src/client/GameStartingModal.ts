@@ -37,7 +37,7 @@ export class GameStartingModal extends LitElement {
           <div class="opentroop-loading__shade" aria-hidden="true"></div>
           <div class="opentroop-loading__mission">
             <div class="opentroop-loading__crest">
-              <img src=${assetUrl("images/OpenTroopLogo.svg")} alt="OpenTroop" />
+              <img src=${assetUrl("images/OpenTroopLogo.svg")} alt="WorldFront" />
             </div>
             <span>DEPLOYING</span>
             <div class="opentroop-loading__progress" aria-hidden="true">
