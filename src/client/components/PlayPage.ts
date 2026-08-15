@@ -107,7 +107,12 @@ export class PlayPage extends LitElement {
                     <span aria-hidden="true">›</span>
                   </button>
                 `
-              : nothing}
+              : html`
+                  <div
+                    class="opentroop-continue-button opentroop-continue-button--placeholder"
+                    aria-hidden="true"
+                  ></div>
+                `}
 
             <game-mode-selector></game-mode-selector>
           </section>

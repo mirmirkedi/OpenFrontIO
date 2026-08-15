@@ -310,6 +310,10 @@ body {
 }
 
 .opentroop-continue-button:active { transform: scale(0.985); filter: brightness(0.92); }
+.opentroop-continue-button--placeholder {
+  visibility: hidden;
+  pointer-events: none;
+}
 .opentroop-continue-button__icon { font-size: 28px; font-weight: 900; color: #ffd55f; }
 .opentroop-continue-button small { display: block; color: #ffd878; font-size: 9px; font-weight: 900; letter-spacing: 0.14em; }
 .opentroop-continue-button strong { display: block; margin-top: 2px; font-size: 17px; }
