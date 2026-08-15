@@ -255,11 +255,21 @@ body {
   letter-spacing: 0.19em;
 }
 
-.opentroop-home__eyebrow span {
+.opentroop-home__eyebrow-line {
+  flex: 0 0 24px;
   width: 24px;
   height: 1px;
   background: currentColor;
   opacity: 0.55;
+}
+
+.opentroop-home__eyebrow-text {
+  display: block;
+  flex: 0 1 auto;
+  width: auto;
+  height: auto;
+  background: transparent;
+  white-space: nowrap;
 }
 
 .opentroop-home h1 {

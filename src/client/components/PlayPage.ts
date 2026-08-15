@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
 import { assetUrl } from "../../core/AssetUrls";
 import { isOpenTroopApp } from "../AppMode";
 import { loadActiveLocalGame } from "../LocalPersistantStats";
@@ -13,7 +13,7 @@ import "./StreamingNow";
 
 @customElement("play-page")
 export class PlayPage extends LitElement {
-  private languageRevision = 0;
+  @state() private languageRevision = 0;
 
   connectedCallback() {
     super.connectedCallback();
@@ -38,8 +38,7 @@ export class PlayPage extends LitElement {
   }
 
   render() {
-    // Read the revision so Lit rerenders this static shell after a language
-    // selection even though its labels are resolved through translateText().
+    // Read the revision so the app-mode home rerenders after a language change.
     void this.languageRevision;
     const appMode = isOpenTroopApp();
     const hasSavedGame = appMode && loadActiveLocalGame() !== null;
@@ -84,10 +83,12 @@ export class PlayPage extends LitElement {
 
           <section class="opentroop-home__content">
             <div class="opentroop-home__eyebrow">
-              <span></span><span data-i18n="worldfront.home_eyebrow">SOLO CAMPAIGN</span><span></span>
+              <span class="opentroop-home__eyebrow-line"></span>
+              <span class="opentroop-home__eyebrow-text">${translateText("worldfront.home_eyebrow")}</span>
+              <span class="opentroop-home__eyebrow-line"></span>
             </div>
-            <h1 data-i18n="worldfront.home_title">Command the world.</h1>
-            <p data-i18n="worldfront.home_description">Choose a battlefield, outsmart the bots, and build your empire.</p>
+            <h1>${translateText("worldfront.home_title")}</h1>
+            <p>${translateText("worldfront.home_description")}</p>
 
             ${hasSavedGame
               ? html`
@@ -100,8 +101,8 @@ export class PlayPage extends LitElement {
                   >
                     <span class="opentroop-continue-button__icon">↻</span>
                     <span>
-                      <small data-i18n="worldfront.active_battle">ACTIVE BATTLE</small>
-                      <strong data-i18n="worldfront.continue_game">Continue game</strong>
+                      <small>${translateText("worldfront.active_battle")}</small>
+                      <strong>${translateText("worldfront.continue_game")}</strong>
                     </span>
                     <span aria-hidden="true">›</span>
                   </button>
