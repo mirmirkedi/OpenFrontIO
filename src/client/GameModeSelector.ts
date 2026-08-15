@@ -257,10 +257,10 @@ export class GameModeSelector extends LitElement {
         />
         <div class="opentroop-play-card__shade"></div>
         <div class="opentroop-play-card__content">
-          <div class="opentroop-play-card__badge">WORLD DOMINATION</div>
+          <div class="opentroop-play-card__badge">${translateText("worldfront.play_badge")}</div>
           <div>
-            <h2>Ready for battle?</h2>
-            <p>Play against bots on any map.</p>
+            <h2>${translateText("worldfront.play_title")}</h2>
+            <p>${translateText("worldfront.play_description")}</p>
           </div>
           <button
             class="opentroop-play-button"
@@ -268,7 +268,7 @@ export class GameModeSelector extends LitElement {
             ?disabled=${!this.inputValid}
           >
             <span class="opentroop-play-button__triangle"></span>
-            <span>Play</span>
+            <span>${translateText("main.play")}</span>
           </button>
         </div>
       </div>

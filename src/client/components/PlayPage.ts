@@ -3,6 +3,7 @@ import { customElement } from "lit/decorators.js";
 import { assetUrl } from "../../core/AssetUrls";
 import { isOpenTroopApp } from "../AppMode";
 import { loadActiveLocalGame } from "../LocalPersistantStats";
+import { translateText } from "../Utils";
 import "./CosmeticBackground";
 import "./NavAccountMenu";
 import "./NavUtilityIcons";
@@ -12,11 +13,34 @@ import "./StreamingNow";
 
 @customElement("play-page")
 export class PlayPage extends LitElement {
+  private languageRevision = 0;
+
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener("worldfront-language-changed", this.refreshLanguage);
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener(
+      "worldfront-language-changed",
+      this.refreshLanguage,
+    );
+    super.disconnectedCallback();
+  }
+
+  private refreshLanguage = () => {
+    this.languageRevision += 1;
+    this.requestUpdate();
+  };
+
   createRenderRoot() {
     return this;
   }
 
   render() {
+    // Read the revision so Lit rerenders this static shell after a language
+    // selection even though its labels are resolved through translateText().
+    void this.languageRevision;
     const appMode = isOpenTroopApp();
     const hasSavedGame = appMode && loadActiveLocalGame() !== null;
     if (appMode) {
@@ -37,21 +61,33 @@ export class PlayPage extends LitElement {
                 alt="WorldFront"
               />
             </div>
-            <button
-              class="opentroop-icon-button"
-              aria-label="Help"
-              @click=${() => window.showPage?.("page-help")}
-            >
-              ?
-            </button>
+            <div class="opentroop-home__actions">
+              <button
+                class="opentroop-icon-button"
+                aria-label=${translateText("select_lang.title")}
+                @click=${this.openLanguagePicker}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="12" cy="12" r="8.5"></circle>
+                  <path d="M3.5 12h17M12 3.5c2.3 2.3 3.4 5.1 3.4 8.5S14.3 18.2 12 20.5C9.7 18.2 8.6 15.4 8.6 12S9.7 5.8 12 3.5Z"></path>
+                </svg>
+              </button>
+              <button
+                class="opentroop-icon-button"
+                aria-label="Help"
+                @click=${() => window.showPage?.("page-help")}
+              >
+                ?
+              </button>
+            </div>
           </header>
 
           <section class="opentroop-home__content">
             <div class="opentroop-home__eyebrow">
-              <span></span> SOLO CAMPAIGN <span></span>
+              <span></span><span data-i18n="worldfront.home_eyebrow">SOLO CAMPAIGN</span><span></span>
             </div>
-            <h1>Command the world.</h1>
-            <p>Choose a battlefield, outsmart the bots, and build your empire.</p>
+            <h1 data-i18n="worldfront.home_title">Command the world.</h1>
+            <p data-i18n="worldfront.home_description">Choose a battlefield, outsmart the bots, and build your empire.</p>
 
             ${hasSavedGame
               ? html`
@@ -64,8 +100,8 @@ export class PlayPage extends LitElement {
                   >
                     <span class="opentroop-continue-button__icon">↻</span>
                     <span>
-                      <small>ACTIVE BATTLE</small>
-                      <strong>Continue game</strong>
+                      <small data-i18n="worldfront.active_battle">ACTIVE BATTLE</small>
+                      <strong data-i18n="worldfront.continue_game">Continue game</strong>
                     </span>
                     <span aria-hidden="true">›</span>
                   </button>
@@ -201,5 +237,13 @@ export class PlayPage extends LitElement {
             ></steam-wishlist>`}
       </div>
     `;
+  }
+
+  private openLanguagePicker() {
+    (
+      document.querySelector("lang-selector") as {
+        openLanguagePicker?: () => Promise<void>;
+      } | null
+    )?.openLanguagePicker?.();
   }
 }

@@ -16,6 +16,8 @@ type LanguageMetadata = {
   svg: string;
 };
 
+const WORLDFRONT_LANGUAGE_KEY = "worldfront.language";
+
 @customElement("lang-selector")
 export class LangSelector extends LitElement {
   @state() public translations: Record<string, string> | undefined;
@@ -87,7 +89,11 @@ export class LangSelector extends LitElement {
 
   private async initializeLanguage() {
     const browserLocale = navigator.language;
-    const savedLang = localStorage.getItem("lang");
+    // Keep the mobile game's explicit choice across app restarts while still
+    // respecting the web game's existing language preference.
+    const savedLang =
+      localStorage.getItem(WORLDFRONT_LANGUAGE_KEY) ??
+      localStorage.getItem("lang");
     const userLang = this.getClosestSupportedLang(savedLang ?? browserLocale);
 
     const [defaultTranslations, translations] = await Promise.all([
@@ -101,6 +107,7 @@ export class LangSelector extends LitElement {
 
     await this.loadLanguageList();
     this.applyTranslation();
+    this.notifyLanguageChanged();
   }
 
   private async loadLanguage(lang: string): Promise<Record<string, string>> {
@@ -199,9 +206,19 @@ export class LangSelector extends LitElement {
 
   private async changeLanguage(lang: string) {
     localStorage.setItem("lang", lang);
+    localStorage.setItem(WORLDFRONT_LANGUAGE_KEY, lang);
     this.translations = await this.loadLanguage(lang);
     this.currentLang = lang;
     this.applyTranslation();
+    this.notifyLanguageChanged();
+  }
+
+  private notifyLanguageChanged() {
+    window.dispatchEvent(
+      new CustomEvent("worldfront-language-changed", {
+        detail: { lang: this.currentLang },
+      }),
+    );
   }
 
   private applyTranslation() {
@@ -224,6 +241,7 @@ export class LangSelector extends LitElement {
       "settings-modal",
       "username-input",
       "game-mode-selector",
+      "play-page",
       "game-config-settings",
       "map-picker",
       "graphics-preset-selector",
@@ -339,6 +357,10 @@ export class LangSelector extends LitElement {
       // Use the navigation system
       window.showPage?.("page-language");
     }
+  }
+
+  public async openLanguagePicker(): Promise<void> {
+    await this.openModal();
   }
 
   public close() {

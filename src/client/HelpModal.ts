@@ -3,6 +3,7 @@ import { customElement, query, state } from "lit/decorators.js";
 import { translateText, TUTORIAL_VIDEO_URL } from "../client/Utils";
 import { assetUrl } from "../core/AssetUrls";
 import { UserSettings } from "../core/game/UserSettings";
+import { isOpenTroopApp } from "./AppMode";
 import { BaseModal } from "./components/BaseModal";
 import "./components/Difficulties";
 import { modalHeader } from "./components/ui/ModalHeader";
@@ -81,6 +82,15 @@ export class HelpModal extends BaseModal {
           [&_li]:text-gray-300 [&_li]:leading-relaxed
           [&_p]:text-gray-300 [&_p]:mb-3 [&_strong]:text-white [&_strong]:font-bold"
       >
+          ${isOpenTroopApp()
+            ? html`<button
+                class="mb-5 flex w-full items-center justify-between rounded-xl border border-sky-300/20 bg-[#0a2034] px-4 py-3 text-left text-sm font-bold text-sky-100"
+                @click=${this.openLanguagePicker}
+              >
+                <span>${translateText("select_lang.title")}</span>
+                <span class="text-sky-300" aria-hidden="true">›</span>
+              </button>`
+            : null}
           <!-- Video Tutorial Section -->
           <div class="flex items-center gap-3 mb-3">
             <div class="text-blue-400">
@@ -1234,6 +1244,14 @@ export class HelpModal extends BaseModal {
         </div>
       </div>
     `;
+  }
+
+  private openLanguagePicker() {
+    (
+      document.querySelector("lang-selector") as {
+        openLanguagePicker?: () => Promise<void>;
+      } | null
+    )?.openLanguagePicker?.();
   }
 
   openTroubleshooting() {

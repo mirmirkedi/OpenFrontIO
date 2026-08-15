@@ -268,7 +268,7 @@ export class SinglePlayerModal extends BaseModal {
   protected renderHeaderSlot() {
     if (isOpenTroopApp()) {
       return modalHeader({
-        title: "BATTLE SETUP",
+        title: translateText("worldfront.setup_header"),
         onBack: () => this.close(),
         ariaLabel: translateText("common.back"),
         leftClassName: "opentroop-setup-header__left",
@@ -423,15 +423,6 @@ export class SinglePlayerModal extends BaseModal {
         <div
           class="opentroop-setup-scroll flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-4 pb-6 mr-1 mx-auto w-full max-w-5xl"
         >
-          ${isOpenTroopApp()
-            ? html`
-                <div class="opentroop-setup-intro">
-                  <span>NEW BATTLE</span>
-                  <h2>Set the battlefield.</h2>
-                  <p>Pick a map, choose your challenge, then command your troops.</p>
-                </div>
-              `
-            : null}
           <game-config-settings
             class="block"
             .sectionGapClass=${"space-y-6"}
