@@ -13,15 +13,11 @@ import {
   getSecondsUntilServerTimestamp,
   renderDuration,
 } from "../Utils";
-import {
-  MultiplayerServerAdapter,
-  ServerConnectionStatus,
-} from "./MultiplayerServerAdapter";
+import { MultiplayerServerAdapter } from "./MultiplayerServerAdapter";
 
 @customElement("multiplayer-home-modal")
 export class MultiplayerHomeModal extends BaseModal {
   @state() private lobbies: PublicGames | null = null;
-  @state() private serverStatus: ServerConnectionStatus = "disconnected";
   @state() private joinCode: string = "";
   @state() private joinError: string = "";
   @state() private defaultLobbyTime: number = 60;
@@ -44,10 +40,6 @@ export class MultiplayerHomeModal extends BaseModal {
     const adapter = MultiplayerServerAdapter.getInstance();
     this.unsubscribeAdapter = adapter.subscribe({
       onLobbiesUpdate: (lobbies) => this.handleLobbiesUpdate(lobbies),
-      onStatusChange: (status) => {
-        this.serverStatus = status;
-        this.requestUpdate();
-      },
     });
     adapter.connect();
   }
@@ -131,25 +123,6 @@ export class MultiplayerHomeModal extends BaseModal {
             Multiplayer
           </span>
         </div>
-        <div>
-          ${this.renderServerStatusBadge()}
-        </div>
-      </div>
-    `;
-  }
-
-  private renderServerStatusBadge() {
-    const isOnline = this.serverStatus === "connected";
-    const statusText = isOnline
-      ? "SERVER ONLINE"
-      : this.serverStatus === "connecting" || this.serverStatus === "reconnecting"
-        ? "CONNECTING..."
-        : "OFFLINE";
-
-    return html`
-      <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#051a2d] border border-[#1d4c72] text-[11px] font-black tracking-widest text-[#a8e2ff]">
-        <span class="w-2 h-2 rounded-full ${isOnline ? "bg-[#38bdf8] shadow-[0_0_8px_#38bdf8]" : "bg-amber-400 animate-pulse"}"></span>
-        <span>${statusText}</span>
       </div>
     `;
   }

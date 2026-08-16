@@ -271,9 +271,6 @@ export class GameModeSelector extends LitElement {
               />
               <div class="opentroop-play-card__shade"></div>
               <div class="opentroop-play-card__content">
-                <div class="opentroop-play-card__badge">
-                  ${translateText("worldfront.play_badge")}
-                </div>
                 <div>
                   <h2>${translateText("worldfront.play_title")}</h2>
                   <p>${translateText("worldfront.play_description")}</p>
@@ -300,9 +297,6 @@ export class GameModeSelector extends LitElement {
               />
               <div class="opentroop-play-card__shade"></div>
               <div class="opentroop-play-card__content">
-                <div class="opentroop-play-card__badge">
-                  ONLINE WARZONE
-                </div>
                 <div>
                   <h2>Online Arena</h2>
                   <p>Play against real commanders online.</p>
