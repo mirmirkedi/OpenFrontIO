@@ -767,6 +767,48 @@ body {
   );
 }
 
+/* The 13-inch iPad layout has enough room for the setup frames to use the
+   whole horizontal canvas. Keep individual controls capped so they remain
+   readable instead of turning into oversized buttons. */
+@media (min-width: 1200px) {
+  .opentroop-setup-scroll {
+    max-width: none !important;
+    margin-inline: 0;
+  }
+
+  .opentroop-setup-shell game-config-settings section > div.grid {
+    justify-items: center;
+  }
+
+  .opentroop-setup-shell game-config-settings section > div.grid > button,
+  .opentroop-setup-shell game-config-settings section > div.grid > toggle-input-card {
+    width: 100%;
+    max-width: 320px;
+    justify-self: center;
+  }
+
+  .opentroop-setup-shell game-config-settings section > div.grid > div {
+    width: 100%;
+    max-width: 320px;
+    justify-self: center;
+  }
+
+  .opentroop-setup-shell game-config-settings section > div.grid > div.col-span-2 {
+    max-width: 520px;
+  }
+
+  .opentroop-setup-shell map-picker .grid > div {
+    width: 100%;
+    max-width: 320px;
+    justify-self: center;
+  }
+
+  .opentroop-start-battle {
+    max-width: 900px;
+    margin-inline: auto;
+  }
+}
+
 .opentroop-start-battle {
   display: flex;
   width: 100%;
