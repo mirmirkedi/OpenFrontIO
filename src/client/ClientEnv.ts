@@ -57,12 +57,20 @@ export class ClientEnv {
     return ClientEnv.get().gameEnv;
   }
   static numWorkers(): number {
+    const host = ClientEnv.serverHost();
+    if (!host || host === "openfront.io") {
+      return 4;
+    }
     return ClientEnv.get().numWorkers;
   }
   static turnstileSiteKey(): string {
     return ClientEnv.get().turnstileSiteKey;
   }
   static jwtAudience(): string {
+    const host = ClientEnv.serverHost();
+    if (!host || host === "openfront.io") {
+      return "openfront.io";
+    }
     return ClientEnv.get().jwtAudience;
   }
   static instanceId(): string {
@@ -99,7 +107,7 @@ export class ClientEnv {
     return 100;
   }
   static gameCreationRate(): number {
-    return ClientEnv.env() === GameEnv.Dev ? 5 * 1000 : 2 * 60 * 1000;
+    return 2 * 60 * 1000;
   }
   static workerIndex(gameID: GameID): number {
     return simpleHash(gameID) % ClientEnv.numWorkers();
@@ -125,30 +133,19 @@ export class ClientEnv {
 
 /**
  * Resolve the game-server WebSocket origin.
- *
- * When an explicit `serverHost` is configured, target it over TLS (wss). Only
- * the desktop app sets this: it loads the renderer from `app://openfront`,
- * where `window.location.host` is just "openfront" (not a real server), and the
- * game-server host is NOT derivable from the API audience — it is the bare
- * audience host in prod (`openfront.io`) but a branch-variable subdomain on
- * dev/staging (default `main.openfront.dev`, or `<branch>.openfront.dev`). So
- * the host is injected explicitly rather than derived.
- *
- * When no `serverHost` is configured — the normal web build — the game server
- * is same-origin as the document, so we keep the historical behaviour exactly:
- * derive scheme + host from `window.location`. This leaves the web build
- * byte-for-byte unchanged.
+ * Targets official openfront.io server for all multiplayer operations.
  */
 export function deriveServerWsBase(
   serverHost: string | undefined,
-  locationProtocol: string,
-  locationHost: string,
+  _locationProtocol: string,
+  _locationHost: string,
 ): string {
-  if (serverHost) {
-    return `wss://${serverHost}`;
+  if (serverHost && serverHost !== "localhost") {
+    return serverHost.startsWith("ws://") || serverHost.startsWith("wss://")
+      ? serverHost
+      : `wss://${serverHost}`;
   }
-  const wsProtocol = locationProtocol === "https:" ? "wss:" : "ws:";
-  return `${wsProtocol}//${locationHost}`;
+  return "wss://openfront.io";
 }
 /**
  * Values that flow from server → client via index.html. Set on the server from
