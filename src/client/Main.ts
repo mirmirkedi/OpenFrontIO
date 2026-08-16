@@ -924,7 +924,7 @@ class Client {
       this.lobbyHandle.stop(true);
       document.body.classList.remove("in-game");
     }
-    if (lobby.source === "public") {
+    if (lobby.source === "public" || lobby.source === "private") {
       this.joinModal?.open({
         lobbyId: lobby.gameID,
         lobbyInfo: lobby.publicLobbyInfo,

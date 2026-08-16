@@ -57,20 +57,12 @@ export class ClientEnv {
     return ClientEnv.get().gameEnv;
   }
   static numWorkers(): number {
-    const host = ClientEnv.serverHost();
-    if (!host || host === "openfront.io") {
-      return 4;
-    }
     return ClientEnv.get().numWorkers;
   }
   static turnstileSiteKey(): string {
     return ClientEnv.get().turnstileSiteKey;
   }
   static jwtAudience(): string {
-    const host = ClientEnv.serverHost();
-    if (!host || host === "openfront.io") {
-      return "openfront.io";
-    }
     return ClientEnv.get().jwtAudience;
   }
   static instanceId(): string {
@@ -107,7 +99,7 @@ export class ClientEnv {
     return 100;
   }
   static gameCreationRate(): number {
-    return 2 * 60 * 1000;
+    return 60 * 1000;
   }
   static workerIndex(gameID: GameID): number {
     return simpleHash(gameID) % ClientEnv.numWorkers();
@@ -133,19 +125,19 @@ export class ClientEnv {
 
 /**
  * Resolve the game-server WebSocket origin.
- * Targets official openfront.io server for all multiplayer operations.
  */
 export function deriveServerWsBase(
   serverHost: string | undefined,
-  _locationProtocol: string,
-  _locationHost: string,
+  locationProtocol: string,
+  locationHost: string,
 ): string {
   if (serverHost && serverHost !== "localhost") {
     return serverHost.startsWith("ws://") || serverHost.startsWith("wss://")
       ? serverHost
       : `wss://${serverHost}`;
   }
-  return "wss://openfront.io";
+  const wsProtocol = locationProtocol === "https:" ? "wss:" : "ws:";
+  return `${wsProtocol}//${locationHost}`;
 }
 /**
  * Values that flow from server → client via index.html. Set on the server from

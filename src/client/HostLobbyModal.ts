@@ -1458,11 +1458,7 @@ async function createLobby(): Promise<GameInfo> {
   // persistentID should never be exposed to other clients
   const token = await getPlayToken();
   try {
-    const createUrl =
-      typeof window !== "undefined" && window.location.origin.includes("openfront.io")
-        ? "/api/create_game"
-        : "https://openfront.io/api/create_game";
-    const response = await fetch(createUrl, {
+    const response = await fetch(`/api/create_game`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
