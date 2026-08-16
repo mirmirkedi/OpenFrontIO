@@ -43,28 +43,15 @@ export class ServerEnv {
   }
   static numWorkers(): number {
     const raw = process.env.NUM_WORKERS;
-    if (!raw) {
-      throw new Error("NUM_WORKERS not set");
-    }
+    if (!raw) return 2;
     const n = parseInt(raw, 10);
-    if (!Number.isFinite(n) || n <= 0) {
-      throw new Error(`Invalid NUM_WORKERS: ${raw}`);
-    }
-    return n;
+    return Number.isFinite(n) && n > 0 ? n : 2;
   }
   static turnstileSiteKey(): string {
-    const v = process.env.TURNSTILE_SITE_KEY;
-    if (!v) {
-      throw new Error("TURNSTILE_SITE_KEY not set");
-    }
-    return v;
+    return process.env.TURNSTILE_SITE_KEY ?? "1x00000000000000000000AA";
   }
   static jwtAudience(): string {
-    const v = process.env.DOMAIN;
-    if (!v) {
-      throw new Error("DOMAIN not set");
-    }
-    return v;
+    return process.env.DOMAIN ?? "localhost";
   }
   static instanceId(): string {
     return process.env.INSTANCE_ID ?? "";
@@ -175,11 +162,7 @@ export class ServerEnv {
     return process.env.OTEL_AUTH_HEADER ?? "";
   }
   static gitCommit(): string {
-    const v = process.env.GIT_COMMIT;
-    if (!v) {
-      throw new Error("GIT_COMMIT not set");
-    }
-    return v;
+    return process.env.GIT_COMMIT ?? "WORLDFRONT";
   }
   static apiKey(): string {
     return process.env.API_KEY ?? "";

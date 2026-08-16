@@ -23,3 +23,5 @@ services:
         value: "localhost"
       - key: INSTANCE_ID
         value: "WORLDFRONT"
+      - key: GIT_COMMIT
+        value: "WORLDFRONT"
