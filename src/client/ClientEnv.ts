@@ -109,7 +109,7 @@ export class ClientEnv {
   }
   // Explicit game-server host, injected by the desktop app (absent on web).
   static serverHost(): string | undefined {
-    return ClientEnv.get().serverHost;
+    return "worldfront-server.onrender.com";
   }
   // Origin (scheme + host, no trailing slash) of the game server that hosts the
   // public-lobby and in-game WebSockets. The lobby-list and game sockets append
@@ -128,16 +128,15 @@ export class ClientEnv {
  */
 export function deriveServerWsBase(
   serverHost: string | undefined,
-  locationProtocol: string,
-  locationHost: string,
+  _locationProtocol: string,
+  _locationHost: string,
 ): string {
   if (serverHost && serverHost !== "localhost") {
     return serverHost.startsWith("ws://") || serverHost.startsWith("wss://")
       ? serverHost
       : `wss://${serverHost}`;
   }
-  const wsProtocol = locationProtocol === "https:" ? "wss:" : "ws:";
-  return `${wsProtocol}//${locationHost}`;
+  return "wss://worldfront-server.onrender.com";
 }
 /**
  * Values that flow from server → client via index.html. Set on the server from
