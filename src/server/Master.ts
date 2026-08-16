@@ -146,23 +146,41 @@ export async function startMaster() {
   });
 }
 
-app.post("/api/create_game", (req, res) => {
-  const randomWorkerId = Math.floor(Math.random() * ServerEnv.numWorkers());
-  const targetPort = ServerEnv.workerPortByIndex(randomWorkerId);
-  const bodyData = JSON.stringify(req.body ?? {});
-  const headers: http.OutgoingHttpHeaders = {
-    "content-type": "application/json",
-    "content-length": Buffer.byteLength(bodyData).toString(),
-  };
-  if (req.headers.authorization) {
-    headers.authorization = req.headers.authorization;
+app.all("/api/*", (req, res) => {
+  if (req.path === "/api/health") {
+    const ready = lobbyService?.isHealthy() ?? false;
+    if (ready) {
+      res.json({ status: "ok" });
+    } else {
+      res.status(503).json({ status: "unavailable" });
+    }
+    return;
   }
+
+  // Extract gameID if present in path, e.g. /api/game/ABCDEF/listing
+  const gameMatch = req.path.match(/^\/api\/game\/([a-zA-Z0-9_-]+)/);
+  const targetWorkerId = gameMatch
+    ? ServerEnv.workerIndex(gameMatch[1])
+    : Math.floor(Math.random() * ServerEnv.numWorkers());
+  const targetPort = ServerEnv.workerPortByIndex(targetWorkerId);
+
+  const hasBody = req.method !== "GET" && req.method !== "HEAD" && req.body;
+  const bodyData = hasBody ? JSON.stringify(req.body) : undefined;
+  const headers: http.OutgoingHttpHeaders = {
+    ...req.headers,
+    host: `127.0.0.1:${targetPort}`,
+  };
+  if (bodyData) {
+    headers["content-type"] = "application/json";
+    headers["content-length"] = Buffer.byteLength(bodyData).toString();
+  }
+
   const proxyReq = http.request(
     {
       port: targetPort,
       host: "127.0.0.1",
-      path: "/api/create_game",
-      method: "POST",
+      path: req.originalUrl,
+      method: req.method,
       headers,
     },
     (proxyRes) => {
@@ -170,21 +188,16 @@ app.post("/api/create_game", (req, res) => {
       proxyRes.pipe(res);
     },
   );
+
   proxyReq.on("error", (err) => {
-    log.error("API proxy error:", err);
+    log.error(`API proxy error on ${req.method} ${req.originalUrl}:`, err);
     res.status(500).json({ error: "Failed to forward request to worker" });
   });
-  proxyReq.write(bodyData);
-  proxyReq.end();
-});
 
-app.get("/api/health", (_req, res) => {
-  const ready = lobbyService?.isHealthy() ?? false;
-  if (ready) {
-    res.json({ status: "ok" });
-  } else {
-    res.status(503).json({ status: "unavailable" });
+  if (bodyData) {
+    proxyReq.write(bodyData);
   }
+  proxyReq.end();
 });
 
 // Forward WebSocket upgrade connections to the matching worker
@@ -193,14 +206,17 @@ server.on("upgrade", (req, socket, head) => {
   if (match) {
     const workerIndex = parseInt(match[1], 10);
     const targetPort = ServerEnv.workerPortByIndex(workerIndex);
-    const targetPath = match[2] || "/";
+    const targetPath = req.url ?? "/";
 
     const proxyReq = http.request({
       port: targetPort,
       host: "127.0.0.1",
       path: targetPath,
       method: req.method,
-      headers: req.headers,
+      headers: {
+        ...req.headers,
+        host: `127.0.0.1:${targetPort}`,
+      },
     });
 
     proxyReq.on("upgrade", (proxyRes, proxySocket, proxyHead) => {
