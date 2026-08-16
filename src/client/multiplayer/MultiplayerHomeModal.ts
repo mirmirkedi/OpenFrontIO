@@ -119,7 +119,7 @@ export class MultiplayerHomeModal extends BaseModal {
           >
             ←
           </button>
-          <span class="opentroop-setup-header__title font-black uppercase tracking-wider">
+          <span class="opentroop-setup-header__title font-bold uppercase tracking-wider text-white">
             Multiplayer
           </span>
         </div>
@@ -138,53 +138,53 @@ export class MultiplayerHomeModal extends BaseModal {
       <div class="opentroop-setup-shell flex flex-col h-full">
         <div class="opentroop-setup-scroll flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-3 pb-6 mx-auto w-full max-w-4xl space-y-6">
           
-          <!-- Mode Actions Section -->
+          <!-- Warfare Actions Section -->
           <div>
             <div class="flex items-center justify-between pb-2 border-b border-white/10 mb-3">
-              <span class="text-xs font-black uppercase tracking-widest text-[#9edfff]">
+              <span class="text-xs font-bold uppercase tracking-widest text-white/50">
                 Warfare Actions
               </span>
             </div>
 
-            <!-- Action Grid (Tactical Game Buttons) -->
+            <!-- Action Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <!-- Quick Match Button -->
               <button
                 @click=${this.openQuickMatch}
-                class="game-config-card flex items-center justify-between p-4 rounded-xl border border-[#2d5d84]/50 bg-[#122b40] hover:bg-[#183a56] active:scale-[0.98] transition-all text-left"
+                class="w-full flex items-center justify-between p-4 rounded-xl border bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 active:scale-[0.98] transition-all text-left"
               >
                 <div>
-                  <span class="block text-sm sm:text-base font-black uppercase tracking-wider text-white">
+                  <span class="block text-sm sm:text-base font-bold uppercase tracking-wider text-white">
                     Quick Match
                   </span>
-                  <span class="block text-xs font-semibold text-[#8cc6eb] mt-0.5">
+                  <span class="block text-xs font-normal text-white/60 mt-0.5">
                     Jump into next available battle
                   </span>
                 </div>
-                <span class="text-xl text-[#38bdf8] font-bold">›</span>
+                <span class="text-lg text-white/40 font-bold">›</span>
               </button>
 
               <!-- Create Lobby Button -->
               <button
                 @click=${this.openCreateLobby}
-                class="game-config-card flex items-center justify-between p-4 rounded-xl border border-[#2d5d84]/50 bg-[#122b40] hover:bg-[#183a56] active:scale-[0.98] transition-all text-left"
+                class="w-full flex items-center justify-between p-4 rounded-xl border bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 active:scale-[0.98] transition-all text-left"
               >
                 <div>
-                  <span class="block text-sm sm:text-base font-black uppercase tracking-wider text-white">
+                  <span class="block text-sm sm:text-base font-bold uppercase tracking-wider text-white">
                     Create Lobby
                   </span>
-                  <span class="block text-xs font-semibold text-[#8cc6eb] mt-0.5">
+                  <span class="block text-xs font-normal text-white/60 mt-0.5">
                     Custom rules, maps & friends
                   </span>
                 </div>
-                <span class="text-xl text-[#38bdf8] font-bold">›</span>
+                <span class="text-lg text-white/40 font-bold">›</span>
               </button>
             </div>
 
             <!-- Join with Code Bar -->
             <form
               @submit=${this.handleJoinCodeSubmit}
-              class="mt-3 flex gap-2 items-center p-2 rounded-xl bg-[#081827] border border-[#1d4466]"
+              class="mt-3 flex gap-2 items-center p-1.5 rounded-xl bg-white/5 border border-white/10"
             >
               <input
                 type="text"
@@ -192,11 +192,11 @@ export class MultiplayerHomeModal extends BaseModal {
                 @input=${this.handleJoinCodeInput}
                 placeholder="ENTER LOBBY CODE"
                 maxlength="16"
-                class="flex-1 bg-transparent px-3 py-2 text-xs sm:text-sm font-mono font-bold tracking-widest text-white uppercase focus:outline-none placeholder:text-[#4d7a9e]"
+                class="flex-1 bg-transparent px-3 py-2 text-xs sm:text-sm font-mono font-bold tracking-widest text-white uppercase focus:outline-none placeholder:text-white/30"
               />
               <button
                 type="submit"
-                class="px-5 py-2.5 rounded-lg bg-[#0083d4] hover:bg-[#0294ee] active:scale-95 text-white font-black text-xs uppercase tracking-wider shadow-[0_3px_0_#004877] transition-all shrink-0"
+                class="px-5 py-2.5 rounded-lg bg-malibu-blue hover:bg-aquarius active:scale-95 text-white font-bold text-xs uppercase tracking-wider transition-all shrink-0"
               >
                 Join
               </button>
@@ -210,16 +210,16 @@ export class MultiplayerHomeModal extends BaseModal {
           <div>
             <div class="flex items-center justify-between pb-2 border-b border-white/10 mb-3">
               <div class="flex items-center gap-2">
-                <span class="text-xs font-black uppercase tracking-widest text-[#9edfff]">
+                <span class="text-xs font-bold uppercase tracking-widest text-white/50">
                   Public Battlefields
                 </span>
-                <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-[#164665] text-[#9edfff] border border-[#2d9bd2]/40">
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-white/10 text-white/80 border border-white/10">
                   ${allPublicGames.length}
                 </span>
               </div>
               <button
                 @click=${() => MultiplayerServerAdapter.getInstance().connect()}
-                class="text-[11px] font-black uppercase tracking-wider text-[#38bdf8] hover:text-[#7dd3fc]"
+                class="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-white"
               >
                 ↻ Refresh
               </button>
@@ -229,17 +229,17 @@ export class MultiplayerHomeModal extends BaseModal {
             ${this.lobbies === null
               ? html`
                   <div class="flex flex-col items-center justify-center p-8 text-center">
-                    <span class="w-8 h-8 border-3 border-[#38bdf8]/30 border-t-[#38bdf8] rounded-full animate-spin mb-2"></span>
-                    <p class="text-xs font-bold text-[#8cc6eb] tracking-wider uppercase">Loading battles...</p>
+                    <span class="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mb-2"></span>
+                    <p class="text-xs font-bold text-white/50 tracking-wider uppercase">Loading battles...</p>
                   </div>
                 `
               : allPublicGames.length === 0
                 ? html`
-                    <div class="p-6 text-center text-[#8cc6eb]">
+                    <div class="p-6 text-center text-white/60 rounded-xl bg-white/5 border border-white/10">
                       <p class="text-xs font-bold uppercase tracking-wider">No active public lobbies</p>
                       <button
                         @click=${this.openCreateLobby}
-                        class="mt-3 px-4 py-2 rounded-lg bg-[#0083d4] text-white font-black text-xs uppercase tracking-wider"
+                        class="mt-3 px-4 py-2 rounded-lg bg-malibu-blue hover:bg-aquarius text-white font-bold text-xs uppercase tracking-wider"
                       >
                         Create First Lobby
                       </button>
@@ -282,10 +282,10 @@ export class MultiplayerHomeModal extends BaseModal {
     return html`
       <div
         @click=${() => this.joinPublicLobby(lobby)}
-        class="group relative overflow-hidden rounded-xl border border-[#234b6e] bg-[#081b2c] hover:border-[#38bdf8] transition-all cursor-pointer flex flex-col justify-between min-h-[140px]"
+        class="group relative overflow-hidden rounded-xl border bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer flex flex-col justify-between min-h-[140px]"
       >
         <!-- Map Background Thumbnail -->
-        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-30 group-hover:opacity-50 transition-opacity">
+        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-30 group-hover:opacity-45 transition-opacity">
           ${mapImageSrc
             ? html`
                 <img
@@ -295,24 +295,24 @@ export class MultiplayerHomeModal extends BaseModal {
                 />
               `
             : nothing}
-          <div class="absolute inset-0 bg-gradient-to-t from-[#081b2c] via-[#081b2c]/85 to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
         </div>
 
         <!-- Top Badges -->
         <div class="relative z-10 flex items-start justify-between p-3 gap-2">
           <div class="flex flex-wrap gap-1">
-            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-[#0083d4] text-white">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-malibu-blue text-white">
               ${modeName}
             </span>
             ${modifierLabels.map(
               (mod) => html`
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#103a5c] text-[#a5e0ff] border border-[#205b8c]">
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-black/40 text-white/80 border border-white/10">
                   ${mod}
                 </span>
               `,
             )}
           </div>
-          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-black tracking-wider bg-[#04101b] text-[#38bdf8] border border-[#1a4468]">
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider bg-black/50 text-white border border-white/10">
             ${timeDisplay}
           </span>
         </div>
@@ -320,15 +320,15 @@ export class MultiplayerHomeModal extends BaseModal {
         <!-- Bottom Row -->
         <div class="relative z-10 flex items-end justify-between p-3">
           <div>
-            <h4 class="text-white font-black text-sm uppercase tracking-wider leading-tight">
+            <h4 class="text-white font-bold text-sm uppercase tracking-wider leading-tight">
               ${mapName}
             </h4>
-            <div class="text-[#8acbf4] text-xs font-bold mt-0.5">
+            <div class="text-white/60 text-xs font-normal mt-0.5">
               ${lobby.numClients ?? 0}/${lobby.gameConfig?.maxPlayers ?? 50} Players
             </div>
           </div>
           <button
-            class="px-4 py-1.5 rounded-lg bg-[#0083d4] hover:bg-[#0294ee] active:scale-95 text-white font-black text-xs uppercase tracking-wider shadow-[0_2px_0_#004877]"
+            class="px-4 py-1.5 rounded-lg bg-malibu-blue hover:bg-aquarius active:scale-95 text-white font-bold text-xs uppercase tracking-wider"
           >
             Join
           </button>
