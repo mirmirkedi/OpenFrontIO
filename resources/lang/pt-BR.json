@@ -477,7 +477,7 @@
     "medium": "Médio"
   },
   "discord_user_header": {
-    "avatar_alt": "Avatar"
+    "avatar_alt": "avatar"
   },
   "doomsday_clock": {
     "collapsing": "Colapsando - {rate}/s",
@@ -639,7 +639,7 @@
     "stats": "Estatísticas"
   },
   "game_mode": {
-    "ffa": "Free for All",
+    "ffa": "Grátis para todos",
     "hvn": "Humanos vs Nações",
     "teams": "Equipes"
   },
@@ -847,7 +847,7 @@
     "ui_wilderness": "Terra inóspita",
     "ui_your_team": "Seu Time:",
     "video_tutorial": "Vídeo tutorial",
-    "video_tutorial_title": "OpenFront.io Tutorial",
+    "video_tutorial_title": "Tutorial OpenFront.io",
     "build_atom": "Bomba Atômica",
     "build_city": "Cidade",
     "build_defense": "Posto de Defesa",
@@ -1041,7 +1041,7 @@
     "title": "OpenFront (ALFA)",
     "troubleshooting": "Solução de problemas",
     "user_avatar_alt": "Avatar de {username}",
-    "wiki": "Wiki",
+    "wiki": "Wikipédia",
     "settings": "Configurações"
   },
   "map": {
@@ -1116,7 +1116,7 @@
     "levant": "Mediterrâneo Levante",
     "lisbon": "Lisboa",
     "losangeles": "Los Angeles",
-    "luna": "Luna",
+    "luna": "Lua",
     "manicouagan": "Manicouagan",
     "map": "Mapa",
     "marenostrum": "Mar Mediterrâneo",
@@ -1125,7 +1125,7 @@
     "middleeast": "Oriente Médio",
     "milkyway": "Via Láctea",
     "mississippiriver": "Rio Mississippiano",
-    "montreal": "Montreal",
+    "montreal": "Montréal",
     "morethanluck": "Mais Que Sorte",
     "newyorkcity": "Cidade de Nova Iorque",
     "niledelta": "O Delta do Nilo",
@@ -1167,7 +1167,7 @@
     "worldinverted": "O Mundo Invertido",
     "yangtzeriver": "Rio Yangtze",
     "yellowsea": "O Mar Amarelo",
-    "yenisei": "Yenisei"
+    "yenisei": "Ienissei"
   },
   "map_categories": {
     "africa": "África",
@@ -1628,7 +1628,7 @@
     "no_subscriptions": "Não há inscrições disponíveis. Volte mais tarde para novos itens.",
     "no_tribes": "Você ainda não comprou nenhum nome de tribo.",
     "packs": "Pacotes",
-    "patterns": "Skins",
+    "patterns": "Peles",
     "plutonium_amount": "Quantidade de plutônio",
     "price_per_month": "/mês",
     "purchase_currency": "Comprar {currency}",
@@ -1825,7 +1825,7 @@
     "graphics_preset_desc": "Escolha o visual predefinido para o mapa. Ajuste finalize ou faça seu próprio nas configurações gráficas do jogo.",
     "graphics_preset_label": "Predefinição gráfica",
     "graphics_refresh_modifier": "Modificador de atualização de gráficos",
-    "graphics_refresh_modifier_desc": "Segure esta tecla e R para atualizar os gráficos",
+    "graphics_refresh_modifier_desc": "Segure esta tecla e {key} para atualizar os gráficos",
     "graphics_settings_desc": "Ajustar como o mapa parece",
     "graphics_settings_label": "Configurações de gráficos",
     "ground_attack": "Ataque terrestre",

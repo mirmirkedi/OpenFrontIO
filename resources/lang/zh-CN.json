@@ -999,7 +999,7 @@
   "leaderboard_modal": {
     "clan": "军团",
     "clans_tab": "军团",
-    "elo": "ELO",
+    "elo": "埃洛",
     "error": "加载排行榜时出错",
     "games": "游戏场数",
     "loading": "正在加载……",
@@ -1741,7 +1741,7 @@
     "copied_to_clipboard": "信息已复制到剪贴板！如果你需要帮助，可以随时在我们的Discord上分享它。",
     "device_pixel_ratio": "设备像素比",
     "environment": "环境",
-    "gpu": "GPU",
+    "gpu": "图形处理器",
     "gpu_tip": "如果有的话，请验证这是否是独显。",
     "hardware_acceleration_tip": "确保在您的浏览器设置中启用硬件加速以实现最佳性能。",
     "high_precision_shaders": "高精度阴影",

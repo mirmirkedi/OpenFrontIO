@@ -1918,15 +1918,15 @@
     "youtube_tutorial": "Need some pona?"
   },
   "worldfront": {
-    "active_battle": "ACTIVE BATTLE",
+    "active_battle": "utala lon",
     "continue_game": "Continue musi",
-    "home_description": "Choose a battlefield, outsmart the bots, and build your empire.",
-    "home_eyebrow": "SOLO CAMPAIGN",
-    "home_title": "Command the world.",
+    "home_description": "o wile e ma utala, o anpa e ilo, o pali e ma suli sina.",
+    "home_eyebrow": "musi pi jan wan",
+    "home_title": "o lawa e ma ale.",
     "language": "toki",
-    "play_badge": "WORLD DOMINATION",
+    "play_badge": "lawa ma ale",
     "play_description": "o musi against bots lon any map.",
-    "play_title": "Ready for battle?",
-    "setup_header": "BATTLE SETUP"
+    "play_title": "sina ken ala ken utala?",
+    "setup_header": "pali utala"
   }
 }

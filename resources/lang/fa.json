@@ -1304,7 +1304,7 @@
     "layers_header": "لایه های رندر",
     "max_label": "حداکثر:",
     "render_layers_summary": "آخرین تیک: {frames} فریم، {ms}ms",
-    "render_layers_table_header": "avg / max | tick avg",
+    "render_layers_table_header": "میانگین / حداکثر | تیک میانگین",
     "reset": "بازنشانی",
     "tick_delay": "تأخیر تیک:",
     "tick_exec": "تیک اجرایی:",

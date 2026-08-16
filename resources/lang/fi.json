@@ -1140,7 +1140,7 @@
     "northwestpassage": "Luoteisväylä",
     "oceania": "Oseania",
     "onion": "Sipuli",
-    "pangaea": "Pangaea",
+    "pangaea": "Pangea",
     "passage": "Passage",
     "pluto": "Pluto",
     "random": "Satunnainen",
@@ -1174,7 +1174,7 @@
     "worldinverted": "Maailma Käänteinen",
     "yangtzeriver": "Jangtse-joki",
     "yellowsea": "Keltainen meri",
-    "yenisei": "Yenisei"
+    "yenisei": "Jenisei"
   },
   "map_categories": {
     "africa": "Afrikka",
@@ -1804,12 +1804,12 @@
     "attack_ratio_controls": "Hyökkäyksen osuus -säätimet",
     "attack_ratio_desc": "Mikä osuus joukoistasi lähetetään hyökkäykseen (1–100%)",
     "attack_ratio_down": "Vähennä hyökkäyksen osuutta",
-    "attack_ratio_down_desc": "Vähennä hyökkäyksen osuutta 10%",
+    "attack_ratio_down_desc": "Vähennä hyökkäyksen osuutta {amount}%",
     "attack_ratio_increment_desc": "Kuinka paljon hyökkäyssuhteen näppäinsidokset muuttuvat painallusta/vieritystä kohden.",
     "attack_ratio_increment_label": "Hyökkäyssuhteen näppäinsidon lisäys",
     "attack_ratio_label": "⚔️ Hyökkäyksen osuus",
     "attack_ratio_up": "Lisää hyökkäyksen osuutta",
-    "attack_ratio_up_desc": "Lisää hyökkäyksen osuutta 10%",
+    "attack_ratio_up_desc": "Lisää hyökkäyksen osuutta {amount}%",
     "attacking_troops_overlay_desc": "Näytä hyökkääjän ja puolustajan joukkojen määrä aktiivisilla etulinjoilla.",
     "attacking_troops_overlay_label": "Hyökkäävien joukkojen peitto",
     "background_music_volume": "Taustamusiikin äänenvoimakkuus",
