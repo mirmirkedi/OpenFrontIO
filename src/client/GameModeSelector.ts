@@ -247,33 +247,137 @@ export class GameModeSelector extends LitElement {
     `;
   }
 
+  @state() private currentSlide: number = 0;
+  private carouselTrackRef: HTMLElement | null = null;
+
   private renderOpenTroopHome() {
     return html`
-      <div class="opentroop-play-card">
-        <img
-          class="opentroop-play-card__map"
-          src=${assetUrl("images/TerrainMapFrontPage.png")}
-          alt=""
-        />
-        <div class="opentroop-play-card__shade"></div>
-        <div class="opentroop-play-card__content">
-          <div class="opentroop-play-card__badge">${translateText("worldfront.play_badge")}</div>
-          <div>
-            <h2>${translateText("worldfront.play_title")}</h2>
-            <p>${translateText("worldfront.play_description")}</p>
+      <div class="opentroop-carousel-container">
+        <!-- Carousel Track -->
+        <div
+          class="opentroop-carousel-track"
+          @scroll=${this.handleCarouselScroll}
+          ${(el: Element) => {
+            this.carouselTrackRef = el as HTMLElement;
+          }}
+        >
+          <!-- Slide 0: Solo / Bot Battle -->
+          <div class="opentroop-carousel-slide">
+            <div class="opentroop-play-card">
+              <img
+                class="opentroop-play-card__map"
+                src=${assetUrl("images/TerrainMapFrontPage.png")}
+                alt=""
+              />
+              <div class="opentroop-play-card__shade"></div>
+              <div class="opentroop-play-card__content">
+                <div class="opentroop-play-card__badge">
+                  ${translateText("worldfront.play_badge")}
+                </div>
+                <div>
+                  <h2>${translateText("worldfront.play_title")}</h2>
+                  <p>${translateText("worldfront.play_description")}</p>
+                </div>
+                <button
+                  class="opentroop-play-button"
+                  @click=${this.openSinglePlayerModal}
+                  ?disabled=${!this.inputValid}
+                >
+                  <span class="opentroop-play-button__triangle"></span>
+                  <span>${translateText("main.play")}</span>
+                </button>
+              </div>
+            </div>
           </div>
+
+          <!-- Slide 1: Multiplayer Online Battle -->
+          <div class="opentroop-carousel-slide">
+            <div class="opentroop-play-card opentroop-play-card--multiplayer">
+              <img
+                class="opentroop-play-card__map"
+                src=${assetUrl("images/TerrainMapFrontPage.png")}
+                alt=""
+              />
+              <div class="opentroop-play-card__shade"></div>
+              <div class="opentroop-play-card__content">
+                <div class="opentroop-play-card__badge">
+                  ONLINE WARZONE
+                </div>
+                <div>
+                  <h2>Online Arena</h2>
+                  <p>Play against real commanders online.</p>
+                </div>
+                <button
+                  class="opentroop-play-button"
+                  @click=${this.openMultiplayerModal}
+                  ?disabled=${!this.inputValid}
+                >
+                  <span class="opentroop-play-button__triangle"></span>
+                  <span>MULTIPLAYER</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination Dots -->
+        <div class="opentroop-carousel-pagination">
           <button
-            class="opentroop-play-button"
-            @click=${this.openSinglePlayerModal}
-            ?disabled=${!this.inputValid}
-          >
-            <span class="opentroop-play-button__triangle"></span>
-            <span>${translateText("main.play")}</span>
-          </button>
+            class="opentroop-carousel-dot ${this.currentSlide === 0 ? "opentroop-carousel-dot--active" : ""}"
+            @click=${() => this.scrollToSlide(0)}
+            aria-label="Solo battle"
+          ></button>
+          <button
+            class="opentroop-carousel-dot ${this.currentSlide === 1 ? "opentroop-carousel-dot--active" : ""}"
+            @click=${() => this.scrollToSlide(1)}
+            aria-label="Multiplayer battle"
+          ></button>
         </div>
       </div>
     `;
   }
+
+  private handleCarouselScroll = (e: Event) => {
+    const el = e.target as HTMLElement;
+    const scrollLeft = el.scrollLeft;
+    const width = el.clientWidth;
+    if (width <= 0) return;
+    const nextIndex = Math.round(scrollLeft / width);
+    if (nextIndex !== this.currentSlide && (nextIndex === 0 || nextIndex === 1)) {
+      this.currentSlide = nextIndex;
+      window.dispatchEvent(
+        new CustomEvent("opentroop-mode-changed", {
+          detail: { mode: nextIndex },
+        }),
+      );
+    }
+  };
+
+  private scrollToSlide(index: number) {
+    this.currentSlide = index;
+    window.dispatchEvent(
+      new CustomEvent("opentroop-mode-changed", {
+        detail: { mode: index },
+      }),
+    );
+    const track =
+      this.carouselTrackRef ??
+      (this.querySelector(".opentroop-carousel-track") as HTMLElement | null);
+    if (track) {
+      track.scrollTo({
+        left: index * track.clientWidth,
+        behavior: "smooth",
+      });
+    }
+  }
+
+  private openMultiplayerModal = () => {
+    if (!this.validateUsername()) return;
+    window.showPage?.("page-multiplayer");
+    (
+      document.querySelector("multiplayer-home-modal") as { open?: () => void } | null
+    )?.open?.();
+  };
 
   private renderSpecialLobbyCard(lobby: PublicGameInfo) {
     return this.renderLobbyCard(lobby, this.getLobbyTitle(lobby));

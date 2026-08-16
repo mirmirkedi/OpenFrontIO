@@ -61,6 +61,7 @@ import "./NewsModal";
 import "./PlayerProfileModal";
 import { RewardsModal } from "./RewardsModal";
 import "./SinglePlayerModal";
+import "./multiplayer/MultiplayerHomeModal";
 import {
   isSteamLinkHash,
   parseSteamLinkToken,
