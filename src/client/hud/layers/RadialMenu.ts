@@ -916,12 +916,14 @@ export class RadialMenu implements Controller {
   private handleCenterButtonClick() {
     if (this.centerButtonState === "default") {
       if (this.params && this.isCenterButtonEnabled()) {
+        this.eventBus.emit(new PlaySoundEffectEvent("click"));
         this.centerButtonElement?.action(this.params);
       }
       return;
     }
 
     if (this.centerButtonState === "back") {
+      this.eventBus.emit(new PlaySoundEffectEvent("click"));
       this.navigationInProgress = true;
       this.navigateBack();
       return;
