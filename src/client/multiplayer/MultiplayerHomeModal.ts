@@ -136,11 +136,11 @@ export class MultiplayerHomeModal extends BaseModal {
 
     return html`
       <div class="opentroop-setup-shell flex flex-col h-full">
-        <div class="opentroop-setup-scroll flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-3 pb-6 mx-auto w-full max-w-4xl space-y-5">
+        <div class="opentroop-setup-scroll flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-3 pb-6 mx-auto w-full max-w-4xl space-y-6">
           
           <!-- Mode Actions Section -->
-          <section class="p-3.5 border border-[#1f405c]/60 rounded-xl bg-[#0d2133]">
-            <div class="flex items-center justify-between pb-3 border-b border-[#1f405c]/40 mb-3.5">
+          <div>
+            <div class="flex items-center justify-between pb-2 border-b border-white/10 mb-3">
               <span class="text-xs font-black uppercase tracking-widest text-[#9edfff]">
                 Warfare Actions
               </span>
@@ -204,11 +204,11 @@ export class MultiplayerHomeModal extends BaseModal {
             ${this.joinError
               ? html`<p class="text-rose-400 text-xs font-bold mt-2 px-1">${this.joinError}</p>`
               : nothing}
-          </section>
+          </div>
 
           <!-- Public Battles Section -->
-          <section class="p-3.5 border border-[#1f405c]/60 rounded-xl bg-[#0d2133]">
-            <div class="flex items-center justify-between pb-3 border-b border-[#1f405c]/40 mb-3.5">
+          <div>
+            <div class="flex items-center justify-between pb-2 border-b border-white/10 mb-3">
               <div class="flex items-center gap-2">
                 <span class="text-xs font-black uppercase tracking-widest text-[#9edfff]">
                   Public Battlefields
@@ -250,7 +250,7 @@ export class MultiplayerHomeModal extends BaseModal {
                       ${allPublicGames.map((lobby) => this.renderPublicLobbyCard(lobby))}
                     </div>
                   `}
-          </section>
+          </div>
 
         </div>
       </div>

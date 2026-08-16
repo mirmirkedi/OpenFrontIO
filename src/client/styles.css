@@ -737,18 +737,20 @@ body {
 }
 
 .opentroop-setup-shell game-config-settings section {
-  padding: 14px;
-  border: 1px solid rgba(145, 201, 231, 0.14);
-  border-radius: 12px;
-  background: #0d2133;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
 }
 
 .opentroop-setup-shell game-config-settings section + section {
-  margin-top: 14px;
+  margin-top: 22px;
 }
 .opentroop-setup-shell game-config-settings section > div:first-child {
-  border-bottom-color: rgba(145, 201, 231, 0.18);
+  border-bottom: 1px solid rgba(145, 201, 231, 0.18);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
 }
 .opentroop-setup-shell map-picker .map-picker-tabs {
   border-radius: 14px;
