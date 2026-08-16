@@ -213,6 +213,7 @@ async function refreshJwt(): Promise<void> {
 }
 
 async function doRefreshJwt(): Promise<void> {
+  if (isOpenTroopApp()) return;
   if (steamSDK.isOnSteam()) {
     const ticket = await steamSDK.getTicket();
     if (ticket) {

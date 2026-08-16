@@ -128,9 +128,13 @@ export class ClientEnv {
  */
 export function deriveServerWsBase(
   serverHost: string | undefined,
-  _locationProtocol: string,
-  _locationHost: string,
+  locationProtocol: string,
+  locationHost: string,
 ): string {
+  if (typeof window !== "undefined" && window.location.hostname === "localhost") {
+    const wsProtocol = locationProtocol === "https:" ? "wss:" : "ws:";
+    return `${wsProtocol}//${locationHost}`;
+  }
   if (serverHost && serverHost !== "localhost") {
     return serverHost.startsWith("ws://") || serverHost.startsWith("wss://")
       ? serverHost

@@ -25,6 +25,17 @@ const log = logger.child({ comp: "m" });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.use((_req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+  if (_req.method === "OPTIONS") {
+    res.sendStatus(200);
+    return;
+  }
+  next();
+});
+
 app.use(express.json());
 
 // Serve the shared app shell for the root document.
@@ -138,8 +149,14 @@ export async function startMaster() {
 app.post("/api/create_game", (req, res) => {
   const randomWorkerId = Math.floor(Math.random() * ServerEnv.numWorkers());
   const targetPort = ServerEnv.workerPortByIndex(randomWorkerId);
-  const bodyData = JSON.stringify(req.body);
-  const headers = { ...req.headers, "content-length": Buffer.byteLength(bodyData).toString() };
+  const bodyData = JSON.stringify(req.body ?? {});
+  const headers: http.OutgoingHttpHeaders = {
+    "content-type": "application/json",
+    "content-length": Buffer.byteLength(bodyData).toString(),
+  };
+  if (req.headers.authorization) {
+    headers.authorization = req.headers.authorization;
+  }
   const proxyReq = http.request(
     {
       port: targetPort,

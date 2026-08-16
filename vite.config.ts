@@ -398,32 +398,31 @@ export default defineConfig(({ mode }) => {
       open: process.env.SKIP_BROWSER_OPEN !== "true",
       proxy: {
         "/lobbies": {
-          target: "ws://localhost:3000",
+          target: "https://worldfront-server.onrender.com",
           ws: true,
+          secure: true,
           changeOrigin: true,
         },
         // Worker proxies
         "/w0": {
-          target: "ws://localhost:3001",
+          target: "https://worldfront-server.onrender.com",
           ws: true,
-          secure: false,
+          secure: true,
           changeOrigin: true,
           bypass: (req) => devGameHtmlBypass(req),
-          rewrite: (path) => path.replace(/^\/w0/, ""),
         },
         "/w1": {
-          target: "ws://localhost:3002",
+          target: "https://worldfront-server.onrender.com",
           ws: true,
-          secure: false,
+          secure: true,
           changeOrigin: true,
           bypass: (req) => devGameHtmlBypass(req),
-          rewrite: (path) => path.replace(/^\/w1/, ""),
         },
         // API proxies
         "/api": {
-          target: "http://localhost:3000",
+          target: "https://worldfront-server.onrender.com",
           changeOrigin: true,
-          secure: false,
+          secure: true,
         },
       },
     },
