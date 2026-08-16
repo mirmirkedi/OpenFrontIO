@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: worldfront-server
+    runtime: docker
+    plan: free
+    region: frankfurt
+    envVars:
+      - key: GAME_ENV
+        value: dev
+      - key: NUM_WORKERS
+        value: "2"
+      - key: TURNSTILE_SITE_KEY
+        value: "1x00000000000000000000AA"
+      - key: API_KEY
+        value: "WARNING_DEV_API_KEY_DO_NOT_USE_IN_PRODUCTION"
+      - key: ADMIN_BOT_API_KEY
+        value: "WARNING_DEV_ADMIN_BOT_KEY_DO_NOT_USE_IN_PRODUCTION"
+      - key: INSTANCE_ID
+        value: "WORLDFRONT"
