@@ -1,10 +1,14 @@
 services:
   - type: web
     name: worldfront-server
-    runtime: docker
+    runtime: node
     plan: free
     region: frankfurt
+    buildCommand: npm install --legacy-peer-deps && npm run build-prod
+    startCommand: npm run start:server
     envVars:
+      - key: NODE_VERSION
+        value: "24.11.1"
       - key: GAME_ENV
         value: dev
       - key: NUM_WORKERS
@@ -15,5 +19,7 @@ services:
         value: "WARNING_DEV_API_KEY_DO_NOT_USE_IN_PRODUCTION"
       - key: ADMIN_BOT_API_KEY
         value: "WARNING_DEV_ADMIN_BOT_KEY_DO_NOT_USE_IN_PRODUCTION"
+      - key: DOMAIN
+        value: "localhost"
       - key: INSTANCE_ID
         value: "WORLDFRONT"

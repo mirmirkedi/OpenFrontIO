@@ -7,8 +7,7 @@ FROM base AS build
 ENV HUSKY=0
 # Copy package files first for better caching
 COPY package*.json ./
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci
+RUN npm install --legacy-peer-deps
 
 # Copy only what's needed for build
 COPY tsconfig.json ./
@@ -17,6 +16,7 @@ COPY eslint.config.js ./
 COPY index.html ./
 COPY resources ./resources
 COPY proprietary ./proprietary
+COPY scripts ./scripts
 COPY src ./src
 
 ARG GIT_COMMIT=unknown
@@ -28,8 +28,7 @@ FROM base AS prod-deps
 ENV HUSKY=0
 ENV NPM_CONFIG_IGNORE_SCRIPTS=1
 COPY package*.json ./
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev
+RUN npm install --omit=dev --legacy-peer-deps
 
 # Final production image
 FROM base
