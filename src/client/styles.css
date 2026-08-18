@@ -663,10 +663,10 @@ body {
 }
 
 .opentroop-setup-shell game-config-settings section {
-  padding: 14px;
-  border: 1px solid rgba(145, 201, 231, 0.14);
-  border-radius: 12px;
-  background: #0d2133;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
 }
 
