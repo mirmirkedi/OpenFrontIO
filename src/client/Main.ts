@@ -61,7 +61,6 @@ import "./NewsModal";
 import "./PlayerProfileModal";
 import { RewardsModal } from "./RewardsModal";
 import "./SinglePlayerModal";
-import "./multiplayer/MultiplayerHomeModal";
 import {
   isSteamLinkHash,
   parseSteamLinkToken,
@@ -924,7 +923,7 @@ class Client {
       this.lobbyHandle.stop(true);
       document.body.classList.remove("in-game");
     }
-    if (lobby.source === "public" || lobby.source === "private") {
+    if (lobby.source === "public") {
       this.joinModal?.open({
         lobbyId: lobby.gameID,
         lobbyInfo: lobby.publicLobbyInfo,

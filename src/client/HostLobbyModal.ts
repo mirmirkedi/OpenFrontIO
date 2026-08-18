@@ -1458,6 +1458,8 @@ async function createLobby(): Promise<GameInfo> {
   // persistentID should never be exposed to other clients
   const token = await getPlayToken();
   try {
+    // No worker prefix and no id: nginx (prod) / the vite dev proxy randomly
+    // routes to a worker, which mints a self-owned id and returns it.
     const response = await fetch(`/api/create_game`, {
       method: "POST",
       headers: {

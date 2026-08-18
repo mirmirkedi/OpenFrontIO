@@ -99,7 +99,7 @@ export class ClientEnv {
     return 100;
   }
   static gameCreationRate(): number {
-    return 60 * 1000;
+    return ClientEnv.env() === GameEnv.Dev ? 5 * 1000 : 2 * 60 * 1000;
   }
   static workerIndex(gameID: GameID): number {
     return simpleHash(gameID) % ClientEnv.numWorkers();
@@ -109,7 +109,7 @@ export class ClientEnv {
   }
   // Explicit game-server host, injected by the desktop app (absent on web).
   static serverHost(): string | undefined {
-    return "worldfront-server.onrender.com";
+    return ClientEnv.get().serverHost;
   }
   // Origin (scheme + host, no trailing slash) of the game server that hosts the
   // public-lobby and in-game WebSockets. The lobby-list and game sockets append
@@ -125,22 +125,30 @@ export class ClientEnv {
 
 /**
  * Resolve the game-server WebSocket origin.
+ *
+ * When an explicit `serverHost` is configured, target it over TLS (wss). Only
+ * the desktop app sets this: it loads the renderer from `app://openfront`,
+ * where `window.location.host` is just "openfront" (not a real server), and the
+ * game-server host is NOT derivable from the API audience — it is the bare
+ * audience host in prod (`openfront.io`) but a branch-variable subdomain on
+ * dev/staging (default `main.openfront.dev`, or `<branch>.openfront.dev`). So
+ * the host is injected explicitly rather than derived.
+ *
+ * When no `serverHost` is configured — the normal web build — the game server
+ * is same-origin as the document, so we keep the historical behaviour exactly:
+ * derive scheme + host from `window.location`. This leaves the web build
+ * byte-for-byte unchanged.
  */
 export function deriveServerWsBase(
   serverHost: string | undefined,
   locationProtocol: string,
   locationHost: string,
 ): string {
-  if (typeof window !== "undefined" && window.location.hostname === "localhost") {
-    const wsProtocol = locationProtocol === "https:" ? "wss:" : "ws:";
-    return `${wsProtocol}//${locationHost}`;
+  if (serverHost) {
+    return `wss://${serverHost}`;
   }
-  if (serverHost && serverHost !== "localhost") {
-    return serverHost.startsWith("ws://") || serverHost.startsWith("wss://")
-      ? serverHost
-      : `wss://${serverHost}`;
-  }
-  return "wss://worldfront-server.onrender.com";
+  const wsProtocol = locationProtocol === "https:" ? "wss:" : "ws:";
+  return `${wsProtocol}//${locationHost}`;
 }
 /**
  * Values that flow from server → client via index.html. Set on the server from

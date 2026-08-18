@@ -14,15 +14,10 @@ import "./StreamingNow";
 @customElement("play-page")
 export class PlayPage extends LitElement {
   @state() private languageRevision = 0;
-  @state() private activeMode = 0;
 
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener("worldfront-language-changed", this.refreshLanguage);
-    window.addEventListener(
-      "opentroop-mode-changed",
-      this.handleModeChanged as EventListener,
-    );
   }
 
   disconnectedCallback() {
@@ -30,16 +25,8 @@ export class PlayPage extends LitElement {
       "worldfront-language-changed",
       this.refreshLanguage,
     );
-    window.removeEventListener(
-      "opentroop-mode-changed",
-      this.handleModeChanged as EventListener,
-    );
     super.disconnectedCallback();
   }
-
-  private handleModeChanged = (e: CustomEvent<{ mode: number }>) => {
-    this.activeMode = e.detail?.mode ?? 0;
-  };
 
   private refreshLanguage = () => {
     this.languageRevision += 1;
@@ -55,20 +42,6 @@ export class PlayPage extends LitElement {
     void this.languageRevision;
     const appMode = isOpenTroopApp();
     const hasSavedGame = appMode && loadActiveLocalGame() !== null;
-    const isMultiplayer = this.activeMode === 1;
-
-    const eyebrowText = isMultiplayer
-      ? "ONLINE MULTIPLAYER"
-      : translateText("worldfront.home_eyebrow");
-
-    const titleText = isMultiplayer
-      ? "Dominate the globe."
-      : translateText("worldfront.home_title");
-
-    const descText = isMultiplayer
-      ? "Challenge real players online, join active warzones, or battle friends."
-      : translateText("worldfront.home_description");
-
     if (appMode) {
       return html`
         <main id="page-play" class="opentroop-home">
@@ -111,11 +84,11 @@ export class PlayPage extends LitElement {
           <section class="opentroop-home__content">
             <div class="opentroop-home__eyebrow">
               <span class="opentroop-home__eyebrow-line"></span>
-              <span class="opentroop-home__eyebrow-text">${eyebrowText}</span>
+              <span class="opentroop-home__eyebrow-text">${translateText("worldfront.home_eyebrow")}</span>
               <span class="opentroop-home__eyebrow-line"></span>
             </div>
-            <h1>${titleText}</h1>
-            <p>${descText}</p>
+            <h1>${translateText("worldfront.home_title")}</h1>
+            <p>${translateText("worldfront.home_description")}</p>
 
             ${hasSavedGame
               ? html`

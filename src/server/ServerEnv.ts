@@ -43,15 +43,28 @@ export class ServerEnv {
   }
   static numWorkers(): number {
     const raw = process.env.NUM_WORKERS;
-    if (!raw) return 2;
+    if (!raw) {
+      throw new Error("NUM_WORKERS not set");
+    }
     const n = parseInt(raw, 10);
-    return Number.isFinite(n) && n > 0 ? n : 2;
+    if (!Number.isFinite(n) || n <= 0) {
+      throw new Error(`Invalid NUM_WORKERS: ${raw}`);
+    }
+    return n;
   }
   static turnstileSiteKey(): string {
-    return process.env.TURNSTILE_SITE_KEY ?? "1x00000000000000000000AA";
+    const v = process.env.TURNSTILE_SITE_KEY;
+    if (!v) {
+      throw new Error("TURNSTILE_SITE_KEY not set");
+    }
+    return v;
   }
   static jwtAudience(): string {
-    return process.env.DOMAIN ?? "localhost";
+    const v = process.env.DOMAIN;
+    if (!v) {
+      throw new Error("DOMAIN not set");
+    }
+    return v;
   }
   static instanceId(): string {
     return process.env.INSTANCE_ID ?? "";
@@ -113,7 +126,7 @@ export class ServerEnv {
     return 100;
   }
   static gameCreationRate(): number {
-    return 60 * 1000;
+    return ServerEnv.gameEnv === GameEnv.Dev ? 5 * 1000 : 2 * 60 * 1000;
   }
   static workerIndex(gameID: GameID): number {
     return simpleHash(gameID) % ServerEnv.numWorkers();
@@ -162,7 +175,11 @@ export class ServerEnv {
     return process.env.OTEL_AUTH_HEADER ?? "";
   }
   static gitCommit(): string {
-    return process.env.GIT_COMMIT ?? "WORLDFRONT";
+    const v = process.env.GIT_COMMIT;
+    if (!v) {
+      throw new Error("GIT_COMMIT not set");
+    }
+    return v;
   }
   static apiKey(): string {
     return process.env.API_KEY ?? "";
