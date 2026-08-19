@@ -271,6 +271,12 @@ export class SinglePlayerModal extends BaseModal {
         title: translateText("worldfront.setup_header"),
         onBack: () => this.close(),
         ariaLabel: translateText("common.back"),
+        rightContent: html`<button
+          class="opentroop-start-battle-header"
+          @click=${this.startGame}
+        >
+          START
+        </button>`,
         leftClassName: "opentroop-setup-header__left",
         buttonClassName: "opentroop-setup-header__back",
         titleClassName: "opentroop-setup-header__title",

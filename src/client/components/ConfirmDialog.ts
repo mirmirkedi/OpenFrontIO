@@ -30,7 +30,7 @@ import { translateText } from "../Utils";
 export class ConfirmDialog extends LitElement {
   @property() heading = "";
   @property() message = "";
-  @property() variant: "danger" | "warning" = "danger";
+  @property() variant: "danger" | "warning" | "neutral" = "danger";
   @property() textareaPlaceholder = "";
   @property() confirmText = "";
   @property({ type: Boolean }) disabled = false;
@@ -71,12 +71,23 @@ export class ConfirmDialog extends LitElement {
 
   private renderOverlay() {
     const isDanger = this.variant === "danger";
-    const borderColor = isDanger ? "border-red-500/50" : "border-amber-500/50";
+    const isWarning = this.variant === "warning";
+    const borderColor = isDanger
+      ? "border-red-500/50"
+      : isWarning
+        ? "border-amber-500/50"
+        : "border-white/10";
     const cardBg = "bg-surface";
-    const textColor = isDanger ? "text-red-300" : "text-amber-300";
+    const textColor = isDanger
+      ? "text-red-300"
+      : isWarning
+        ? "text-amber-300"
+        : "text-white";
     const btnClass = isDanger
       ? "bg-red-600 text-white hover:bg-red-700"
-      : "bg-amber-600 text-white hover:bg-amber-700";
+      : isWarning
+        ? "bg-amber-600 text-white hover:bg-amber-700"
+        : "bg-blue-600 text-white hover:bg-blue-700";
 
     return html`
       <div

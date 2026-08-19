@@ -629,7 +629,9 @@ class Client {
           // We can't block navigation on an async confirmation, so restore the
           // history entry immediately and only leave once the player confirms.
           history.pushState(null, "", this.currentUrl);
-          showInGameConfirm(translateText("help_modal.exit_confirmation")).then(
+          showInGameConfirm(translateText("help_modal.exit_confirmation"), {
+            variant: "neutral",
+          }).then(
             (isConfirmed) => {
               if (isConfirmed) leaveGame();
             },
