@@ -7,7 +7,7 @@
     "build-opentroop": "npm run build-worldfront",
     "cap:sync": "npm run build-worldfront && cap sync android",
     "android:debug": "npm run build-worldfront && cap sync android && cap build android --androidreleasetype APK",
-    "android:release": "npm run build-worldfront && cap sync android && cap build android --androidreleasetype AAB",
+    "android:release": "npm run build-worldfront && cap sync android && cap build android --androidreleasetype AAB --keystorepath \"$OPENTROOP_KEYSTORE_PATH\" --keystorepass \"$OPENTROOP_KEYSTORE_PASSWORD\" --keystorealias \"$OPENTROOP_KEY_ALIAS\" --keystorealiaspass \"$OPENTROOP_KEY_PASSWORD\"",
     "start:client": "vite",
     "start:server": "tsx src/server/Server.ts",
     "start:worldfront": "GAME_ENV=prod NUM_WORKERS=1 DOMAIN=localhost SERVER_HOST=localhost INSTANCE_ID=worldfront-mobile OPENTROOP_APP=true TURNSTILE_SITE_KEY=1x00000000000000000000AA GIT_COMMIT=worldfront-mobile tsx src/server/Server.ts",
