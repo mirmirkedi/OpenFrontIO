@@ -187,6 +187,8 @@ function createGlStub() {
       unitsSeen += units.size;
     },
     updateStructures: noop("updateStructures"),
+    updateSmallPlayerGlow: noop("updateSmallPlayerGlow"),
+    updateSpiralRibbons: noop("updateSpiralRibbons"),
     applyDeadUnits: noop("applyDeadUnits"),
     applyConquestEvents: noop("applyConquestEvents"),
     applyBonusEvents: noop("applyBonusEvents"),

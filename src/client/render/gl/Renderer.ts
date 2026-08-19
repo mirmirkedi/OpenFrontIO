@@ -1338,7 +1338,10 @@ export class GPURenderer {
     if (pe.borderStamp) this.borderStampPass.draw(cam);
     if (pe.railroad) this.railroadPass.draw(cam, zoom);
     if (pe.unit) this.unitPass.drawGround(cam);
-    if (pe.falloutBloom) this.bloomPass.draw(cam, this.frameTick);
+    // Fallout bloom is a four-pass GPU pipeline. It is visually empty until
+    // a tile has active heat, so avoid paying for it on ordinary frames.
+    if (pe.falloutBloom && this.heatManager.isActive())
+      this.bloomPass.draw(cam, this.frameTick);
     this.samRadiusPass.draw(cam);
     this.rangeCirclePass.draw(cam);
     this.nukeTrajectoryPass.draw(cam);

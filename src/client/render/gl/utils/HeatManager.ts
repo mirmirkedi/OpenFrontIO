@@ -147,6 +147,11 @@ export class HeatManager {
     return this.heatReadTex;
   }
 
+  /** Whether the bloom/light passes have any active fallout to render. */
+  isActive(): boolean {
+    return this.heatActive;
+  }
+
   /**
    * Run GPU heat update: detect fallout-bit transitions, apply decay,
    * then snapshot tileTex → prevTileTex.

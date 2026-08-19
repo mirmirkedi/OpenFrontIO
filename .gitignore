@@ -28,3 +28,5 @@ tests/perf/output/
 map-generator/map-generator
 map-generator/map-generator.exe
 /.token-optimizer
+worldfront-release.keystore
+worldfront.release-signing.env
