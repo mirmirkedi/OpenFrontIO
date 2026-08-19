@@ -22,6 +22,7 @@ const donateTroopIcon = assetUrl("images/DonateTroopIconWhite.svg");
 const swordIcon = assetUrl("images/SwordIconWhite.svg");
 
 import { ContextMenuEvent } from "../../InputHandler";
+import { SendAttackIntentEvent } from "../../Transport";
 
 function emptyPlayerActions(): PlayerActions {
   return {
@@ -105,6 +106,19 @@ export class MainRadialMenu implements Controller {
       const myPlayer = this.game.myPlayer();
       if (myPlayer === null) return;
       myPlayer.actions(clickedTile).then((actions) => {
+        // A tap on an attackable tile is already an unambiguous attack
+        // command. Do not force mobile players through the radial menu first.
+        if (actions.canAttack) {
+          this.eventBus.emit(
+            new SendAttackIntentEvent(
+              this.game.owner(clickedTile).id(),
+              myPlayer.troops() * this.uiState.attackRatio,
+            ),
+          );
+          this.closeMenu();
+          return;
+        }
+
         this.updatePlayerActions(
           myPlayer,
           actions,
