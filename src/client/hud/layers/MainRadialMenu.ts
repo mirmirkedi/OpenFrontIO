@@ -106,12 +106,17 @@ export class MainRadialMenu implements Controller {
       const myPlayer = this.game.myPlayer();
       if (myPlayer === null) return;
       myPlayer.actions(clickedTile).then((actions) => {
-        // A tap on an attackable tile is already an unambiguous attack
-        // command. Do not force mobile players through the radial menu first.
-        if (actions.canAttack) {
+        const targetOwner = this.game.owner(clickedTile);
+        const isOtherPlayerTarget =
+          targetOwner.isPlayer() && targetOwner.id() !== myPlayer.id();
+
+        // Bot targets remain fast tap-to-attack. A human player's territory
+        // must open the action menu first so alliance/trade/profile actions
+        // are not swallowed by the attack shortcut.
+        if (actions.canAttack && !isOtherPlayerTarget) {
           this.eventBus.emit(
             new SendAttackIntentEvent(
-              this.game.owner(clickedTile).id(),
+              targetOwner.id(),
               myPlayer.troops() * this.uiState.attackRatio,
             ),
           );

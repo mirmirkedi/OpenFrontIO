@@ -39,6 +39,7 @@ import { getPersistentID } from "./Auth";
 import { showInGameAlert } from "./InGameModal";
 import {
   AutoUpgradeEvent,
+  ContextMenuEvent,
   DoBoatAttackEvent,
   DoBreakAllianceEvent,
   DoGroundAttackEvent,
@@ -1092,6 +1093,19 @@ export class ClientGameRunner {
       if (myPlayer === null) return;
       this.myPlayer = myPlayer;
     }
+
+    // A human player's territory is ambiguous on mobile: tapping it may
+    // mean alliance, trade, profile, or attack. Open the action menu first;
+    // bot territories keep the fast tap-to-attack behavior.
+    const targetOwner = this.gameView.owner(tile);
+    if (
+      targetOwner.isPlayer() &&
+      targetOwner.id() !== this.myPlayer.id()
+    ) {
+      this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
+      return;
+    }
+
     this.myPlayer.actions(tile, [UnitType.TransportShip]).then((actions) => {
       if (actions.canAttack) {
         this.eventBus.emit(
