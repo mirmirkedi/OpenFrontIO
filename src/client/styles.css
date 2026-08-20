@@ -94,6 +94,24 @@ body {
     env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
+/* The app shell owns the safe-area insets and the full-screen background.
+   Leaving the legacy page padding/background active exposes the original
+   OpenFront wallpaper as a strip above the WorldFront lobby on phones. */
+body.opentroop-app {
+  padding: 0 !important;
+  background:
+    radial-gradient(
+      circle at 50% 18%,
+      rgba(34, 178, 255, 0.28),
+      transparent 30rem
+    ),
+    linear-gradient(155deg, #07101e 0%, #0b1d32 47%, #060b14 100%);
+}
+
+body.opentroop-app #hex-grid {
+  display: none !important;
+}
+
 /* OpenTroop's native-game home screen. The layout deliberately uses bounded
    content widths and safe-area aware spacing rather than device-specific px
    positioning, so phones, tablets and foldables keep the same hierarchy. */
@@ -105,8 +123,10 @@ body {
   min-height: 100dvh;
   flex-direction: column;
   overflow: hidden;
-  padding: clamp(18px, 4vw, 40px) clamp(18px, 5vw, 72px)
-    max(18px, env(safe-area-inset-bottom));
+  padding: max(clamp(18px, 4vw, 40px), env(safe-area-inset-top))
+    max(clamp(18px, 5vw, 72px), env(safe-area-inset-right))
+    max(18px, env(safe-area-inset-bottom))
+    max(clamp(18px, 5vw, 72px), env(safe-area-inset-left));
   color: #fff;
   background:
     radial-gradient(
@@ -167,6 +187,13 @@ body {
 .opentroop-main-scroll:has(.opentroop-home:not(.hidden)) {
   overflow-y: hidden !important;
   touch-action: pan-x;
+}
+
+/* Inline pages such as battle setup must keep their own bottom safe-area
+   inset instead of ending underneath the browser/home-indicator area. */
+.opentroop-main-scroll:has(.opentroop-home.hidden) {
+  scroll-padding-block: env(safe-area-inset-top)
+    env(safe-area-inset-bottom);
 }
 
 .opentroop-main-scroll > .opentroop-home {
@@ -325,6 +352,51 @@ body {
   color: rgba(223, 241, 255, 0.72);
   font-size: clamp(14px, 2.8vw, 17px);
   line-height: 1.45;
+}
+
+@media (max-width: 699px) and (orientation: portrait) {
+  /* Let the lobby occupy exactly the available viewport. The previous
+     49vh card minimum made the action button and attribution overflow on
+     short phones. */
+  .opentroop-main-scroll > .opentroop-home {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .opentroop-home__content {
+    min-height: 0;
+    gap: clamp(10px, 2.2vh, 18px);
+    padding-block: clamp(10px, 2.5vh, 22px);
+  }
+
+  .opentroop-home__content > game-mode-selector {
+    display: block;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+
+  .opentroop-play-card {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .opentroop-play-card__content {
+    gap: clamp(8px, 1.8vh, 14px);
+    padding: clamp(16px, 4vw, 26px);
+  }
+
+  .opentroop-play-card h2 {
+    font-size: clamp(24px, 7vw, 34px);
+  }
+
+  .opentroop-play-card p {
+    font-size: clamp(12px, 3.5vw, 14px);
+  }
+
+  .opentroop-play-button {
+    min-height: clamp(52px, 7vh, 62px);
+    font-size: clamp(18px, 5.5vw, 22px);
+  }
 }
 
 .opentroop-continue-button {
@@ -660,6 +732,13 @@ body {
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: auto;
   scrollbar-gutter: stable;
+  scroll-padding-block: env(safe-area-inset-top)
+    env(safe-area-inset-bottom);
+}
+
+.opentroop-setup-shell,
+.opentroop-setup-shell > .opentroop-setup-scroll {
+  min-height: 0;
 }
 
 .opentroop-setup-shell game-config-settings section {
@@ -759,7 +838,7 @@ body {
 }
 
 .opentroop-setup-footer {
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
   background: linear-gradient(
     180deg,
     rgba(5, 11, 20, 0.78),
