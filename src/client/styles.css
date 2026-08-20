@@ -804,13 +804,13 @@ body.opentroop-app #hex-grid {
 }
 
 .opentroop-setup-shell game-config-settings section + section {
-  margin-top: 14px;
+  margin-top: 10px;
 }
 .opentroop-setup-shell game-config-settings section > div:first-child {
   border-bottom-color: rgba(145, 201, 231, 0.18);
 }
 .opentroop-setup-shell map-picker .map-picker-tabs {
-  border-radius: 14px;
+  border-radius: 12px;
 }
 .opentroop-setup-shell game-config-settings h3 {
   color: #cfe6f1;
@@ -822,7 +822,7 @@ body.opentroop-app #hex-grid {
    restrained states, and no decorative card glow. The home screen and battle
    HUD intentionally keep their own visual language. */
 .opentroop-setup-shell game-config-settings .game-config-card {
-  border-radius: 10px !important;
+  border-radius: 12px !important;
   box-shadow: none !important;
   transition:
     background-color 140ms ease,
@@ -830,26 +830,26 @@ body.opentroop-app #hex-grid {
 }
 
 .opentroop-setup-shell game-config-settings .game-config-card:not(.game-config-card--active) {
-  background-color: #102332 !important;
-  border-color: rgba(145, 201, 231, 0.12) !important;
+  background-color: rgba(13, 31, 45, 0.78) !important;
+  border-color: rgba(145, 201, 231, 0.1) !important;
 }
 
 .opentroop-setup-shell game-config-settings .game-config-card--active {
-  background-color: #1a435a !important;
-  border-color: rgba(72, 177, 224, 0.72) !important;
-  box-shadow: inset 0 0 0 1px rgba(121, 211, 255, 0.08) !important;
+  background-color: #174158 !important;
+  border-color: rgba(91, 190, 231, 0.66) !important;
+  box-shadow: inset 0 0 0 1px rgba(121, 211, 255, 0.06) !important;
 }
 
 .opentroop-setup-shell game-config-settings .game-config-card:hover {
-  background-color: #173246 !important;
+  background-color: #152e41 !important;
 }
 
 .opentroop-setup-shell game-config-settings .game-config-card--active:hover {
-  background-color: #1d4a62 !important;
+  background-color: #1b4961 !important;
 }
 
 .opentroop-setup-shell game-config-settings .grid {
-  gap: 12px;
+  gap: 10px;
 }
 
 /* Small semantic watermarks make compact setup cards scannable without
@@ -866,7 +866,7 @@ body.opentroop-app #hex-grid {
   width: 58px;
   height: 58px;
   color: #9edfff;
-  opacity: 0.09;
+  opacity: 0.035;
   pointer-events: none;
   transform: translateY(-50%) rotate(-8deg);
   transition:
@@ -877,12 +877,12 @@ body.opentroop-app #hex-grid {
 
 .game-config-card--active .game-config-watermark {
   color: #d9f5ff;
-  opacity: 0.16;
+  opacity: 0.075;
   transform: translateY(-50%) rotate(-8deg) scale(1.04);
 }
 .opentroop-setup-shell map-picker [role="tablist"] {
   background: rgba(3, 17, 31, 0.84);
-  border-color: rgba(157, 213, 238, 0.12);
+  border-color: rgba(157, 213, 238, 0.1);
 }
 .opentroop-setup-shell map-picker [role="tab"] {
   min-height: 42px;
