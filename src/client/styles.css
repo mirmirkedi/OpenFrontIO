@@ -415,6 +415,46 @@ body.opentroop-app #hex-grid {
     min-height: clamp(52px, 7vh, 62px);
     font-size: clamp(18px, 5.5vw, 22px);
   }
+
+  /* Keep the active-battle frame in the lower half of the home content. */
+  .opentroop-home__content:has(
+    .opentroop-continue-button:not(.opentroop-continue-button--placeholder)
+  ) {
+    position: relative;
+    justify-content: flex-start;
+    padding-top: clamp(34px, 6vh, 52px);
+  }
+
+  .opentroop-home__content:has(
+      .opentroop-continue-button:not(.opentroop-continue-button--placeholder)
+    )
+    > game-mode-selector {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 50%;
+  }
+
+  .opentroop-home__content:has(
+      .opentroop-continue-button:not(.opentroop-continue-button--placeholder)
+    )
+    .opentroop-play-card {
+    height: 100%;
+    min-height: 0;
+  }
+
+  /* Anchor the resume action immediately above the frame's top edge. */
+  .opentroop-home__content:has(
+      .opentroop-continue-button:not(.opentroop-continue-button--placeholder)
+    )
+    > .opentroop-continue-button {
+    position: absolute;
+    right: 0;
+    bottom: calc(50% + 10px);
+    left: 0;
+    z-index: 2;
+  }
 }
 
 .opentroop-continue-button {
