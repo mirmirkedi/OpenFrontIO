@@ -423,6 +423,7 @@ body.opentroop-app #hex-grid {
     position: relative;
     justify-content: flex-start;
     padding-top: clamp(34px, 6vh, 52px);
+    --opentroop-active-card-lift: 50px;
   }
 
   .opentroop-home__content:has(
@@ -431,7 +432,7 @@ body.opentroop-app #hex-grid {
     > game-mode-selector {
     position: absolute;
     right: 0;
-    bottom: 0;
+    bottom: var(--opentroop-active-card-lift);
     left: 0;
     height: 50%;
   }
@@ -451,7 +452,7 @@ body.opentroop-app #hex-grid {
     > .opentroop-continue-button {
     position: absolute;
     right: 0;
-    bottom: calc(50% + 10px);
+    bottom: calc(50% + 10px + var(--opentroop-active-card-lift));
     left: 0;
     z-index: 2;
   }

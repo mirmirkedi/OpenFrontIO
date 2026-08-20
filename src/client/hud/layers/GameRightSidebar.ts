@@ -264,13 +264,12 @@ export class GameRightSidebar extends LitElement implements Controller {
   }
 
   private async onExitButtonClick() {
-    const isAlive = this.game.myPlayer()?.isAlive();
-    if (isAlive) {
-      const isConfirmed = await showInGameConfirm(
-        translateText("help_modal.exit_confirmation"),
-      );
-      if (!isConfirmed) return;
-    }
+    // Always confirm an exit. In single-player/mobile sessions the local
+    // player may not be available yet, which must not bypass the confirmation.
+    const isConfirmed = await showInGameConfirm(
+      translateText("help_modal.exit_confirmation"),
+    );
+    if (!isConfirmed) return;
     await crazyGamesSDK.requestMidgameAd();
     await crazyGamesSDK.gameplayStop();
     // redirect to the home page
