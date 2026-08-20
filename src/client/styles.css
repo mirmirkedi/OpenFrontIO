@@ -165,6 +165,24 @@ body.opentroop-app #hex-grid {
   display: none !important;
 }
 
+/* Keep app-mode inline pages consistent with the in-game settings surface. */
+.opentroop-modal-backdrop {
+  background:
+    radial-gradient(
+      circle at 50% 10%,
+      rgba(19, 99, 151, 0.28),
+      transparent 42rem
+    ),
+    linear-gradient(160deg, #0b304c 0%, #061522 72%, #030b12 100%) !important;
+}
+
+.opentroop-modal-surface {
+  background: linear-gradient(160deg, #0b304c, #061522) !important;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.46),
+    inset 0 1px rgba(221, 249, 255, 0.08);
+}
+
 .opentroop-main-scroll {
   max-width: none !important;
   min-height: 0;

@@ -11,6 +11,7 @@ import {
   ToggleRenderDebugGuiEvent,
 } from "../../InputHandler";
 import { translateText } from "../../Utils";
+import { showInGameConfirm } from "../../InGameModal";
 import {
   SetBackgroundMusicVolumeEvent,
   SetSoundEffectsVolumeEvent,
@@ -194,8 +195,14 @@ export class SettingsModal extends LitElement implements Controller {
     this.closeModal({ keepPause: true });
   }
 
-  private onExitButtonClick() {
-    // redirect to the home page
+  private async onExitButtonClick() {
+    const confirmed = await showInGameConfirm(
+      translateText("help_modal.exit_confirmation"),
+      { variant: "neutral" },
+    );
+    if (!confirmed) return;
+
+    await crazyGamesSDK.gameplayStop();
     window.location.href = "/";
   }
 

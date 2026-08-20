@@ -125,8 +125,10 @@ export class OModal extends LitElement {
       return html``;
     }
 
+    const appModalSurface =
+      this.inline && document.body.classList.contains("opentroop-app");
     const backdropClass = this.inline
-      ? "relative z-10 w-full h-full flex items-stretch bg-transparent"
+      ? `relative z-10 w-full h-full flex items-stretch bg-transparent ${appModalSurface ? "opentroop-modal-backdrop" : ""}`
       : "fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center overflow-hidden";
 
     const wrapperClass = this.inline
@@ -139,7 +141,8 @@ export class OModal extends LitElement {
 
     const hasTabs = this.tabs.length > 0;
     const sectionClass =
-      "relative flex-1 min-h-0 flex flex-col text-white bg-black/70 backdrop-blur-xl lg:rounded-2xl lg:border border-white/10 overflow-hidden";
+      "relative flex-1 min-h-0 flex flex-col text-white bg-black/70 backdrop-blur-xl lg:rounded-2xl lg:border border-white/10 overflow-hidden" +
+      (appModalSurface ? " opentroop-modal-surface" : "");
 
     return html`
       <aside

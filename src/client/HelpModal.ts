@@ -131,7 +131,6 @@ export class HelpModal extends BaseModal {
                     src=${assetUrl("images/helpModal/leaderboard2.webp")}
                     alt="Leaderboard"
                     class="rounded-lg shadow-lg border border-white/20 max-w-[200px]"
-                    loading="lazy"
                   />
                 </div>
                 <div
@@ -154,7 +153,6 @@ export class HelpModal extends BaseModal {
                     src=${assetUrl("images/helpModal/controlPanel.webp")}
                     alt="Control Panel"
                     class="rounded-lg shadow-lg border border-white/20 max-w-[200px]"
-                    loading="lazy"
                   />
                 </div>
                 <div class="flex flex-col justify-center text-white/70 text-sm">
@@ -182,13 +180,11 @@ export class HelpModal extends BaseModal {
                       src=${assetUrl("images/helpModal/eventsPanel.webp")}
                       alt="Events"
                       class="rounded-lg shadow-lg border border-white/20 max-w-[200px]"
-                      loading="lazy"
                     />
                     <img
                       src=${assetUrl("images/helpModal/eventsPanelAttack.webp")}
                       alt="Events Attack"
                       class="rounded-lg shadow-lg border border-white/20 max-w-[200px]"
-                      loading="lazy"
                     />
                   </div>
                 </div>
@@ -217,7 +213,6 @@ export class HelpModal extends BaseModal {
                     src=${assetUrl("images/helpModal/options2.webp")}
                     alt="Options"
                     class="rounded-lg shadow-lg border border-white/20 max-w-[200px]"
-                    loading="lazy"
                   />
                 </div>
                 <div class="flex flex-col justify-center text-white/70 text-sm">
@@ -247,7 +242,6 @@ export class HelpModal extends BaseModal {
                     src=${assetUrl("images/helpModal/playerInfoOverlay.webp")}
                     alt="Player Info"
                     class="rounded-lg shadow-lg border border-white/20 max-w-[200px]"
-                    loading="lazy"
                   />
                 </div>
                 <div
@@ -296,13 +290,11 @@ export class HelpModal extends BaseModal {
                   src=${assetUrl("images/helpModal/radialMenu2.webp")}
                   alt="Radial Menu"
                   class="rounded-lg shadow-lg border border-white/20 max-w-[200px]"
-                  loading="lazy"
                 />
                 <img
                   src=${assetUrl("images/helpModal/radialMenuAlly.webp")}
                   alt="Radial Menu Ally"
                   class="rounded-lg shadow-lg border border-white/20 max-w-[200px]"
-                  loading="lazy"
                 />
               </div>
               <div class="text-white/70 text-sm">
@@ -412,7 +404,6 @@ export class HelpModal extends BaseModal {
                     src=${assetUrl("images/helpModal/infoMenu2.webp")}
                     alt="Enemy Info"
                     class="rounded-lg shadow-lg border border-white/20 max-w-[240px]"
-                    loading="lazy"
                   />
                 </div>
                 <div class="text-white/70 text-sm">
@@ -452,7 +443,6 @@ export class HelpModal extends BaseModal {
                       <img
                         src=${assetUrl("images/StopIconWhite.svg")}
                         class="w-8 h-8 scale-75 origin-left"
-                        loading="lazy"
                       />
                       <span>${translateText("help_modal.info_trade")}</span>
                     </li>
@@ -473,7 +463,6 @@ export class HelpModal extends BaseModal {
                     src=${assetUrl("images/helpModal/infoMenu2Ally.webp")}
                     alt="Ally Info"
                     class="rounded-lg shadow-lg border border-white/20 max-w-[240px]"
-                    loading="lazy"
                   />
                 </div>
                 <div class="text-white/70 text-sm">
@@ -773,7 +762,6 @@ export class HelpModal extends BaseModal {
                   src=${assetUrl("images/helpModal/crown.webp")}
                   alt="Rank 1"
                   class="rounded shadow-lg border border-white/10 h-24 w-auto object-contain"
-                  loading="lazy"
                 />
                 <span
                   class="text-xs font-bold uppercase tracking-wider text-white text-center"
@@ -790,7 +778,6 @@ export class HelpModal extends BaseModal {
                   src=${assetUrl("images/helpModal/traitor2.webp")}
                   alt="Traitor"
                   class="rounded shadow-lg border border-white/10 h-24 w-auto object-contain"
-                  loading="lazy"
                 />
                 <span
                   class="text-xs font-bold uppercase tracking-wider text-white text-center"
@@ -807,7 +794,6 @@ export class HelpModal extends BaseModal {
                   src=${assetUrl("images/helpModal/ally2.webp")}
                   alt="Ally"
                   class="rounded shadow-lg border border-white/10 h-24 w-auto object-contain"
-                  loading="lazy"
                 />
                 <span
                   class="text-xs font-bold uppercase tracking-wider text-white text-center"
@@ -824,7 +810,6 @@ export class HelpModal extends BaseModal {
                   src=${assetUrl("images/helpModal/embargo.webp")}
                   alt="Embargo"
                   class="rounded shadow-lg border border-white/10 h-24 w-auto object-contain"
-                  loading="lazy"
                 />
                 <span
                   class="text-xs font-bold uppercase tracking-wider text-white text-center"
@@ -841,7 +826,6 @@ export class HelpModal extends BaseModal {
                   src=${assetUrl("images/helpModal/allianceRequest.webp")}
                   alt="Request"
                   class="rounded shadow-lg border border-white/10 h-24 w-auto object-contain"
-                  loading="lazy"
                 />
                 <span
                   class="text-xs font-bold uppercase tracking-wider text-white text-center"
