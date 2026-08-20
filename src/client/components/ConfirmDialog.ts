@@ -91,13 +91,13 @@ export class ConfirmDialog extends LitElement {
 
     return html`
       <div
-        class="fixed inset-0 z-[10020] flex items-center justify-center bg-black/80"
+        class="opentroop-confirm-overlay fixed inset-0 z-[10020] flex items-center justify-center bg-black/80"
         @click=${(e: Event) => {
           if (e.target === e.currentTarget) this.handleCancel();
         }}
       >
         <div
-          class="relative mx-4 w-full ${this.wide
+          class="opentroop-confirm-panel relative mx-4 w-full ${this.wide
             ? "max-w-md"
             : "max-w-sm"} p-6 rounded-2xl border ${borderColor} ${cardBg} shadow-2xl"
         >

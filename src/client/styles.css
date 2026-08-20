@@ -1049,12 +1049,10 @@ body.opentroop-app #hex-grid {
   width: 112px;
   height: 112px;
   place-items: center;
-  border: 2px solid rgba(120, 219, 255, 0.78);
+  border: 1px solid rgba(120, 219, 255, 0.54);
   border-radius: 50%;
   background: rgba(2, 23, 38, 0.76);
-  box-shadow:
-    0 0 0 8px rgba(10, 113, 174, 0.16),
-    0 12px 28px rgba(0, 0, 0, 0.52);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.42);
 }
 .opentroop-loading__crest img {
   width: 76px;
@@ -1064,9 +1062,9 @@ body.opentroop-app #hex-grid {
 .opentroop-loading__mission > span {
   margin-top: 26px;
   color: #f0fbff;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 950;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
 }
 .opentroop-loading__progress {
   display: grid;
@@ -1081,8 +1079,8 @@ body.opentroop-app #hex-grid {
   background: rgba(2, 19, 31, 0.72);
 }
 .opentroop-loading__progress i:nth-child(-n + 4) {
-  background: #34b9fa;
-  box-shadow: 0 0 10px rgba(63, 199, 255, 0.65);
+  background: #229bd0;
+  box-shadow: 0 0 6px rgba(63, 199, 255, 0.36);
   animation: opentroop-loading-pulse 0.9s ease-in-out infinite alternate;
 }
 .opentroop-loading__progress i:nth-child(2) {
@@ -1111,15 +1109,15 @@ body.opentroop-app #hex-grid {
   background: #020912;
 }
 .opentroop-app.in-game div:has(> control-panel) {
-  border: 1px solid rgba(104, 210, 255, 0.32);
+  border: 1px solid rgba(157, 213, 238, 0.2);
   background: linear-gradient(
     180deg,
-    rgba(8, 37, 62, 0.94),
-    rgba(3, 17, 30, 0.96)
+    rgba(8, 31, 49, 0.96),
+    rgba(3, 17, 30, 0.98)
   ) !important;
   box-shadow:
-    0 -8px 28px rgba(0, 0, 0, 0.34),
-    inset 0 1px rgba(167, 233, 255, 0.14);
+    0 -8px 22px rgba(0, 0, 0, 0.3),
+    inset 0 1px rgba(167, 233, 255, 0.08);
 }
 .opentroop-app.in-game control-panel > div {
   padding: 8px 10px;
@@ -1137,45 +1135,45 @@ body.opentroop-app #hex-grid {
 .opentroop-app.in-game game-right-sidebar aside {
   min-height: 46px;
   gap: 12px;
-  border: 1px solid rgba(116, 219, 255, 0.28);
+  border: 1px solid rgba(157, 213, 238, 0.2);
   border-top: 0;
   border-right: 0;
-  border-radius: 0 0 0 16px;
+  border-radius: 0 0 0 14px;
   background: linear-gradient(
     135deg,
-    rgba(5, 33, 55, 0.96),
-    rgba(2, 16, 29, 0.96)
+    rgba(6, 29, 47, 0.98),
+    rgba(2, 16, 29, 0.98)
   ) !important;
   box-shadow:
-    -8px 7px 20px rgba(0, 0, 0, 0.25),
-    inset 0 1px rgba(177, 235, 255, 0.12);
+    -8px 7px 18px rgba(0, 0, 0, 0.24),
+    inset 0 1px rgba(177, 235, 255, 0.08);
 }
 .opentroop-app.in-game game-right-sidebar aside > div.cursor-pointer {
   display: grid;
   width: 29px;
   height: 29px;
   place-items: center;
-  border: 1px solid rgba(131, 218, 255, 0.17);
-  border-radius: 8px;
-  background: rgba(1, 15, 26, 0.42);
+  border: 1px solid rgba(131, 218, 255, 0.13);
+  border-radius: 7px;
+  background: rgba(1, 15, 26, 0.54);
 }
 .opentroop-app.in-game game-right-sidebar aside > div.cursor-pointer:active {
   transform: scale(0.92);
 }
 .opentroop-app.in-game game-left-sidebar aside {
   padding: 8px;
-  border: 1px solid rgba(116, 219, 255, 0.28);
+  border: 1px solid rgba(157, 213, 238, 0.2);
   border-top: 0;
   border-left: 0;
-  border-radius: 0 0 16px 0;
+  border-radius: 0 0 14px 0;
   background: linear-gradient(
     225deg,
-    rgba(5, 33, 55, 0.96),
-    rgba(2, 16, 29, 0.96)
+    rgba(6, 29, 47, 0.98),
+    rgba(2, 16, 29, 0.98)
   ) !important;
   box-shadow:
-    8px 7px 20px rgba(0, 0, 0, 0.25),
-    inset 0 1px rgba(177, 235, 255, 0.12);
+    8px 7px 18px rgba(0, 0, 0, 0.24),
+    inset 0 1px rgba(177, 235, 255, 0.08);
 }
 .opentroop-app.in-game game-left-sidebar [role="button"] {
   padding: 5px;
@@ -1198,6 +1196,34 @@ body.opentroop-app #hex-grid {
   display: none;
   pointer-events: none;
 }
+
+/* Confirmation dialogs use a shared component, but the app shell gets the
+   same restrained surface and action language as the other WorldFront views. */
+.opentroop-app .opentroop-confirm-overlay {
+  background: rgba(1, 8, 15, 0.78) !important;
+  backdrop-filter: blur(6px);
+}
+.opentroop-app .opentroop-confirm-panel {
+  border-color: rgba(157, 213, 238, 0.28) !important;
+  border-radius: 18px !important;
+  background: linear-gradient(160deg, #0a2b43, #061522) !important;
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.5) !important;
+}
+.opentroop-app .opentroop-confirm-panel button {
+  border-radius: 12px !important;
+}
+.opentroop-app .opentroop-confirm-panel button.bg-blue-600,
+.opentroop-app .opentroop-confirm-panel button.bg-red-600,
+.opentroop-app .opentroop-confirm-panel button.bg-amber-600 {
+  border: 1px solid rgba(202, 236, 247, 0.46);
+  background: linear-gradient(180deg, #229bd0, #0876b2) !important;
+  box-shadow: 0 6px 14px rgba(0, 57, 101, 0.26);
+}
+.opentroop-app .opentroop-confirm-panel button.bg-blue-600:hover,
+.opentroop-app .opentroop-confirm-panel button.bg-red-600:hover,
+.opentroop-app .opentroop-confirm-panel button.bg-amber-600:hover {
+  background: linear-gradient(180deg, #2aa8dc, #0b81bd) !important;
+}
 /* WinModal is a direct body child. Never let a stale controller overlay the
    lobby after a local game has been left or after the WebView refreshes. */
 .opentroop-app:not(.in-game) .opentroop-result {
@@ -1207,16 +1233,16 @@ body.opentroop-app #hex-grid {
 .opentroop-result__panel {
   width: min(100%, 440px);
   padding: 34px 24px 24px;
-  border: 1px solid rgba(112, 215, 255, 0.38);
-  border-radius: 22px;
+  border: 1px solid rgba(157, 213, 238, 0.3);
+  border-radius: 18px;
   background: linear-gradient(
     160deg,
-    rgba(12, 55, 86, 0.98),
+    rgba(10, 43, 66, 0.98),
     rgba(3, 17, 31, 0.99)
   );
   box-shadow:
-    0 24px 70px rgba(0, 0, 0, 0.56),
-    inset 0 1px rgba(221, 249, 255, 0.15);
+    0 20px 52px rgba(0, 0, 0, 0.5),
+    inset 0 1px rgba(221, 249, 255, 0.1);
   text-align: center;
 }
 .opentroop-result__eyebrow {
@@ -1245,12 +1271,12 @@ body.opentroop-app #hex-grid {
 }
 .opentroop-result__actions button {
   min-height: 52px;
-  border: 1px solid rgba(214, 247, 255, 0.64);
-  border-radius: 14px;
-  background: linear-gradient(180deg, #31b6fa, #0075bf);
+  border: 1px solid rgba(202, 236, 247, 0.46);
+  border-radius: 13px;
+  background: linear-gradient(180deg, #229bd0, #0876b2);
   box-shadow:
-    inset 0 1px rgba(255, 255, 255, 0.32),
-    0 4px 0 #003e70;
+    inset 0 1px rgba(255, 255, 255, 0.2),
+    0 6px 14px rgba(0, 57, 101, 0.26);
   color: white;
   font-size: 13px;
   font-weight: 950;
@@ -1259,8 +1285,8 @@ body.opentroop-app #hex-grid {
 .opentroop-result__actions button:active {
   transform: translateY(3px);
   box-shadow:
-    inset 0 1px rgba(255, 255, 255, 0.2),
-    0 1px 0 #003e70;
+    inset 0 1px rgba(255, 255, 255, 0.16),
+    0 3px 8px rgba(0, 57, 101, 0.22);
 }
 .opentroop-result__actions .opentroop-result__secondary {
   border-color: rgba(143, 205, 232, 0.28);
