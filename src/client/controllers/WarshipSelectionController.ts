@@ -226,7 +226,13 @@ export class WarshipSelectionController implements Controller {
       return;
     }
     if (!this.game.isWater(clickRef)) {
-      this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
+      // Empty land is a normal map tap, not an action-menu target. Keep the
+      // radial menu for owned territories where player actions are available.
+      if (this.game.owner(clickRef).isPlayer()) {
+        this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
+      } else {
+        this.eventBus.emit(new MouseUpEvent(event.x, event.y));
+      }
       return;
     }
     if (this.selectedUnit || this.multiSelectedWarships.length > 0) {

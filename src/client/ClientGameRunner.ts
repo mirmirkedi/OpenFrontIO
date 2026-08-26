@@ -1106,7 +1106,11 @@ export class ClientGameRunner {
       return;
     }
 
-    this.myPlayer.actions(tile, [UnitType.TransportShip]).then((actions) => {
+    // A tap must evaluate the complete ground-action set as well as the
+    // optional transport-ship action. Restricting this query to transports
+    // made attacks on unclaimed/disconnected land work only through the
+    // long-press radial menu.
+    this.myPlayer.actions(tile, null).then((actions) => {
       if (actions.canAttack) {
         this.eventBus.emit(
           new SendAttackIntentEvent(
@@ -1116,6 +1120,11 @@ export class ClientGameRunner {
         );
       } else if (this.canAutoBoat(actions.buildableUnits, tile)) {
         this.sendBoatAttackIntent(tile);
+      } else if (!this.gameView.hasOwner(tile)) {
+        // Keep the menu available for unclaimed land that is not currently
+        // connected to the player's territory. Connected unclaimed land is
+        // handled directly above, so it stays a one-tap attack.
+        this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
       }
     });
   }
