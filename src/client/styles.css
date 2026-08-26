@@ -1131,6 +1131,26 @@ body.opentroop-app #hex-grid {
   background: #020912;
 }
 
+/* The bottom HUD is mounted once at the document root and reused by every
+   match. It must not remain above lobby/setup pages after leaving a game. */
+.opentroop-app:not(.in-game) #in-game-bottom-hud,
+.opentroop-app:not(.in-game) .game-top-safe-area-fill,
+.opentroop-app:not(.in-game) .game-top-right-controls,
+.opentroop-app:not(.in-game) game-left-sidebar,
+.opentroop-app:not(.in-game) player-info-overlay,
+.opentroop-app:not(.in-game) heads-up-message,
+.opentroop-app:not(.in-game) spawn-timer,
+.opentroop-app:not(.in-game) immunity-timer,
+.opentroop-app:not(.in-game) in-game-promo,
+.opentroop-app:not(.in-game) alert-frame,
+.opentroop-app:not(.in-game) build-menu,
+.opentroop-app:not(.in-game) player-panel,
+.opentroop-app:not(.in-game) chat-modal,
+.opentroop-app:not(.in-game) multi-tab-modal {
+  display: none !important;
+  pointer-events: none !important;
+}
+
 /* Android edge-to-edge puts the game below the camera cutout. Keep the
    top-right game controls in the visible safe area on small screens. */
 @media (max-width: 639px) {

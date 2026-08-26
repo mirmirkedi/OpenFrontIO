@@ -68,7 +68,9 @@ const DEFAULT_OPTIONS = {
   goldMultiplierValue: undefined as number | undefined,
   startingGold: false,
   startingGoldValue: undefined as number | undefined,
-  disabledUnits: [] as UnitType[],
+  // MIRV is intentionally opt-in: its large multi-warhead attack can
+  // overwhelm a new battle before the player has chosen to enable it.
+  disabledUnits: [UnitType.MIRV] as UnitType[],
   customAlliances: false,
   customAllianceMinutes: undefined as number | undefined,
   waterNukes: false,

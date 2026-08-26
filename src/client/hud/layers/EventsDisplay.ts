@@ -153,6 +153,13 @@ export class EventsDisplay extends LitElement implements Controller {
     );
   }
 
+  stop() {
+    this.active = false;
+    this._isVisible = false;
+    this.events = [];
+    this.requestUpdate();
+  }
+
   private onAllianceRequestSentConfirmation(e: SendAllianceRequestIntentEvent) {
     const myPlayer = this.game.myPlayer();
     if (!myPlayer || e.requestor.id() !== myPlayer.id()) {

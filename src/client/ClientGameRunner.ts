@@ -1046,6 +1046,7 @@ export class ClientGameRunner {
   public stop() {
     this.soundManager.dispose();
     this.graphicsListenerAbort?.abort();
+    this.renderer.stop();
     this.disposeRenderer?.();
     if (!this.isActive) return;
 

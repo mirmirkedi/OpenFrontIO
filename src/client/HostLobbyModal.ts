@@ -96,7 +96,9 @@ export class HostLobbyModal extends BaseModal {
   @state() private lobbyUrlSuffix = "";
   @state() private clients: ClientInfo[] = [];
   @state() private useRandomMap: boolean = false;
-  @state() private disabledUnits: UnitType[] = [];
+  // Keep MIRV opt-in in Battle Setup; it remains available if the host
+  // explicitly enables it.
+  @state() private disabledUnits: UnitType[] = [UnitType.MIRV];
   @state() private hostCheatsEnabled: boolean = false;
   @state() private hostCheatInfiniteGold: boolean = false;
   @state() private hostCheatInfiniteTroops: boolean = false;
@@ -806,7 +808,7 @@ export class HostLobbyModal extends BaseModal {
     this.randomSpawn = false;
     this.compactMap = false;
     this.useRandomMap = false;
-    this.disabledUnits = [];
+    this.disabledUnits = [UnitType.MIRV];
     this.lobbyId = "";
     this.clients = [];
     this.lobbyCreatorClientID = "";

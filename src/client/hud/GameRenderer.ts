@@ -368,6 +368,11 @@ export class GameRenderer {
     this.transformHandler.centerAll(0.9);
   }
 
+  stop() {
+    this.layers.forEach((layer) => layer.stop?.());
+    this.layerTickState.clear();
+  }
+
   tick() {
     const nowMs = performance.now();
     const shouldProfileTick = FrameProfiler.isEnabled();
