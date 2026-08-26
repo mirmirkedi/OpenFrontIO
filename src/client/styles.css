@@ -1153,7 +1153,16 @@ body.opentroop-app #hex-grid {
      remain fixed above it. Leave the panel below that control cluster so its
      header and first rows stay readable on phones. */
   .opentroop-app.in-game #page-leaderboard {
-    padding-top: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 140px);
+    display: block !important;
+  }
+
+  .opentroop-app.in-game #page-leaderboard > o-modal {
+    display: block;
+    position: relative;
+    top: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 140px);
+    height: calc(
+      100% - max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) - 140px
+    );
   }
 }
 
