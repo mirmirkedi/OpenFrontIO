@@ -46,6 +46,9 @@ export class WinModal extends LitElement implements Controller {
   private isRankedGame = false;
 
   @state()
+  private isDeath = false;
+
+  @state()
   private patternContent: TemplateResult | null = null;
 
   private _title: string;
@@ -69,26 +72,34 @@ export class WinModal extends LitElement implements Controller {
           role="dialog"
           aria-modal="true"
         >
-          <div class="opentroop-result__panel">
+          <div
+            class="opentroop-result__panel ${this.isDeath ? "opentroop-result--death" : ""}"
+          >
             <span class="opentroop-result__eyebrow"
-              >${this.isWin ? "VICTORY" : "BATTLE OVER"}</span
+              >${this.isWin ? "VICTORY" : this.isDeath ? "DEFEATED" : "BATTLE OVER"}</span
             >
             <h2>${this._title || ""}</h2>
             <p>
               ${this.isWin
                 ? "The battlefield is yours."
+                : this.isDeath
+                  ? "Your territory has been conquered."
                 : "Your command has ended."}
             </p>
-            <div class="opentroop-result__actions ${this.showButtons ? "" : "hidden"}">
+            <div
+              class="opentroop-result__actions ${this.showButtons ? "" : "hidden"} ${this.isWin ? "" : "opentroop-result__actions--single"}"
+            >
               <button @click=${() => this._handleExit()}>MAIN MENU</button>
-              <button
-                class="opentroop-result__secondary"
-                @click=${() => this.hide()}
-              >
-                ${this.game?.myPlayer()?.isAlive()
-                  ? "CONTINUE"
-                  : "SPECTATE"}
-              </button>
+              ${this.isWin
+                ? html`
+                    <button
+                      class="opentroop-result__secondary"
+                      @click=${() => this.hide()}
+                    >
+                      CONTINUE
+                    </button>
+                  `
+                : null}
             </div>
           </div>
         </div>
@@ -130,15 +141,17 @@ export class WinModal extends LitElement implements Controller {
                 ></o-button>
               `
             : null}
-          <o-button
-            variant="primary"
-            width="block"
-            class="flex-1"
-            .title=${this.game?.myPlayer()?.isAlive()
-              ? translateText("win_modal.keep")
-              : translateText("win_modal.spectate")}
-            @click=${() => this.hide()}
-          ></o-button>
+          ${this.isWin
+            ? html`
+                <o-button
+                  variant="primary"
+                  width="block"
+                  class="flex-1"
+                  .title=${translateText("win_modal.keep")}
+                  @click=${() => this.hide()}
+                ></o-button>
+              `
+            : null}
         </div>
       </div>
     `;
@@ -361,6 +374,7 @@ export class WinModal extends LitElement implements Controller {
     ) {
       this.hasShownDeathModal = true;
       this._title = translateText("win_modal.died");
+      this.isDeath = true;
       this.show();
     }
     const updates = this.game.updatesSinceLastTick();
@@ -373,6 +387,7 @@ export class WinModal extends LitElement implements Controller {
         this.eventBus.emit(new SendWinnerEvent(undefined, wu.allPlayersStats));
         this._title = translateText("win_modal.match_cancelled");
         this.isWin = false;
+        this.isDeath = false;
         history.replaceState(null, "", `${window.location.pathname}?replay`);
         this.show();
       } else if (wu.winner[0] === "team") {
@@ -380,12 +395,14 @@ export class WinModal extends LitElement implements Controller {
         if (wu.winner[1] === this.game.myPlayer()?.team()) {
           this._title = translateText("win_modal.your_team");
           this.isWin = true;
+          this.isDeath = false;
           crazyGamesSDK.happytime();
         } else {
           this._title = translateText("win_modal.other_team", {
             team: wu.winner[1],
           });
           this.isWin = false;
+          this.isDeath = false;
         }
         history.replaceState(null, "", `${window.location.pathname}?replay`);
         this.show();
@@ -395,6 +412,7 @@ export class WinModal extends LitElement implements Controller {
           nation: wu.winner[1],
         });
         this.isWin = false;
+        this.isDeath = false;
         this.show();
       } else {
         const winner = this.game.playerByClientID(wu.winner[1]);
@@ -411,12 +429,14 @@ export class WinModal extends LitElement implements Controller {
         ) {
           this._title = translateText("win_modal.you_won");
           this.isWin = true;
+          this.isDeath = false;
           crazyGamesSDK.happytime();
         } else {
           this._title = translateText("win_modal.other_won", {
             player: winner.displayName(),
           });
           this.isWin = false;
+          this.isDeath = false;
         }
         history.replaceState(null, "", `${window.location.pathname}?replay`);
         this.show();

@@ -23,7 +23,10 @@ import { getApiBase } from "./Api";
 import { getAuthHeader, getPersistentID } from "./Auth";
 import { isOpenTroopApp } from "./AppMode";
 import { LobbyConfig } from "./ClientGameRunner";
-import { saveActiveLocalGame } from "./LocalPersistantStats";
+import {
+  clearActiveLocalGame,
+  saveActiveLocalGame,
+} from "./LocalPersistantStats";
 import {
   GameSpeedDownIntentEvent,
   GameSpeedUpIntentEvent,
@@ -338,7 +341,10 @@ export class LocalServer {
     record: PartialGameRecord,
     unloading: boolean,
   ): Promise<void> {
-    if (isOpenTroopApp()) return;
+    if (isOpenTroopApp()) {
+      clearActiveLocalGame();
+      return;
+    }
     this.archiveInFlight = true;
     try {
       const authHeader = await getAuthHeader();

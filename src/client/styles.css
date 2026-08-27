@@ -1179,9 +1179,9 @@ body.opentroop-app #hex-grid {
   .opentroop-app.in-game #page-leaderboard > o-modal {
     display: block;
     position: relative;
-    top: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 140px);
+    top: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 270px);
     height: calc(
-      100% - max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) - 140px
+      100% - max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) - 270px
     );
   }
 }
@@ -1321,6 +1321,16 @@ body.opentroop-app #hex-grid {
     inset 0 1px rgba(221, 249, 255, 0.12);
   text-align: center;
 }
+.opentroop-result__panel.opentroop-result--death {
+  border-color: rgba(255, 129, 96, 0.5);
+  background: linear-gradient(160deg, #291924, #0a1d2c 72%);
+}
+.opentroop-result__panel.opentroop-result--death::before {
+  background: #ff8064;
+}
+.opentroop-result__panel.opentroop-result--death .opentroop-result__eyebrow {
+  color: #ff9c85;
+}
 .opentroop-result__panel::before {
   position: absolute;
   top: 0;
@@ -1354,6 +1364,9 @@ body.opentroop-app #hex-grid {
   grid-template-columns: 1fr 1fr;
   gap: 11px;
   margin-top: 28px;
+}
+.opentroop-result__actions--single {
+  grid-template-columns: 1fr;
 }
 .opentroop-result__actions button {
   min-height: 52px;
