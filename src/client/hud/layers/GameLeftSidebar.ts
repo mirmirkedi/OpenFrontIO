@@ -202,7 +202,7 @@ export class GameLeftSidebar extends LitElement implements Controller {
               </div>
             `
           : null}
-        <div class="flex flex-col gap-2 min-w-0 w-full">
+        <div class="game-left-sidebar__stats flex flex-col gap-2 min-w-0 w-full">
           <player-stats
             class=${this.isPlayerStatsShown ? "block min-w-0" : "hidden"}
             .game=${this.game}

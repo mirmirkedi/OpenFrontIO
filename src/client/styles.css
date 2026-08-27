@@ -1179,10 +1179,16 @@ body.opentroop-app #hex-grid {
   .opentroop-app.in-game #page-leaderboard > o-modal {
     display: block;
     position: relative;
-    top: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 270px);
+    top: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 140px);
     height: calc(
-      100% - max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) - 270px
+      100% - max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) - 140px
     );
+  }
+
+  /* Move only the leaderboard tables; keep the icon and its background fixed. */
+  .opentroop-app.in-game game-left-sidebar .game-left-sidebar__stats:has(player-stats.block),
+  .opentroop-app.in-game game-left-sidebar .game-left-sidebar__stats:has(team-stats.block) {
+    margin-top: 20px;
   }
 }
 
