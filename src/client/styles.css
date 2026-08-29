@@ -1170,13 +1170,34 @@ body.opentroop-app #hex-grid {
     left: 0;
     height: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 12px);
     pointer-events: none;
-    background: #061d2f;
+    /* Preserve the safe-area height for camera cutouts without drawing a
+       visible strip between the two top HUD frames. */
+    background: transparent;
   }
 
   .opentroop-app.in-game .game-top-right-controls {
     top: calc(
       max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 12px
     ) !important;
+  }
+
+  /* Keep the leaderboard frame aligned with the right-hand control frame.
+     Extend only each frame's background upward into the safe-area gap. */
+  .opentroop-app.in-game game-left-sidebar aside {
+    top: calc(
+      max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 12px
+    ) !important;
+    box-shadow:
+      0 -40px 0 rgba(6, 29, 47, 0.98),
+      8px 7px 18px rgba(0, 0, 0, 0.24),
+      inset 0 1px rgba(177, 235, 255, 0.08);
+  }
+
+  .opentroop-app.in-game game-right-sidebar aside {
+    box-shadow:
+      0 -40px 0 rgba(6, 29, 47, 0.98),
+      -8px 7px 18px rgba(0, 0, 0, 0.24),
+      inset 0 1px rgba(177, 235, 255, 0.08);
   }
 
   /* The leaderboard is an inline full-screen page, while the game controls
