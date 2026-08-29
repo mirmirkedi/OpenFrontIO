@@ -33,15 +33,17 @@ export class HelpModal extends BaseModal {
           [&_li]:text-gray-300 [&_li]:leading-relaxed
           [&_p]:text-gray-300 [&_p]:mb-3 [&_strong]:text-white [&_strong]:font-bold"
       >
-          ${isOpenTroopApp()
-            ? html`<button
-                class="mb-5 flex w-full items-center justify-between rounded-xl border border-sky-300/20 bg-[#0a2034] px-4 py-3 text-left text-sm font-bold text-sky-100"
-                @click=${this.openLanguagePicker}
-              >
-                <span>${translateText("select_lang.title")}</span>
-                <span class="text-sky-300" aria-hidden="true">›</span>
-              </button>`
-            : null}
+          ${
+            isOpenTroopApp()
+              ? html`<button
+                  class="mb-5 flex w-full items-center justify-between rounded-xl border border-sky-300/20 bg-[#0a2034] px-4 py-3 text-left text-sm font-bold text-sky-100"
+                  @click=${this.openLanguagePicker}
+                >
+                  <span>${translateText("select_lang.title")}</span>
+                  <span class="text-sky-300" aria-hidden="true">›</span>
+                </button>`
+              : null
+          }
           <!-- Video Tutorial Section -->
           <div class="flex items-center gap-3 mb-3">
             <div class="text-blue-400">
@@ -833,6 +835,32 @@ export class HelpModal extends BaseModal {
                   ${translateText("help_modal.icon_request")}
                 </span>
               </div>
+            </div>
+          </section>
+          <section class="mt-8 border-t border-white/10 pt-5">
+            <h3 class="mb-3 text-lg font-semibold text-blue-100">
+              Music credits
+            </h3>
+            <div class="space-y-2 text-xs leading-relaxed text-white/60">
+              <p>
+                Miguel Johnson — “Good Day To Die” ·
+                <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">CC BY 3.0</a>
+                · <a href="https://migueljohnson.bandcamp.com/" target="_blank" rel="noreferrer">artist</a>
+              </p>
+              <p>
+                Scott Buckley — “Legionnaire” ·
+                <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>
+                · <a href="https://youtube.com/user/musicbyscottb" target="_blank" rel="noreferrer">artist</a>
+              </p>
+              <p>
+                Alexander Nakarada — “Pirates Of The Quarantine” ·
+                <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">CC BY 3.0</a>
+                · <a href="https://www.creatorchords.com/" target="_blank" rel="noreferrer">artist</a>
+              </p>
+              <p>
+                Music provided by
+                <a href="https://breakingcopyright.com/" target="_blank" rel="noreferrer">BreakingCopyright</a>.
+              </p>
             </div>
           </section>
         </div>

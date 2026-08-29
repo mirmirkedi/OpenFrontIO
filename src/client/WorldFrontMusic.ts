@@ -3,7 +3,9 @@ import { assetUrl } from "../core/AssetUrls";
 const MUSIC_ENABLED_KEY = "worldfront.music.enabled";
 
 /** Add tracks here when they are ready, for example: ["music/worldfront-theme.mp3"]. */
-const WORLD_FRONT_MUSIC_TRACKS: string[] = [];
+const WORLD_FRONT_MUSIC_TRACKS: string[] = [
+  "sounds/music/alexander-nakarada-pirates-of-the-quarantine.mp3",
+];
 
 class WorldFrontMusicController {
   private readonly tracks = WORLD_FRONT_MUSIC_TRACKS.map((track) =>
@@ -13,8 +15,16 @@ class WorldFrontMusicController {
   private trackIndex = 0;
   private enabled = this.readEnabledPreference();
 
+  constructor() {
+    this.shuffleTracks();
+  }
+
   isEnabled(): boolean {
     return this.enabled;
+  }
+
+  hasTracks(): boolean {
+    return this.tracks.length > 0;
   }
   toggle(): void {
     this.setEnabled(!this.enabled);
@@ -55,10 +65,25 @@ class WorldFrontMusicController {
 
   private playNext = (): void => {
     if (!this.audio || !this.enabled || this.tracks.length === 0) return;
-    this.trackIndex = (this.trackIndex + 1) % this.tracks.length;
+    if (this.trackIndex === this.tracks.length - 1) {
+      this.shuffleTracks();
+      this.trackIndex = 0;
+    } else {
+      this.trackIndex += 1;
+    }
     this.audio.src = this.tracks[this.trackIndex];
     void this.play();
   };
+
+  private shuffleTracks(): void {
+    for (let index = this.tracks.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [this.tracks[index], this.tracks[randomIndex]] = [
+        this.tracks[randomIndex],
+        this.tracks[index],
+      ];
+    }
+  }
 
   private readEnabledPreference(): boolean {
     try {

@@ -24,6 +24,8 @@ export class PlayPage extends LitElement {
       this.refreshLanguage,
     );
     window.addEventListener("worldfront-music-changed", this.refreshMusic);
+    window.addEventListener("pointerdown", this.unlockMusic, { passive: true });
+    window.addEventListener("keydown", this.unlockMusic);
   }
 
   disconnectedCallback() {
@@ -32,6 +34,8 @@ export class PlayPage extends LitElement {
       this.refreshLanguage,
     );
     window.removeEventListener("worldfront-music-changed", this.refreshMusic);
+    window.removeEventListener("pointerdown", this.unlockMusic);
+    window.removeEventListener("keydown", this.unlockMusic);
     super.disconnectedCallback();
   }
 
@@ -44,10 +48,18 @@ export class PlayPage extends LitElement {
     this.musicEnabled = worldFrontMusic.isEnabled();
   };
 
-  private toggleMusic = () => {
+  private unlockMusic = () => {
+    if (isOpenTroopApp()) worldFrontMusic.unlock();
+  };
+
+  private toggleMusic = (event: Event) => {
     this.musicEnabled = !this.musicEnabled;
+    (event.currentTarget as HTMLElement).dataset.musicEnabled = String(
+      this.musicEnabled,
+    );
     worldFrontMusic.setEnabled(this.musicEnabled);
     worldFrontMusic.unlock();
+    this.requestUpdate();
   };
 
   createRenderRoot() {
@@ -59,6 +71,7 @@ export class PlayPage extends LitElement {
     void this.languageRevision;
     const appMode = isOpenTroopApp();
     const hasSavedGame = appMode && loadActiveLocalGame() !== null;
+    const hasMusicTracks = worldFrontMusic.hasTracks();
     if (appMode) {
       return html`
         <main id="page-play" class="opentroop-home">
@@ -80,6 +93,7 @@ export class PlayPage extends LitElement {
             <div class="opentroop-home__actions">
               <button
                 class="opentroop-icon-button"
+                data-music-toggle
                 aria-label=${translateText(
                   this.musicEnabled
                     ? "worldfront.music_on"
@@ -94,21 +108,44 @@ export class PlayPage extends LitElement {
                 data-music-enabled=${this.musicEnabled}
                 @click=${this.toggleMusic}
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M4 14h3l4 3V7L7 10H4z"></path>
-                  ${this.musicEnabled
-                    ? html`<path d="M15 9.5a4 4 0 0 1 0 5"></path
-                        ><path d="M17.5 7a7.5 7.5 0 0 1 0 10"></path>`
-                    : html`<path d="M16 8l6 8M22 8l-6 8"></path>`}
-                </svg>
+                ${!hasMusicTracks
+                  ? html`<svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M4 14h3l4 3V7L7 10H4z"></path>
+                    </svg>`
+                  : this.musicEnabled
+                    ? html`<svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M4 14h3l4 3V7L7 10H4z"></path>
+                        <path d="M15 9.5a4 4 0 0 1 0 5"></path>
+                        <path d="M17.5 7a7.5 7.5 0 0 1 0 10"></path>
+                      </svg>`
+                    : html`<svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M4 14h3l4 3V7L7 10H4z"></path>
+                        <path d="M16 8l6 8M22 8l-6 8"></path>
+                      </svg>`}
               </button>
               <button
                 class="opentroop-icon-button"

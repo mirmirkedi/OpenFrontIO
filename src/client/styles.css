@@ -210,8 +210,7 @@ body.opentroop-app #hex-grid {
 /* Inline pages such as battle setup must keep their own bottom safe-area
    inset instead of ending underneath the browser/home-indicator area. */
 .opentroop-main-scroll:has(.opentroop-home.hidden) {
-  scroll-padding-block: env(safe-area-inset-top)
-    env(safe-area-inset-bottom);
+  scroll-padding-block: env(safe-area-inset-top) env(safe-area-inset-bottom);
 }
 
 .opentroop-main-scroll > .opentroop-home {
@@ -429,7 +428,7 @@ body.opentroop-app #hex-grid {
   }
 
   .opentroop-home__content:has(
-    .opentroop-continue-button:not(.opentroop-continue-button--placeholder)
+      .opentroop-continue-button:not(.opentroop-continue-button--placeholder)
     )
     > game-mode-selector {
     position: absolute;
@@ -450,7 +449,7 @@ body.opentroop-app #hex-grid {
 
   /* Attach the resume action directly above the shortened card. */
   .opentroop-home__content:has(
-    .opentroop-continue-button:not(.opentroop-continue-button--placeholder)
+      .opentroop-continue-button:not(.opentroop-continue-button--placeholder)
     )
     > .opentroop-continue-button {
     position: absolute;
@@ -548,7 +547,7 @@ body.opentroop-app #hex-grid {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.80;
+  opacity: 0.8;
   filter: saturate(0.92) contrast(1.02);
 }
 
@@ -808,8 +807,7 @@ body.opentroop-app #hex-grid {
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: auto;
   scrollbar-gutter: stable;
-  scroll-padding-block: env(safe-area-inset-top)
-    env(safe-area-inset-bottom);
+  scroll-padding-block: env(safe-area-inset-top) env(safe-area-inset-bottom);
 }
 
 .opentroop-setup-shell,
@@ -851,7 +849,9 @@ body.opentroop-app #hex-grid {
     border-color 140ms ease;
 }
 
-.opentroop-setup-shell game-config-settings .game-config-card:not(.game-config-card--active) {
+.opentroop-setup-shell
+  game-config-settings
+  .game-config-card:not(.game-config-card--active) {
   background-color: rgba(13, 31, 45, 0.78) !important;
   border-color: rgba(145, 201, 231, 0.1) !important;
 }
@@ -936,7 +936,11 @@ body.opentroop-app #hex-grid {
   }
 
   .opentroop-setup-shell game-config-settings section > div.grid > button,
-  .opentroop-setup-shell game-config-settings section > div.grid > toggle-input-card {
+  .opentroop-setup-shell
+    game-config-settings
+    section
+    > div.grid
+    > toggle-input-card {
     width: 100%;
     max-width: 320px;
     justify-self: center;
@@ -948,7 +952,11 @@ body.opentroop-app #hex-grid {
     justify-self: center;
   }
 
-  .opentroop-setup-shell game-config-settings section > div.grid > div.col-span-2 {
+  .opentroop-setup-shell
+    game-config-settings
+    section
+    > div.grid
+    > div.col-span-2 {
     max-width: 520px;
   }
 
@@ -1166,7 +1174,9 @@ body.opentroop-app #hex-grid {
   }
 
   .opentroop-app.in-game .game-top-right-controls {
-    top: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 12px) !important;
+    top: calc(
+      max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 12px
+    ) !important;
   }
 
   /* The leaderboard is an inline full-screen page, while the game controls
@@ -1186,8 +1196,12 @@ body.opentroop-app #hex-grid {
   }
 
   /* Move only the leaderboard tables; keep the icon and its background fixed. */
-  .opentroop-app.in-game game-left-sidebar .game-left-sidebar__stats:has(player-stats.block),
-  .opentroop-app.in-game game-left-sidebar .game-left-sidebar__stats:has(team-stats.block) {
+  .opentroop-app.in-game
+    game-left-sidebar
+    .game-left-sidebar__stats:has(player-stats.block),
+  .opentroop-app.in-game
+    game-left-sidebar
+    .game-left-sidebar__stats:has(team-stats.block) {
     margin-top: 20px;
   }
 }

@@ -31,24 +31,29 @@ export class SoundManager {
     this.safely("initialize background music", () => {
       this.backgroundMusic = [
         new Howl({
-          src: [assetUrl("sounds/music/of4.mp3")],
+          src: [assetUrl("sounds/music/miguel-johnson-good-day-to-die.mp3")],
           loop: false,
           onend: this.playNext.bind(this),
           volume: 0,
         }),
         new Howl({
-          src: [assetUrl("sounds/music/openfront.mp3")],
+          src: [assetUrl("sounds/music/scott-buckley-legionnaire.mp3")],
           loop: false,
           onend: this.playNext.bind(this),
           volume: 0,
         }),
         new Howl({
-          src: [assetUrl("sounds/music/war.mp3")],
+          src: [
+            assetUrl(
+              "sounds/music/alexander-nakarada-pirates-of-the-quarantine.mp3",
+            ),
+          ],
           loop: false,
           onend: this.playNext.bind(this),
           volume: 0,
         }),
       ];
+      this.shuffleBackgroundMusic();
     });
     this.setBackgroundMusicVolume(userSettings.backgroundMusicVolume());
     this.setSoundEffectsVolume(userSettings.soundEffectsVolume());
@@ -125,8 +130,24 @@ export class SoundManager {
   }
 
   private playNext(): void {
-    this.currentTrack = (this.currentTrack + 1) % this.backgroundMusic.length;
+    if (this.backgroundMusic.length === 0) return;
+    if (this.currentTrack === this.backgroundMusic.length - 1) {
+      this.shuffleBackgroundMusic();
+      this.currentTrack = 0;
+    } else {
+      this.currentTrack += 1;
+    }
     this.playBackgroundMusic();
+  }
+
+  private shuffleBackgroundMusic(): void {
+    for (let index = this.backgroundMusic.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [this.backgroundMusic[index], this.backgroundMusic[randomIndex]] = [
+        this.backgroundMusic[randomIndex],
+        this.backgroundMusic[index],
+      ];
+    }
   }
 
   private getOrLoadSoundEffect(name: SoundEffect): Howl | null {
