@@ -49,7 +49,9 @@ export class PlayPage extends LitElement {
   };
 
   private unlockMusic = () => {
-    if (isOpenTroopApp()) worldFrontMusic.unlock();
+    if (isOpenTroopApp() && !document.body.classList.contains("in-game")) {
+      worldFrontMusic.unlock();
+    }
   };
 
   private toggleMusic = (event: Event) => {

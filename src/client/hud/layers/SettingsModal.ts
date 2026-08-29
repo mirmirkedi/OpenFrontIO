@@ -6,16 +6,16 @@ import { assetUrl } from "../../../core/AssetUrls";
 import { EventBus } from "../../../core/EventBus";
 import { UserSettings } from "../../../core/game/UserSettings";
 import { Controller } from "../../Controller";
+import { showInGameConfirm } from "../../InGameModal";
 import {
   AlternateViewEvent,
   ToggleRenderDebugGuiEvent,
 } from "../../InputHandler";
-import { translateText } from "../../Utils";
-import { showInGameConfirm } from "../../InGameModal";
 import {
   SetBackgroundMusicVolumeEvent,
   SetSoundEffectsVolumeEvent,
 } from "../../sound/Sounds";
+import { translateText } from "../../Utils";
 import { ShowGraphicsSettingsModalEvent } from "./GraphicsSettingsModal";
 const cursorPriceIcon = assetUrl("images/CursorPriceIconWhite.svg");
 const emojiIcon = assetUrl("images/EmojiIconWhite.svg");
@@ -47,6 +47,8 @@ export class SettingsModal extends LitElement implements Controller {
 
   @state()
   private alternateView: boolean = false;
+
+  private backgroundMusicBeforeMute: number | null = null;
 
   @query(".modal-overlay")
   private modalOverlay!: HTMLElement;
@@ -213,6 +215,20 @@ export class SettingsModal extends LitElement implements Controller {
     this.requestUpdate();
   }
 
+  private onToggleBackgroundMusic() {
+    const currentVolume = this.userSettings.backgroundMusicVolume();
+    const nextVolume =
+      currentVolume > 0
+        ? (() => {
+            this.backgroundMusicBeforeMute = currentVolume;
+            return 0;
+          })()
+        : (this.backgroundMusicBeforeMute ?? 0.45);
+    this.userSettings.setBackgroundMusicVolume(nextVolume);
+    this.eventBus.emit(new SetBackgroundMusicVolumeEvent(nextVolume));
+    this.requestUpdate();
+  }
+
   private onSoundEffectsVolumeChange(event: Event) {
     const volume = parseFloat((event.target as HTMLInputElement).value) / 100;
     this.userSettings.setSoundEffectsVolume(volume);
@@ -280,7 +296,19 @@ export class SettingsModal extends LitElement implements Controller {
             <div
               class="flex gap-3 items-center w-full text-left p-3 hover:bg-slate-700 rounded-sm text-white transition-colors"
             >
-              <img src=${musicIcon} alt="musicIcon" width="20" height="20" />
+              <button
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md hover:bg-slate-600 transition-colors"
+                @click=${this.onToggleBackgroundMusic}
+                aria-pressed=${this.userSettings.backgroundMusicVolume() === 0}
+                aria-label=${this.userSettings.backgroundMusicVolume() === 0
+                  ? translateText("user_setting.music_on")
+                  : translateText("user_setting.music_off")}
+                title=${this.userSettings.backgroundMusicVolume() === 0
+                  ? translateText("user_setting.music_on")
+                  : translateText("user_setting.music_off")}
+              >
+                <img src=${musicIcon} alt="" width="20" height="20" />
+              </button>
               <div class="flex-1">
                 <div class="font-medium">
                   ${translateText("user_setting.background_music_volume")}

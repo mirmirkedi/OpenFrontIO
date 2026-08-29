@@ -69,6 +69,7 @@ import {
 } from "./Transport";
 import { createCanvas } from "./Utils";
 import { WebGLFrameBuilder } from "./WebGLFrameBuilder";
+import { worldFrontMusic } from "./WorldFrontMusic";
 import { MapLayerController } from "./controllers/MapLayerController";
 import { createRenderer, GameRenderer } from "./hud/GameRenderer";
 import {
@@ -831,6 +832,7 @@ export class ClientGameRunner {
   }
 
   public start() {
+    worldFrontMusic.stop();
     this.soundManager.playBackgroundMusic();
     console.log("starting client game");
 
@@ -1099,10 +1101,7 @@ export class ClientGameRunner {
     // mean alliance, trade, profile, or attack. Open the action menu first;
     // bot territories keep the fast tap-to-attack behavior.
     const targetOwner = this.gameView.owner(tile);
-    if (
-      targetOwner.isPlayer() &&
-      targetOwner.id() !== this.myPlayer.id()
-    ) {
+    if (targetOwner.isPlayer() && targetOwner.id() !== this.myPlayer.id()) {
       this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
       return;
     }

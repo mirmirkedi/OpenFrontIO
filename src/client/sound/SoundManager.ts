@@ -11,9 +11,12 @@ import {
 } from "./Sounds";
 
 export const MAX_CONCURRENT_SOUNDS = 8;
+const PIRATE_MUSIC_GAIN = 0.65;
+const NON_PIRATE_MUSIC_GAIN = 0.4;
 
 export class SoundManager {
   private backgroundMusic: Howl[] = [];
+  private backgroundMusicIsPirate: boolean[] = [];
   private currentTrack: number = 0;
   private soundEffects: Map<SoundEffect, Howl> = new Map();
   private soundEffectsVolume: number = 1;
@@ -53,6 +56,7 @@ export class SoundManager {
           volume: 0,
         }),
       ];
+      this.backgroundMusicIsPirate = [false, false, true];
       this.shuffleBackgroundMusic();
     });
     this.setBackgroundMusicVolume(userSettings.backgroundMusicVolume());
@@ -123,8 +127,11 @@ export class SoundManager {
   public setBackgroundMusicVolume(volume: number): void {
     this.backgroundMusicVolume = this.perceptualGain(volume);
     this.safely("set background music volume", () => {
-      this.backgroundMusic.forEach((track) => {
-        track.volume(this.backgroundMusicVolume);
+      this.backgroundMusic.forEach((track, index) => {
+        const gain = this.backgroundMusicIsPirate[index]
+          ? PIRATE_MUSIC_GAIN
+          : NON_PIRATE_MUSIC_GAIN;
+        track.volume(this.backgroundMusicVolume * gain);
       });
     });
   }
@@ -146,6 +153,13 @@ export class SoundManager {
       [this.backgroundMusic[index], this.backgroundMusic[randomIndex]] = [
         this.backgroundMusic[randomIndex],
         this.backgroundMusic[index],
+      ];
+      [
+        this.backgroundMusicIsPirate[index],
+        this.backgroundMusicIsPirate[randomIndex],
+      ] = [
+        this.backgroundMusicIsPirate[randomIndex],
+        this.backgroundMusicIsPirate[index],
       ];
     }
   }

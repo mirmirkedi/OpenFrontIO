@@ -483,7 +483,9 @@ export class UserSettings {
   }
 
   backgroundMusicVolume(): number {
-    return this.getFloat("settings.backgroundMusicVolume", 0.5);
+    // SoundManager applies a perceptual square curve, so 0.45 produces an
+    // effective music gain of about 0.2 while remaining clearly audible.
+    return this.getFloat("settings.backgroundMusicVolume", 0.45);
   }
 
   setBackgroundMusicVolume(volume: number): void {

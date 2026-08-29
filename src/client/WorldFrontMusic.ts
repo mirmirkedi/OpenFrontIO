@@ -1,6 +1,7 @@
 import { assetUrl } from "../core/AssetUrls";
 
 const MUSIC_ENABLED_KEY = "worldfront.music.enabled";
+const MENU_MUSIC_VOLUME = 0.3;
 
 /** Add tracks here when they are ready, for example: ["music/worldfront-theme.mp3"]. */
 const WORLD_FRONT_MUSIC_TRACKS: string[] = [
@@ -49,11 +50,18 @@ class WorldFrontMusicController {
     if (this.enabled) void this.play();
   }
 
+  stop(): void {
+    if (!this.audio) return;
+    this.audio.pause();
+    this.audio.currentTime = 0;
+  }
+
   private async play(): Promise<void> {
     if (!this.enabled || this.tracks.length === 0) return;
     if (!this.audio) {
       this.audio = new Audio(this.tracks[this.trackIndex]);
       this.audio.preload = "auto";
+      this.audio.volume = MENU_MUSIC_VOLUME;
       this.audio.addEventListener("ended", this.playNext);
     }
     try {

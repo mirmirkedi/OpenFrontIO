@@ -1826,6 +1826,8 @@
     "attacking_troops_overlay_desc": "Aktif ön hatlarda saldırgan ve savunmacı birliklerinin sayılarını gösterin.",
     "attacking_troops_overlay_label": "Saldırı Birlikleri Yerleşimi",
     "background_music_volume": "Arkaplan Müziği Sesi",
+    "music_off": "Müziği kapat",
+    "music_on": "Müziği aç",
     "boat_attack": "Tekne Saldırısı",
     "boat_attack_desc": "İmlecinizin altındaki kareye tekne saldırısı gönder.",
     "box_select_warships": "Kutu Seçimli Savaş Gemileri",
