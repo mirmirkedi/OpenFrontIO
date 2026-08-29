@@ -4,6 +4,7 @@ import { assetUrl } from "../../core/AssetUrls";
 import { isOpenTroopApp } from "../AppMode";
 import { loadActiveLocalGame } from "../LocalPersistantStats";
 import { translateText } from "../Utils";
+import { worldFrontMusic } from "../WorldFrontMusic";
 import "./CosmeticBackground";
 import "./NavAccountMenu";
 import "./NavUtilityIcons";
@@ -14,10 +15,15 @@ import "./StreamingNow";
 @customElement("play-page")
 export class PlayPage extends LitElement {
   @state() private languageRevision = 0;
+  @state() private musicEnabled = worldFrontMusic.isEnabled();
 
   connectedCallback() {
     super.connectedCallback();
-    window.addEventListener("worldfront-language-changed", this.refreshLanguage);
+    window.addEventListener(
+      "worldfront-language-changed",
+      this.refreshLanguage,
+    );
+    window.addEventListener("worldfront-music-changed", this.refreshMusic);
   }
 
   disconnectedCallback() {
@@ -25,12 +31,23 @@ export class PlayPage extends LitElement {
       "worldfront-language-changed",
       this.refreshLanguage,
     );
+    window.removeEventListener("worldfront-music-changed", this.refreshMusic);
     super.disconnectedCallback();
   }
 
   private refreshLanguage = () => {
     this.languageRevision += 1;
     this.requestUpdate();
+  };
+
+  private refreshMusic = () => {
+    this.musicEnabled = worldFrontMusic.isEnabled();
+  };
+
+  private toggleMusic = () => {
+    this.musicEnabled = !this.musicEnabled;
+    worldFrontMusic.setEnabled(this.musicEnabled);
+    worldFrontMusic.unlock();
   };
 
   createRenderRoot() {
@@ -63,12 +80,52 @@ export class PlayPage extends LitElement {
             <div class="opentroop-home__actions">
               <button
                 class="opentroop-icon-button"
+                aria-label=${translateText(
+                  this.musicEnabled
+                    ? "worldfront.music_on"
+                    : "worldfront.music_off",
+                )}
+                title=${translateText(
+                  this.musicEnabled
+                    ? "worldfront.music_on"
+                    : "worldfront.music_off",
+                )}
+                aria-pressed=${this.musicEnabled}
+                data-music-enabled=${this.musicEnabled}
+                @click=${this.toggleMusic}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 14h3l4 3V7L7 10H4z"></path>
+                  ${this.musicEnabled
+                    ? html`<path d="M15 9.5a4 4 0 0 1 0 5"></path
+                        ><path d="M17.5 7a7.5 7.5 0 0 1 0 10"></path>`
+                    : html`<path d="M16 8l6 8M22 8l-6 8"></path>`}
+                </svg>
+              </button>
+              <button
+                class="opentroop-icon-button"
                 aria-label=${translateText("select_lang.title")}
                 @click=${this.openLanguagePicker}
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8">
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                >
                   <circle cx="12" cy="12" r="8.5"></circle>
-                  <path d="M3.5 12h17M12 3.5c2.3 2.3 3.4 5.1 3.4 8.5S14.3 18.2 12 20.5C9.7 18.2 8.6 15.4 8.6 12S9.7 5.8 12 3.5Z"></path>
+                  <path
+                    d="M3.5 12h17M12 3.5c2.3 2.3 3.4 5.1 3.4 8.5S14.3 18.2 12 20.5C9.7 18.2 8.6 15.4 8.6 12S9.7 5.8 12 3.5Z"
+                  ></path>
                 </svg>
               </button>
               <button
@@ -84,7 +141,9 @@ export class PlayPage extends LitElement {
           <section class="opentroop-home__content">
             <div class="opentroop-home__eyebrow">
               <span class="opentroop-home__eyebrow-line"></span>
-              <span class="opentroop-home__eyebrow-text">${translateText("worldfront.home_eyebrow")}</span>
+              <span class="opentroop-home__eyebrow-text"
+                >${translateText("worldfront.home_eyebrow")}</span
+              >
               <span class="opentroop-home__eyebrow-line"></span>
             </div>
             <h1>${translateText("worldfront.home_title")}</h1>
@@ -101,8 +160,12 @@ export class PlayPage extends LitElement {
                   >
                     <span class="opentroop-continue-button__icon">↻</span>
                     <span>
-                      <small>${translateText("worldfront.active_battle")}</small>
-                      <strong>${translateText("worldfront.continue_game")}</strong>
+                      <small
+                        >${translateText("worldfront.active_battle")}</small
+                      >
+                      <strong
+                        >${translateText("worldfront.continue_game")}</strong
+                      >
                     </span>
                     <span aria-hidden="true">›</span>
                   </button>
@@ -169,7 +232,9 @@ export class PlayPage extends LitElement {
             >
               <img
                 src=${assetUrl(
-                  appMode ? "images/WorldFrontLogo.svg" : "images/OpenFrontLogo.svg",
+                  appMode
+                    ? "images/WorldFrontLogo.svg"
+                    : "images/OpenFrontLogo.svg",
                 )}
                 alt=${appMode ? "WorldFront" : "OpenFront"}
                 class="h-full w-auto"
