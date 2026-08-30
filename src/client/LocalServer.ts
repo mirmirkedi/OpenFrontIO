@@ -342,7 +342,9 @@ export class LocalServer {
     unloading: boolean,
   ): Promise<void> {
     if (isOpenTroopApp()) {
-      clearActiveLocalGame();
+      if (this.winner) {
+        clearActiveLocalGame();
+      }
       return;
     }
     this.archiveInFlight = true;

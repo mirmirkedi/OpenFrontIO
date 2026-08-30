@@ -26,6 +26,8 @@ export class PlayPage extends LitElement {
     window.addEventListener("worldfront-music-changed", this.refreshMusic);
     window.addEventListener("pointerdown", this.unlockMusic, { passive: true });
     window.addEventListener("keydown", this.unlockMusic);
+    document.addEventListener("leave-lobby", this.refreshSavedGame);
+    document.addEventListener("visibilitychange", this.onVisibilityChange);
   }
 
   disconnectedCallback() {
@@ -36,8 +38,20 @@ export class PlayPage extends LitElement {
     window.removeEventListener("worldfront-music-changed", this.refreshMusic);
     window.removeEventListener("pointerdown", this.unlockMusic);
     window.removeEventListener("keydown", this.unlockMusic);
+    document.removeEventListener("leave-lobby", this.refreshSavedGame);
+    document.removeEventListener("visibilitychange", this.onVisibilityChange);
     super.disconnectedCallback();
   }
+
+  private refreshSavedGame = () => {
+    this.requestUpdate();
+  };
+
+  private onVisibilityChange = () => {
+    if (document.visibilityState === "visible") {
+      this.requestUpdate();
+    }
+  };
 
   private refreshLanguage = () => {
     this.languageRevision += 1;
