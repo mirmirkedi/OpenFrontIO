@@ -1162,31 +1162,25 @@ body.opentroop-app #hex-grid {
 /* Android edge-to-edge puts the game below the camera cutout. Keep the
    top-right game controls in the visible safe area on small screens. */
 @media (max-width: 639px) {
+  .opentroop-app.in-game {
+    --wf-game-safe-top: min(
+      max(var(--wf-safe-top, 0px), env(safe-area-inset-top)),
+      18px
+    );
+  }
+
   .opentroop-app.in-game .game-top-safe-area-fill {
-    position: fixed;
-    z-index: 999;
-    top: 0;
-    right: 0;
-    left: 0;
-    height: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 12px);
-    pointer-events: none;
-    /* Preserve the safe-area height for camera cutouts without drawing a
-       visible strip between the two top HUD frames. */
-    background: transparent;
+    display: none !important;
   }
 
   .opentroop-app.in-game .game-top-right-controls {
-    top: calc(
-      max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 12px
-    ) !important;
+    top: calc(var(--wf-game-safe-top) + 12px) !important;
   }
 
   /* Keep the leaderboard frame aligned with the right-hand control frame.
      Extend only each frame's background upward into the safe-area gap. */
   .opentroop-app.in-game game-left-sidebar aside {
-    top: calc(
-      max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 12px
-    ) !important;
+    top: calc(var(--wf-game-safe-top) + 12px) !important;
     overflow: visible;
     box-shadow: 8px 7px 18px rgba(0, 0, 0, 0.24);
   }
@@ -1198,32 +1192,13 @@ body.opentroop-app #hex-grid {
 
   .opentroop-app.in-game game-left-sidebar aside::before,
   .opentroop-app.in-game game-right-sidebar aside::before {
-    position: absolute;
-    z-index: 0;
-    top: calc(
-      -1 * (max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 12px)
-    );
-    right: 0;
-    left: 0;
-    height: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 14px);
-    content: "";
-    pointer-events: none;
+    display: none;
   }
 
-  .opentroop-app.in-game game-left-sidebar aside::before {
-    background: linear-gradient(
-      225deg,
-      rgba(6, 29, 47, 0.98),
-      rgba(2, 16, 29, 0.98)
-    );
-  }
-
-  .opentroop-app.in-game game-right-sidebar aside::before {
-    background: linear-gradient(
-      135deg,
-      rgba(6, 29, 47, 0.98),
-      rgba(2, 16, 29, 0.98)
-    );
+  /* Keep the player-information panel below the camera area without allowing
+     device-specific safe-area values to make it excessively tall. */
+  .opentroop-app.in-game player-info-overlay > div {
+    margin-top: calc(min(var(--wf-game-safe-top), 18px) + 8px) !important;
   }
 
   /* The leaderboard is an inline full-screen page, while the game controls
@@ -1236,9 +1211,9 @@ body.opentroop-app #hex-grid {
   .opentroop-app.in-game #page-leaderboard > o-modal {
     display: block;
     position: relative;
-    top: calc(max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) + 140px);
+    top: calc(var(--wf-game-safe-top) + 140px);
     height: calc(
-      100% - max(var(--wf-safe-top, 0px), env(safe-area-inset-top)) - 140px
+      100% - var(--wf-game-safe-top) - 140px
     );
   }
 
