@@ -108,14 +108,11 @@ export class MainRadialMenu implements Controller {
       myPlayer.actions(clickedTile).then((actions) => {
         const targetOwner = this.game.owner(clickedTile);
         const isOtherPlayerTarget =
-          targetOwner.isPlayer() && targetOwner.id() !== myPlayer.id();
+          this.game.hasOwner(clickedTile) && targetOwner.id() !== myPlayer.id();
         const hasActiveAttack = myPlayer.outgoingAttacks().length > 0;
 
-        // Bot targets remain fast tap-to-attack. A human player's territory
-        // must open the action menu first so alliance/trade/profile actions
-        // are not swallowed by the attack shortcut. While an attack is active,
-        // keep the menu open for every enemy target so the next attack can be
-        // chosen explicitly.
+        // Keep the menu open for every occupied enemy target, including bots,
+        // so the attack can be chosen explicitly.
         if (actions.canAttack && !isOtherPlayerTarget && !hasActiveAttack) {
           this.eventBus.emit(
             new SendAttackIntentEvent(

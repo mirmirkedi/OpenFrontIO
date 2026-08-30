@@ -1097,11 +1097,10 @@ export class ClientGameRunner {
       this.myPlayer = myPlayer;
     }
 
-    // A human player's territory is ambiguous on mobile: tapping it may
-    // mean alliance, trade, profile, or attack. Open the action menu first;
-    // bot territories keep the fast tap-to-attack behavior.
+    // Every occupied territory that is not ours opens the action menu first.
+    // This applies equally to human and bot-controlled territories.
     const targetOwner = this.gameView.owner(tile);
-    if (targetOwner.isPlayer() && targetOwner.id() !== this.myPlayer.id()) {
+    if (this.gameView.hasOwner(tile) && targetOwner.id() !== this.myPlayer.id()) {
       this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
       return;
     }
