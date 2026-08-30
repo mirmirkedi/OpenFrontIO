@@ -377,7 +377,7 @@ export default defineConfig(({ mode }) => {
 
     build: {
       outDir: "static", // Webpack outputs to 'static', assuming we want to keep this.
-      emptyOutDir: true,
+      emptyOutDir: false,
       assetsDir: "assets", // Sub-directory for assets
       rollupOptions: {
         output: {

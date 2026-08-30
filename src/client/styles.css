@@ -1181,13 +1181,13 @@ body.opentroop-app #hex-grid {
      Extend only each frame's background upward into the safe-area gap. */
   .opentroop-app.in-game game-left-sidebar aside {
     top: 0 !important;
-    padding-top: calc(var(--wf-game-safe-top) + 16px) !important;
+    padding-top: calc(var(--wf-game-safe-top) + 8px) !important;
     overflow: visible;
     box-shadow: 8px 7px 18px rgba(0, 0, 0, 0.24);
   }
 
   .opentroop-app.in-game game-right-sidebar aside {
-    padding-top: calc(var(--wf-game-safe-top) + 16px) !important;
+    padding-top: calc(var(--wf-game-safe-top) + 8px) !important;
     overflow: visible;
     box-shadow: -8px 7px 18px rgba(0, 0, 0, 0.24);
   }
