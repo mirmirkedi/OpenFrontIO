@@ -1165,7 +1165,7 @@ body.opentroop-app #hex-grid {
   .opentroop-app.in-game {
     --wf-game-safe-top: min(
       max(var(--wf-safe-top, 0px), env(safe-area-inset-top)),
-      18px
+      24px
     );
   }
 
@@ -1174,18 +1174,20 @@ body.opentroop-app #hex-grid {
   }
 
   .opentroop-app.in-game .game-top-right-controls {
-    top: calc(var(--wf-game-safe-top) + 12px) !important;
+    top: 0 !important;
   }
 
   /* Keep the leaderboard frame aligned with the right-hand control frame.
      Extend only each frame's background upward into the safe-area gap. */
   .opentroop-app.in-game game-left-sidebar aside {
-    top: calc(var(--wf-game-safe-top) + 12px) !important;
+    top: 0 !important;
+    padding-top: calc(var(--wf-game-safe-top) + 16px) !important;
     overflow: visible;
     box-shadow: 8px 7px 18px rgba(0, 0, 0, 0.24);
   }
 
   .opentroop-app.in-game game-right-sidebar aside {
+    padding-top: calc(var(--wf-game-safe-top) + 16px) !important;
     overflow: visible;
     box-shadow: -8px 7px 18px rgba(0, 0, 0, 0.24);
   }
@@ -1196,9 +1198,15 @@ body.opentroop-app #hex-grid {
   }
 
   /* Keep the player-information panel below the camera area without allowing
-     device-specific safe-area values to make it excessively tall. */
+     device-specific safe-area values to make it excessively tall.
+     Extend the background seamlessly to the top edge. */
   .opentroop-app.in-game player-info-overlay > div {
-    margin-top: calc(min(var(--wf-game-safe-top), 18px) + 8px) !important;
+    margin-top: 0 !important;
+    top: 0 !important;
+  }
+
+  .opentroop-app.in-game player-info-overlay > div > div {
+    padding-top: calc(var(--wf-game-safe-top) + 10px) !important;
   }
 
   /* The leaderboard is an inline full-screen page, while the game controls
