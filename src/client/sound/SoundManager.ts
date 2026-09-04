@@ -3,6 +3,10 @@ import { assetUrl } from "../../core/AssetUrls";
 import { EventBus } from "../../core/EventBus";
 import { UserSettings } from "../../core/game/UserSettings";
 import {
+  releaseMixFriendlyAudioFocus,
+  requestMixFriendlyAudioFocus,
+} from "./NativeAudioFocus";
+import {
   PlaySoundEffectEvent,
   SetBackgroundMusicVolumeEvent,
   SetSoundEffectsVolumeEvent,
@@ -71,6 +75,7 @@ export class SoundManager {
   }
 
   public dispose(): void {
+    releaseMixFriendlyAudioFocus();
     this.eventBus.off(PlaySoundEffectEvent, this.onPlaySoundEffect);
     this.eventBus.off(
       SetBackgroundMusicVolumeEvent,
@@ -103,12 +108,14 @@ export class SoundManager {
         this.backgroundMusic.length > 0 &&
         !this.backgroundMusic[this.currentTrack].playing()
       ) {
+        requestMixFriendlyAudioFocus();
         this.backgroundMusic[this.currentTrack].play();
       }
     });
   }
 
   public stopBackgroundMusic(): void {
+    releaseMixFriendlyAudioFocus();
     this.safely("stop background music", () => {
       if (this.backgroundMusic.length > 0) {
         this.backgroundMusic[this.currentTrack].stop();

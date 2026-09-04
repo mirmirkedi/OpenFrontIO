@@ -1,4 +1,8 @@
 import { assetUrl } from "../core/AssetUrls";
+import {
+  releaseMixFriendlyAudioFocus,
+  requestMixFriendlyAudioFocus,
+} from "./sound/NativeAudioFocus";
 
 const MUSIC_ENABLED_KEY = "worldfront.music.enabled";
 const MENU_MUSIC_VOLUME = 0.3;
@@ -40,6 +44,7 @@ class WorldFrontMusicController {
     }
     if (enabled) void this.play();
     else this.audio?.pause();
+    if (!enabled) releaseMixFriendlyAudioFocus();
     window.dispatchEvent(
       new CustomEvent("worldfront-music-changed", { detail: { enabled } }),
     );
@@ -51,6 +56,7 @@ class WorldFrontMusicController {
   }
 
   stop(): void {
+    releaseMixFriendlyAudioFocus();
     if (!this.audio) return;
     this.audio.pause();
     this.audio.currentTime = 0;
@@ -58,6 +64,7 @@ class WorldFrontMusicController {
 
   private async play(): Promise<void> {
     if (!this.enabled || this.tracks.length === 0) return;
+    requestMixFriendlyAudioFocus();
     if (!this.audio) {
       this.audio = new Audio(this.tracks[this.trackIndex]);
       this.audio.preload = "auto";
