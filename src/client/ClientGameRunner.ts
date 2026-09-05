@@ -1097,35 +1097,7 @@ export class ClientGameRunner {
       this.myPlayer = myPlayer;
     }
 
-    // Every occupied territory that is not ours opens the action menu first.
-    // This applies equally to human and bot-controlled territories.
-    const targetOwner = this.gameView.owner(tile);
-    if (this.gameView.hasOwner(tile) && targetOwner.id() !== this.myPlayer.id()) {
-      this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
-      return;
-    }
-
-    // A tap must evaluate the complete ground-action set as well as the
-    // optional transport-ship action. Restricting this query to transports
-    // made attacks on unclaimed/disconnected land work only through the
-    // long-press radial menu.
-    this.myPlayer.actions(tile, null).then((actions) => {
-      if (actions.canAttack) {
-        this.eventBus.emit(
-          new SendAttackIntentEvent(
-            this.gameView.owner(tile).id(),
-            this.myPlayer!.troops() * this.renderer.uiState.attackRatio,
-          ),
-        );
-      } else if (this.canAutoBoat(actions.buildableUnits, tile)) {
-        this.sendBoatAttackIntent(tile);
-      } else if (!this.gameView.hasOwner(tile)) {
-        // Keep the menu available for unclaimed land that is not currently
-        // connected to the player's territory. Connected unclaimed land is
-        // handled directly above, so it stays a one-tap attack.
-        this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
-      }
-    });
+    this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
   }
 
   private autoUpgradeEvent(event: AutoUpgradeEvent) {
@@ -1405,22 +1377,6 @@ export class ClientGameRunner {
         this.myPlayer.troops() * this.renderer.uiState.attackRatio,
       ),
     );
-  }
-
-  private canAutoBoat(buildables: BuildableUnit[], tile: TileRef): boolean {
-    if (!this.gameView.isLand(tile)) return false;
-
-    const canBuild = this.canBoatAttack(buildables);
-    if (canBuild === false) return false;
-
-    // TODO: Global enable flag
-    // TODO: Global limit autoboat to nearby shore flag
-    // if (!enableAutoBoat) return false;
-    // if (!limitAutoBoatNear) return true;
-    const distanceSquared = this.gameView.euclideanDistSquared(tile, canBuild);
-    const limit = 100;
-    const limitSquared = limit * limit;
-    return distanceSquared < limitSquared;
   }
 
   private onMouseMove(event: MouseMoveEvent) {

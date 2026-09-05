@@ -22,7 +22,6 @@ const donateTroopIcon = assetUrl("images/DonateTroopIconWhite.svg");
 const swordIcon = assetUrl("images/SwordIconWhite.svg");
 
 import { ContextMenuEvent } from "../../InputHandler";
-import { SendAttackIntentEvent } from "../../Transport";
 
 function emptyPlayerActions(): PlayerActions {
   return {
@@ -106,24 +105,6 @@ export class MainRadialMenu implements Controller {
       const myPlayer = this.game.myPlayer();
       if (myPlayer === null) return;
       myPlayer.actions(clickedTile).then((actions) => {
-        const targetOwner = this.game.owner(clickedTile);
-        const isOtherPlayerTarget =
-          this.game.hasOwner(clickedTile) && targetOwner.id() !== myPlayer.id();
-        const hasActiveAttack = myPlayer.outgoingAttacks().length > 0;
-
-        // Keep the menu open for every occupied enemy target, including bots,
-        // so the attack can be chosen explicitly.
-        if (actions.canAttack && !isOtherPlayerTarget && !hasActiveAttack) {
-          this.eventBus.emit(
-            new SendAttackIntentEvent(
-              targetOwner.id(),
-              myPlayer.troops() * this.uiState.attackRatio,
-            ),
-          );
-          this.closeMenu();
-          return;
-        }
-
         this.updatePlayerActions(
           myPlayer,
           actions,

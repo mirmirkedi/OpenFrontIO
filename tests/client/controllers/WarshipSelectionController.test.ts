@@ -1,5 +1,10 @@
 import { WarshipSelectionController } from "../../../src/client/controllers/WarshipSelectionController";
-import { UnitSelectionEvent } from "../../../src/client/InputHandler";
+import {
+  ContextMenuEvent,
+  MouseUpEvent,
+  TouchEvent,
+  UnitSelectionEvent,
+} from "../../../src/client/InputHandler";
 
 describe("WarshipSelectionController", () => {
   let game: any;
@@ -28,6 +33,52 @@ describe("WarshipSelectionController", () => {
     eventBus = { on: vi.fn() };
     transformHandler = {};
     view = { setSelectedUnits: vi.fn() };
+  });
+
+  it.each([false, true])(
+    "opens the menu on land regardless of ownership (%s)",
+    (owned) => {
+      Object.assign(game, {
+        isValidCoord: () => true,
+        ref: () => 10,
+        inSpawnPhase: () => false,
+        isWater: () => false,
+        owner: () => ({ isPlayer: () => owned }),
+      });
+      eventBus.emit = vi.fn();
+      transformHandler.screenToWorldCoordinates = () => ({ x: 10, y: 10 });
+      const controller = new WarshipSelectionController(
+        game,
+        eventBus,
+        transformHandler,
+        view,
+      );
+      controller["onTouch"](new TouchEvent(20, 30));
+      expect(eventBus.emit).toHaveBeenCalledExactlyOnceWith(
+        new ContextMenuEvent(20, 30),
+      );
+    },
+  );
+
+  it("keeps land spawn selection as a normal input event", () => {
+    Object.assign(game, {
+      isValidCoord: () => true,
+      ref: () => 10,
+      inSpawnPhase: () => true,
+      isWater: () => false,
+    });
+    eventBus.emit = vi.fn();
+    transformHandler.screenToWorldCoordinates = () => ({ x: 10, y: 10 });
+    const controller = new WarshipSelectionController(
+      game,
+      eventBus,
+      transformHandler,
+      view,
+    );
+    controller["onTouch"](new TouchEvent(20, 30));
+    expect(eventBus.emit).toHaveBeenCalledExactlyOnceWith(
+      new MouseUpEvent(20, 30),
+    );
   });
 
   it("tracks the selected unit on single-unit selection (rendering is WebGL)", () => {
