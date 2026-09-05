@@ -345,6 +345,9 @@ export function createRenderer(
 
 export class GameRenderer {
   private layerTickState = new Map<Controller, { lastTickAtMs: number }>();
+  private stopped = false;
+  private readonly onResize = () =>
+    this.transformHandler.updateCanvasBoundingRect();
 
   constructor(
     public transformHandler: TransformHandler,
@@ -354,26 +357,35 @@ export class GameRenderer {
   ) {}
 
   initialize() {
+    this.stopped = false;
     loadAllSprites().catch((err) =>
       console.error("Failed to preload sprites:", err),
     );
 
     this.layers.forEach((l) => l.init?.());
 
-    window.addEventListener("resize", () =>
-      this.transformHandler.updateCanvasBoundingRect(),
-    );
+    window.addEventListener("resize", this.onResize);
 
     //show whole map on startup
     this.transformHandler.centerAll(0.9);
   }
 
   stop() {
+    if (this.stopped) return;
+    this.stopped = true;
+    window.removeEventListener("resize", this.onResize);
+    this.transformHandler.stop();
     this.layers.forEach((layer) => layer.stop?.());
     this.layerTickState.clear();
   }
 
+  frame() {
+    if (this.stopped) return;
+    this.layers.forEach((layer) => layer.frame?.());
+  }
+
   tick() {
+    if (this.stopped) return;
     const nowMs = performance.now();
     const shouldProfileTick = FrameProfiler.isEnabled();
 

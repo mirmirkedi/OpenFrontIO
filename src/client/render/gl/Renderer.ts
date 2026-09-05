@@ -184,6 +184,12 @@ export class GPURenderer {
   private caf: typeof cancelAnimationFrame;
 
   private animId: number | null = null;
+  /** Transient thermal quality; never persisted into the user's graphics settings. */
+  public powerSavingEffects = false;
+
+  hasActiveHeat(): boolean {
+    return this.heatManager.isActive();
+  }
   private frameTick = 0;
   private mapW = 0;
   private mapH = 0;
@@ -1340,7 +1346,11 @@ export class GPURenderer {
     if (pe.unit) this.unitPass.drawGround(cam);
     // Fallout bloom is a four-pass GPU pipeline. It is visually empty until
     // a tile has active heat, so avoid paying for it on ordinary frames.
-    if (pe.falloutBloom && this.heatManager.isActive())
+    if (
+      pe.falloutBloom &&
+      !this.powerSavingEffects &&
+      this.heatManager.isActive()
+    )
       this.bloomPass.draw(cam, this.frameTick);
     this.samRadiusPass.draw(cam);
     this.rangeCirclePass.draw(cam);
@@ -1358,7 +1368,8 @@ export class GPURenderer {
     if (pe.trail) this.trailPass.draw(cam);
     // Spiral vortexes sit above the plain trails, below the missiles that
     // trail them. Skipped in alt view — the strategic overlay stays effects-free.
-    if (!this.altView) this.spiralRibbonPass.draw(cam);
+    if (!this.altView && !this.powerSavingEffects)
+      this.spiralRibbonPass.draw(cam);
     if (pe.unit) this.unitPass.drawMissiles(cam);
 
     if (pe.fx) {

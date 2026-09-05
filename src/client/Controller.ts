@@ -17,6 +17,9 @@ export interface Controller {
   /** Called when the current game ends, before its renderer is disposed. */
   stop?: () => void;
 
+  /** Called immediately before an actual rendered frame, never in the background. */
+  frame?: () => void;
+
   /**
    * Called per game tick (10Hz). Optional — pure event subscribers can omit.
    *

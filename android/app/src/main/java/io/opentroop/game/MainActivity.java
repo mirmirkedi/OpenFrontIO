@@ -1,6 +1,8 @@
 package io.worldfront.game;
 
 import android.os.Bundle;
+import android.os.Build;
+import android.os.PowerManager;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -17,6 +19,42 @@ import androidx.core.view.ViewCompat;
 public class MainActivity extends BridgeActivity {
     private AudioManager audioManager;
     private AudioFocusRequest audioFocusRequest;
+    private volatile boolean appActive = false;
+
+    private final class WorldFrontPowerBridge {
+        @JavascriptInterface
+        public boolean isAppActive() {
+            return appActive;
+        }
+
+        @JavascriptInterface
+        public int getThermalStatus() {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return 0;
+            PowerManager manager = (PowerManager) getSystemService(POWER_SERVICE);
+            return manager == null ? 0 : manager.getCurrentThermalStatus();
+        }
+    }
+
+    private void publishAppState() {
+        if (getBridge() == null || getBridge().getWebView() == null) return;
+        getBridge().getWebView().evaluateJavascript(
+                "window.dispatchEvent(new CustomEvent('worldfront-app-state',"
+                        + "{detail:{active:" + appActive + "}}));", null);
+    }
+
+    @Override
+    public void onPause() {
+        appActive = false;
+        publishAppState();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        appActive = true;
+        publishAppState();
+    }
 
     private final class WorldFrontAudioBridge {
         @JavascriptInterface
@@ -103,6 +141,8 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         installAudioBridge();
+        getBridge().getWebView().addJavascriptInterface(
+                new WorldFrontPowerBridge(), "WorldFrontPower");
         installSafeAreaBridge();
         hideStatusBar();
     }

@@ -377,6 +377,10 @@ export class TransformHandler {
     this.changed = true;
   }
 
+  public stop() {
+    this.clearTarget();
+  }
+
   private clearTarget() {
     if (this.intervalID !== null) {
       clearInterval(this.intervalID);

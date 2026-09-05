@@ -36,6 +36,20 @@ import { GPURenderer } from "./Renderer";
 import type { RenderSettings } from "./RenderSettings";
 
 export class MapRenderer {
+  private powerSavingEffects = false;
+
+  resize(width: number, height: number): void {
+    this.renderer?.resize(width, height);
+  }
+
+  setPowerSavingEffects(reduced: boolean): void {
+    this.powerSavingEffects = reduced;
+    if (this.renderer) this.renderer.powerSavingEffects = reduced;
+  }
+
+  hasActiveHeat(): boolean {
+    return this.renderer?.hasActiveHeat() ?? false;
+  }
   private renderer: GPURenderer | null = null;
   private resizeObs: ResizeObserver | null = null;
   // Stored layer data for context-restore re-creation.
@@ -98,6 +112,7 @@ export class MapRenderer {
       this.caf,
     );
 
+    this.renderer.powerSavingEffects = this.powerSavingEffects;
     const rect = this.canvas.getBoundingClientRect();
     if (rect.width > 0) this.renderer.resize(rect.width, rect.height);
   };

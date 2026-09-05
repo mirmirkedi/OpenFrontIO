@@ -35,6 +35,7 @@ import {
   UserSettings,
 } from "../core/game/UserSettings";
 import { WorkerClient } from "../core/worker/WorkerClient";
+import { isOpenTroopApp } from "./AppMode";
 import { getPersistentID } from "./Auth";
 import { showInGameAlert } from "./InGameModal";
 import {
@@ -72,6 +73,8 @@ import { WebGLFrameBuilder } from "./WebGLFrameBuilder";
 import { worldFrontMusic } from "./WorldFrontMusic";
 import { MapLayerController } from "./controllers/MapLayerController";
 import { createRenderer, GameRenderer } from "./hud/GameRenderer";
+import { FramePacer } from "./render/FramePacer";
+import { PowerProfile } from "./render/PowerProfile";
 import {
   applyGraphicsOverrides,
   createRenderSettings,
@@ -84,9 +87,11 @@ import {
   showGLGate,
   trackGLInit,
 } from "./render/gl";
+import { setAppDprLimit } from "./render/gl/utils/Dpr";
 import { ALL_UNIT_TYPES, UnitState } from "./render/types";
 import { SoundManager } from "./sound/SoundManager";
 import { themeProvider } from "./theme/ThemeProvider";
+import { observeAppVisibility } from "./utilities/AppVisibility";
 import { GameView, PlayerView } from "./view";
 
 export interface LobbyConfig {
@@ -420,6 +425,7 @@ function mountWebGLFrameLoop(
   transformHandler: import("./TransformHandler").TransformHandler,
   gameView: GameView,
   eventBus: EventBus,
+  gameRenderer: GameRenderer,
 ): { builder: WebGLFrameBuilder; stopFrameLoop: () => void } {
   const gameMap = terrainMap.gameMap;
   const mapWidth = gameMap.width();
@@ -441,9 +447,14 @@ function mountWebGLFrameLoop(
   });
   resizeObs.observe(glCanvas);
 
+  let lastDpr = renderDpr();
   const syncCamera = (): void => {
     const scale = transformHandler.scale;
     const dpr = renderDpr();
+    if (dpr !== lastDpr) {
+      view.resize(cachedCanvasW, cachedCanvasH);
+      lastDpr = dpr;
+    }
     const centerX =
       transformHandler.offsetX +
       mapWidth / 2 +
@@ -475,27 +486,130 @@ function mountWebGLFrameLoop(
     view.showMoveIndicator(tx, ty, firstUnit.owner().smallID());
   });
 
-  // Self-driving RAF: syncCamera reads the latest camera state from
-  // TransformHandler, pushes it to WebGL, and synchronously invokes the
-  // renderer's captured frame callback (which draws). One RAF = one
-  // synchronized camera-update + WebGL render.
-  let rafId: number | null = null;
-  const driveFrame = (): void => {
-    syncCamera();
-    rafId = requestAnimationFrame(driveFrame);
+  // One paced loop owns visual animation; simulation ticks are independent.
+  const mobile = isOpenTroopApp();
+  const pacer = new FramePacer();
+  const power = new PowerProfile();
+  power.markActivity(performance.now());
+  let lastThermalPoll = -Infinity;
+  let lastActivityCheck = -Infinity;
+  let lastCheckedTick = -1;
+  let lastX = transformHandler.offsetX;
+  let lastY = transformHandler.offsetY;
+  let lastScale = transformHandler.scale;
+  const onInteraction = () => power.markActivity(performance.now());
+  const interactions = [
+    "pointerdown",
+    "pointermove",
+    "keydown",
+    "wheel",
+  ] as const;
+  if (mobile) {
+    for (const name of interactions)
+      window.addEventListener(name, onInteraction, { passive: true });
+  }
+  const targetFps = (now: number): number => {
+    if (!mobile) return 60;
+    if (now - lastThermalPoll >= 5000) {
+      lastThermalPoll = now;
+      try {
+        power.updateThermal(
+          window.WorldFrontPower?.getThermalStatus() ?? 0,
+          now,
+        );
+      } catch {
+        // Older shells have no bridge. Never guess temperature from slow FPS.
+      }
+      setAppDprLimit(power.dprLimit);
+      view.setPowerSavingEffects(power.reduceEffects);
+    }
+    if (
+      lastX !== transformHandler.offsetX ||
+      lastY !== transformHandler.offsetY ||
+      lastScale !== transformHandler.scale
+    ) {
+      lastX = transformHandler.offsetX;
+      lastY = transformHandler.offsetY;
+      lastScale = transformHandler.scale;
+      power.markActivity(now);
+    }
+    if (now - lastActivityCheck >= 200) {
+      lastActivityCheck = now;
+      const frame = gameView.frameData();
+      if (
+        gameRenderer.uiState.ghostStructure !== null ||
+        frame.inSpawnPhase ||
+        frame.attackRings.length > 0 ||
+        frame.nukeTelegraphs.length > 0 ||
+        frame.spiralRibbons.length > 0 ||
+        view.hasActiveHeat()
+      )
+        power.markActivity(now);
+      // Dirty fields belong to a single tick; don't reuse them forever when paused.
+      if (frame.tick !== lastCheckedTick) {
+        lastCheckedTick = frame.tick;
+        if (
+          frame.changedTiles === null ||
+          frame.changedTiles.length > 0 ||
+          frame.structuresDirty ||
+          frame.events.deadUnits.length > 0 ||
+          frame.events.conquestEvents.length > 0 ||
+          frame.events.bonusEvents.length > 0
+        )
+          power.markActivity(now);
+      }
+      // Conservatively keep moving unit types and construction at 60 FPS.
+      for (const unit of frame.units.values()) {
+        if (
+          unit.isActive &&
+          (unit.underConstruction || !Structures.has(unit.unitType as UnitType))
+        ) {
+          power.markActivity(now);
+          break;
+        }
+      }
+    }
+    return power.fps(now);
   };
-  rafId = requestAnimationFrame(driveFrame);
+  let rafId: number | null = null;
+  let stopped = false;
+  let visible = false;
+  const driveFrame = (now: number): void => {
+    rafId = null;
+    if (stopped || !visible) return;
+    if (pacer.shouldRender(now, targetFps(now))) {
+      gameRenderer.frame();
+      syncCamera();
+    }
+    if (!stopped && visible) rafId = requestAnimationFrame(driveFrame);
+  };
+  const stopVisibility = observeAppVisibility((nextVisible) => {
+    visible = nextVisible;
+    if (!visible) transformHandler.stop();
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    rafId = null;
+    pacer.reset();
+    if (visible && !stopped) {
+      power.markActivity(performance.now());
+      rafId = requestAnimationFrame(driveFrame);
+    }
+  });
 
   // Tear down the per-frame loop so a stopped game stops driving WebGL and
   // releases the view for disposal. Left running, the RAF keeps the WebGL
   // context referenced (and alive) forever — each new game would then stack
   // another context until the browser's limit is hit.
   const stopFrameLoop = (): void => {
+    stopped = true;
+    stopVisibility();
+    for (const name of interactions)
+      window.removeEventListener(name, onInteraction);
     if (rafId !== null) {
       cancelAnimationFrame(rafId);
       rafId = null;
     }
     resizeObs.disconnect();
+    setAppDprLimit(1.25);
   };
 
   const builder = new WebGLFrameBuilder(view);
@@ -711,6 +825,7 @@ async function createClientGame(
       gameRenderer.transformHandler,
       gameView,
       eventBus,
+      gameRenderer,
     );
 
     // Releases all WebGL/DOM resources this game created. Without it, stopping
@@ -1046,6 +1161,7 @@ export class ClientGameRunner {
   }
 
   public stop() {
+    this.input.destroy();
     this.soundManager.dispose();
     this.graphicsListenerAbort?.abort();
     this.renderer.stop();

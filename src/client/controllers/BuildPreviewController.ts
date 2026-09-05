@@ -70,6 +70,7 @@ export function samThreatensNukePreview(
 }
 
 export class BuildPreviewController implements Controller {
+  private stopped = false;
   /** Current ghost (null when no build type is active). */
   private ghostUnit: { buildableUnit: BuildableUnit } | null = null;
   private readonly connectedAllySmallIds: Set<number> = new Set();
@@ -105,6 +106,7 @@ export class BuildPreviewController implements Controller {
   ) {}
 
   init() {
+    this.stopped = false;
     this.eventBus.on(MouseMoveEvent, (e) => this.moveGhost(e));
     this.eventBus.on(MouseUpEvent, (e) => this.requestConfirmStructure(e));
     this.eventBus.on(ConfirmGhostStructureEvent, () =>
@@ -120,63 +122,71 @@ export class BuildPreviewController implements Controller {
     // The shader treats (tileX + 0.5, tileY + 0.5) as the icon center (so an
     // integer tile coord centers on that tile), so we subtract 0.5 here to
     // place the icon exactly under the cursor.
-    const cursorLoop = () => {
-      const ghost = this.lastGhostData;
-      const traj = this.nukeTrajectoryStatic;
-      if (ghost !== null || traj !== null) {
-        const w = this.transformHandler.screenToWorldCoordinatesFloat(
-          this.mousePos.x,
-          this.mousePos.y,
+  }
+
+  frame() {
+    if (this.stopped) return;
+    const ghost = this.lastGhostData;
+    const traj = this.nukeTrajectoryStatic;
+    if (ghost !== null || traj !== null) {
+      const w = this.transformHandler.screenToWorldCoordinatesFloat(
+        this.mousePos.x,
+        this.mousePos.y,
+      );
+      if (ghost !== null) {
+        // The range circle (defense post / SAM / nuke radius) normally
+        // follows the cursor, so smooth it the same way as the icon. When
+        // upgrading, the circle is anchored to the existing structure's tile
+        // (stationary, correctly snapped) — leave it alone in that case.
+        const radiusFollowsCursor = !(
+          ghost.canUpgrade && ghost.upgradeTargetTile !== null
         );
-        if (ghost !== null) {
-          // The range circle (defense post / SAM / nuke radius) normally
-          // follows the cursor, so smooth it the same way as the icon. When
-          // upgrading, the circle is anchored to the existing structure's tile
-          // (stationary, correctly snapped) — leave it alone in that case.
-          const radiusFollowsCursor = !(
-            ghost.canUpgrade && ghost.upgradeTargetTile !== null
-          );
-          this.view.updateGhostPreview({
-            ...ghost,
-            tileX: w.x - 0.5,
-            tileY: w.y - 0.5,
-            ...(radiusFollowsCursor
-              ? { radiusTileX: w.x - 0.5, radiusTileY: w.y - 0.5 }
-              : {}),
-          });
-        }
-        if (traj !== null) {
-          // Rebuild the arc with the live cursor as the destination (same
-          // tile-center convention as the icon: shader adds +0.5).
-          const data = buildNukeTrajectory(
-            traj.srcX,
-            traj.srcY,
-            w.x - 0.5,
-            w.y - 0.5,
-            this.game.height(),
-            traj.directionUp,
-            traj.sams,
-          );
-          // Impassable terrain can't be targeted (nukeSpawn rejects it)
-          // even though nukes fly over it — mark the destination with the
-          // blocked X. Checked per frame so the X tracks the live cursor.
-          const tx = Math.floor(w.x);
-          const ty = Math.floor(w.y);
-          if (
-            this.game.isValidCoord(tx, ty) &&
-            this.game.isImpassable(this.game.ref(tx, ty))
-          ) {
-            data.tSamIntercept = Math.min(data.tSamIntercept, T_BLOCKED_DST);
-          }
-          this.view.updateNukeTrajectory(data);
-        }
+        this.view.updateGhostPreview({
+          ...ghost,
+          tileX: w.x - 0.5,
+          tileY: w.y - 0.5,
+          ...(radiusFollowsCursor
+            ? { radiusTileX: w.x - 0.5, radiusTileY: w.y - 0.5 }
+            : {}),
+        });
       }
-      requestAnimationFrame(cursorLoop);
-    };
-    requestAnimationFrame(cursorLoop);
+      if (traj !== null) {
+        // Rebuild the arc with the live cursor as the destination (same
+        // tile-center convention as the icon: shader adds +0.5).
+        const data = buildNukeTrajectory(
+          traj.srcX,
+          traj.srcY,
+          w.x - 0.5,
+          w.y - 0.5,
+          this.game.height(),
+          traj.directionUp,
+          traj.sams,
+        );
+        // Impassable terrain can't be targeted (nukeSpawn rejects it)
+        // even though nukes fly over it — mark the destination with the
+        // blocked X. Checked per frame so the X tracks the live cursor.
+        const tx = Math.floor(w.x);
+        const ty = Math.floor(w.y);
+        if (
+          this.game.isValidCoord(tx, ty) &&
+          this.game.isImpassable(this.game.ref(tx, ty))
+        ) {
+          data.tSamIntercept = Math.min(data.tSamIntercept, T_BLOCKED_DST);
+        }
+        this.view.updateNukeTrajectory(data);
+      }
+    }
+  }
+
+  stop() {
+    this.stopped = true;
+    this.pendingConfirm = null;
+    this.lastGhostData = null;
+    this.nukeTrajectoryStatic = null;
   }
 
   tick() {
+    if (this.stopped) return;
     // Re-query buildables periodically (world state can change — tiles may
     // become buildable as troops/territory move).
     this.syncGhostState();
@@ -259,6 +269,7 @@ export class BuildPreviewController implements Controller {
       ?.myPlayer()
       ?.buildables(tileRef, [this.ghostUnit?.buildableUnit.type])
       .then((buildables) => {
+        if (this.stopped) return;
         if (!this.ghostUnit) {
           this.pendingConfirm = null;
           this.emitGhostPreview(tileRef, targetingAlly, trajectoryTileRef);

@@ -1,3 +1,4 @@
+import { z } from "zod";
 import {
   GameConfig,
   GameID,
@@ -8,7 +9,6 @@ import {
   TurnSchema,
 } from "../core/Schemas";
 import { replacer } from "../core/Util";
-import { z } from "zod";
 
 export interface LocalStatsData {
   [key: GameID]: {
@@ -21,6 +21,29 @@ export interface LocalStatsData {
 let _startTime: number;
 
 const ACTIVE_GAME_STORAGE_KEY = "opentroop-active-game-v1";
+const ACTIVE_GAME_SAVE_INTERVAL_MS = 5000;
+let pendingActiveGame: ActiveLocalGame | null = null;
+let activeGameSaveTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** Keep the current format; coalesce passive turns into one checkpoint. */
+export function queueActiveLocalGameSave(
+  gameStartInfo: GameStartInfo,
+  turns: Turn[],
+) {
+  pendingActiveGame = { gameStartInfo, turns };
+  activeGameSaveTimer ??= setTimeout(
+    flushActiveLocalGameSave,
+    ACTIVE_GAME_SAVE_INTERVAL_MS,
+  );
+}
+
+export function flushActiveLocalGameSave() {
+  if (activeGameSaveTimer !== null) clearTimeout(activeGameSaveTimer);
+  activeGameSaveTimer = null;
+  const pending = pendingActiveGame;
+  pendingActiveGame = null;
+  if (pending) saveActiveLocalGame(pending.gameStartInfo, pending.turns);
+}
 
 export interface ActiveLocalGame {
   gameStartInfo: GameStartInfo;
@@ -77,6 +100,9 @@ export function saveActiveLocalGame(
   gameStartInfo: GameStartInfo,
   turns: Turn[],
 ) {
+  if (activeGameSaveTimer !== null) clearTimeout(activeGameSaveTimer);
+  activeGameSaveTimer = null;
+  pendingActiveGame = null;
   try {
     localStorage.setItem(
       ACTIVE_GAME_STORAGE_KEY,
@@ -89,6 +115,9 @@ export function saveActiveLocalGame(
 }
 
 export function clearActiveLocalGame() {
+  if (activeGameSaveTimer !== null) clearTimeout(activeGameSaveTimer);
+  activeGameSaveTimer = null;
+  pendingActiveGame = null;
   try {
     localStorage.removeItem(ACTIVE_GAME_STORAGE_KEY);
   } catch (error) {

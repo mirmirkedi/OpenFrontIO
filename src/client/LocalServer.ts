@@ -20,18 +20,21 @@ import {
   replacer,
 } from "../core/Util";
 import { getApiBase } from "./Api";
-import { getAuthHeader, getPersistentID } from "./Auth";
 import { isOpenTroopApp } from "./AppMode";
+import { getAuthHeader, getPersistentID } from "./Auth";
 import { LobbyConfig } from "./ClientGameRunner";
-import {
-  clearActiveLocalGame,
-  saveActiveLocalGame,
-} from "./LocalPersistantStats";
 import {
   GameSpeedDownIntentEvent,
   GameSpeedUpIntentEvent,
   ReplaySpeedChangeEvent,
 } from "./InputHandler";
+import {
+  clearActiveLocalGame,
+  flushActiveLocalGameSave,
+  queueActiveLocalGameSave,
+  saveActiveLocalGame,
+} from "./LocalPersistantStats";
+import { observeAppVisibility } from "./utilities/AppVisibility";
 import {
   defaultReplaySpeedMultiplier,
   ReplaySpeedMultiplier,
@@ -71,7 +74,11 @@ export class LocalServer {
   private turnsExecuted = 0;
   private turnStartTime = 0;
 
-  private turnCheckInterval: NodeJS.Timeout;
+  private turnCheckInterval: ReturnType<typeof setTimeout> | null = null;
+  private running = false;
+  private backgrounded = false;
+  private stopVisibility: (() => void) | null = null;
+  private readonly onPageHide = () => flushActiveLocalGameSave();
   private clientConnect: () => void;
   private clientMessage: (message: ServerMessage) => void;
 
@@ -91,29 +98,22 @@ export class LocalServer {
 
   start() {
     console.log("local server starting");
-    this.turnCheckInterval = setInterval(() => {
-      const turnIntervalMs =
-        ClientEnv.turnIntervalMs() * this.replaySpeedMultiplier;
-      const backlog = Math.max(0, this.turns.length - this.turnsExecuted);
-      const allowReplayBacklog =
-        this.replaySpeedMultiplier === ReplaySpeedMultiplier.fastest &&
-        this.lobbyConfig.gameRecord !== undefined;
-      const maxBacklog = allowReplayBacklog ? MAX_REPLAY_BACKLOG_TURNS : 0;
-
-      const canQueueNextTurn =
-        backlog === 0 || (maxBacklog > 0 && backlog < maxBacklog);
-      if (
-        canQueueNextTurn &&
-        Date.now() > this.turnStartTime + turnIntervalMs
-      ) {
+    this.running = true;
+    if (isOpenTroopApp()) {
+      window.addEventListener("pagehide", this.onPageHide);
+      this.stopVisibility = observeAppVisibility((visible) => {
+        this.backgrounded = !visible;
+        if (!visible) flushActiveLocalGameSave();
+        // Return without a catch-up burst. This does not alter manual pause state.
         this.turnStartTime = Date.now();
-        // End turn on the server means the client will start processing the turn.
-        this.endTurn();
-      }
-    }, 5);
+        this.scheduleNextTurn();
+      });
+    }
+    this.scheduleNextTurn();
 
     this.eventBus.on(ReplaySpeedChangeEvent, (event) => {
       this.replaySpeedMultiplier = event.replaySpeedMultiplier;
+      this.scheduleNextTurn();
     });
 
     if (!this.isReplay) {
@@ -198,6 +198,7 @@ export class LocalServer {
           this.intents.push(stampedIntent);
           this.endTurn();
         }
+        this.scheduleNextTurn();
         return;
       }
       // Don't process non-pause intents during replays or while paused
@@ -259,6 +260,44 @@ export class LocalServer {
   // This is so the client can tell us when it finished processing the turn.
   public turnComplete() {
     this.turnsExecuted++;
+    this.scheduleNextTurn();
+  }
+
+  /** Wake for the next due turn or a worker completion, instead of polling at 5 ms. */
+  private scheduleNextTurn() {
+    if (this.turnCheckInterval !== null) clearTimeout(this.turnCheckInterval);
+    this.turnCheckInterval = null;
+    if (!this.running || this.paused || this.backgrounded) return;
+    if (!this.canQueueTurn()) return;
+    const delay = Math.max(
+      1,
+      this.turnStartTime +
+        ClientEnv.turnIntervalMs() * this.replaySpeedMultiplier -
+        Date.now(),
+    );
+    this.turnCheckInterval = setTimeout(() => {
+      this.turnCheckInterval = null;
+      if (
+        !this.running ||
+        this.paused ||
+        this.backgrounded ||
+        !this.canQueueTurn()
+      )
+        return;
+      this.turnStartTime = Date.now();
+      this.endTurn();
+      this.scheduleNextTurn();
+    }, delay);
+  }
+
+  private canQueueTurn(): boolean {
+    const backlog = Math.max(0, this.turns.length - this.turnsExecuted);
+    const maxBacklog =
+      this.replaySpeedMultiplier === ReplaySpeedMultiplier.fastest &&
+      this.lobbyConfig.gameRecord
+        ? MAX_REPLAY_BACKLOG_TURNS
+        : 0;
+    return backlog === 0 || (maxBacklog > 0 && backlog < maxBacklog);
   }
 
   // endTurn in this context means the server has collected all the intents
@@ -279,8 +318,13 @@ export class LocalServer {
       intents: this.intents,
     };
     this.turns.push(pastTurn);
-    if (isOpenTroopApp() && this.lobbyConfig.gameStartInfo) {
-      saveActiveLocalGame(this.lobbyConfig.gameStartInfo, this.turns);
+    if (isOpenTroopApp() && this.lobbyConfig.gameStartInfo && !this.winner) {
+      if (pastTurn.intents.length > 0) {
+        // Persist explicit player actions immediately; passive time may lag by 5s.
+        saveActiveLocalGame(this.lobbyConfig.gameStartInfo, this.turns);
+      } else {
+        queueActiveLocalGameSave(this.lobbyConfig.gameStartInfo, this.turns);
+      }
     }
     this.intents = [];
     this.clientMessage({
@@ -291,7 +335,16 @@ export class LocalServer {
 
   public endGame() {
     console.log("local server ending game");
-    clearInterval(this.turnCheckInterval);
+    this.running = false;
+    if (this.turnCheckInterval !== null) clearTimeout(this.turnCheckInterval);
+    this.turnCheckInterval = null;
+    this.stopVisibility?.();
+    this.stopVisibility = null;
+    window.removeEventListener("pagehide", this.onPageHide);
+    if (isOpenTroopApp()) {
+      if (this.winner) clearActiveLocalGame();
+      else flushActiveLocalGameSave();
+    }
     if (this.isReplay) {
       return;
     }

@@ -65,6 +65,7 @@ export function alignClusterOrder(next: Cell[], prev: Slot[]): void {
 }
 
 export class AttackingTroopsController implements Controller {
+  private stopped = false;
   private attacks = new Map<string, AttackEntry>();
   private inFlightRequest = false;
   private alternateView = false;
@@ -79,15 +80,20 @@ export class AttackingTroopsController implements Controller {
   ) {}
 
   init() {
+    this.stopped = false;
     this.eventBus.on(AlternateViewEvent, (e) => {
       this.alternateView = e.alternateView;
     });
+  }
 
-    const drive = () => {
-      this.pushLabels();
-      requestAnimationFrame(drive);
-    };
-    requestAnimationFrame(drive);
+  frame() {
+    if (!this.stopped) this.pushLabels();
+  }
+
+  stop() {
+    this.stopped = true;
+    this.attacks.clear();
+    this.labelBuf.length = 0;
   }
 
   getTickIntervalMs() {
@@ -95,6 +101,7 @@ export class AttackingTroopsController implements Controller {
   }
 
   tick() {
+    if (this.stopped) return;
     if (!this.userSettings.attackingTroopsOverlay() || this.alternateView) {
       if (this.attacks.size > 0) this.attacks.clear();
       return;
@@ -142,6 +149,7 @@ export class AttackingTroopsController implements Controller {
     void myPlayer
       .attackClusteredPositions()
       .then((attacks) => {
+        if (this.stopped) return;
         const now = performance.now();
         for (const { id, positions } of attacks) {
           const entry = this.attacks.get(id);

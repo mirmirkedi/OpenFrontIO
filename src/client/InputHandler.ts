@@ -3,6 +3,7 @@ import { PlayerBuildableUnitType, UnitType } from "../core/game/Game";
 import { UserSettings } from "../core/game/UserSettings";
 import { Platform } from "./Platform";
 import { UIState } from "./UIState";
+import { observeAppVisibility } from "./utilities/AppVisibility";
 import { ReplaySpeedMultiplier } from "./utilities/ReplaySpeedMultiplier";
 import { GameView, UnitView } from "./view";
 
@@ -247,7 +248,10 @@ export class InputHandler {
   private suppressNextTap: boolean = false;
   private readonly LONG_PRESS_MS = 800;
 
-  private moveInterval: NodeJS.Timeout | null = null;
+  private moveInterval: ReturnType<typeof setInterval> | null = null;
+  private moveKeys: (() => void) | null = null;
+  private stopVisibility: (() => void) | null = null;
+  private readonly domListeners = new AbortController();
   private activeKeys = new Set<string>();
   private keybinds: Record<string, string> = {};
   private keybindAndEvent: Array<[string, KeybindEntry]> = [];
@@ -448,10 +452,11 @@ export class InputHandler {
       }
     });
 
-    this.canvas.addEventListener("pointerdown", (e) => this.onPointerDown(e));
-    window.addEventListener("pointerup", (e) => this.onPointerUp(e));
-    window.addEventListener("pointercancel", (e) => this.onPointerUp(e));
-    this.canvas.addEventListener(
+    this.listen(this.canvas, "pointerdown", (e) => this.onPointerDown(e));
+    this.listen(window, "pointerup", (e) => this.onPointerUp(e));
+    this.listen(window, "pointercancel", (e) => this.onPointerUp(e));
+    this.listen(
+      this.canvas,
       "wheel",
       (e) => {
         this.onScroll(e);
@@ -461,7 +466,8 @@ export class InputHandler {
       { passive: false },
     );
     // Safari trackpad pinch, which fires no ctrl+wheel event.
-    this.canvas.addEventListener(
+    this.listen(
+      this.canvas,
       "gesturestart",
       (e) => {
         e.preventDefault();
@@ -469,7 +475,8 @@ export class InputHandler {
       },
       { passive: false },
     );
-    this.canvas.addEventListener(
+    this.listen(
+      this.canvas,
       "gesturechange",
       (e) => {
         e.preventDefault();
@@ -477,7 +484,8 @@ export class InputHandler {
       },
       { passive: false },
     );
-    this.canvas.addEventListener(
+    this.listen(
+      this.canvas,
       "gestureend",
       (e) => {
         e.preventDefault();
@@ -485,9 +493,9 @@ export class InputHandler {
       },
       { passive: false },
     );
-    window.addEventListener("pointermove", this.onPointerMove.bind(this));
-    this.canvas.addEventListener("contextmenu", (e) => this.onContextMenu(e));
-    window.addEventListener("mousemove", (e) => {
+    this.listen(window, "pointermove", this.onPointerMove.bind(this));
+    this.listen(this.canvas, "contextmenu", (e) => this.onContextMenu(e));
+    this.listen(window, "mousemove", (e) => {
       if (e.movementX || e.movementY) {
         this.eventBus.emit(new MouseMoveEvent(e.clientX, e.clientY));
       }
@@ -496,8 +504,9 @@ export class InputHandler {
     // their keyup swallowed by the browser (e.g. cmd+zoom) don't stay stuck.
     // Also release the hold-to-view state and any active pointer/drag state
     // so the alternate view and drags aren't left latched when focus returns.
-    window.addEventListener("blur", () => {
+    const clearTransientInput = () => {
       this.activeKeys.clear();
+      this.stopKeyMovement();
       if (this.alternateView) {
         this.alternateView = false;
         this.eventBus.emit(new AlternateViewEvent(false));
@@ -517,10 +526,14 @@ export class InputHandler {
         this.eventBus.emit(new WarshipSelectionBoxCancelEvent());
       }
       this.canvas.style.cursor = "";
+    };
+    this.listen(window, "blur", clearTransientInput);
+    this.stopVisibility = observeAppVisibility((visible) => {
+      if (!visible) clearTransientInput();
     });
     this.pointers.clear();
 
-    this.moveInterval = setInterval(() => {
+    this.moveKeys = () => {
       let deltaX = 0;
       let deltaY = 0;
 
@@ -571,9 +584,9 @@ export class InputHandler {
       ) {
         this.eventBus.emit(new ZoomEvent(cx, cy, -this.ZOOM_SPEED));
       }
-    }, 1);
+    };
 
-    window.addEventListener("keydown", (e) => {
+    this.listen(window, "keydown", (e) => {
       const isTextInput = this.isTextInputTarget(e.target);
       if (isTextInput && e.code !== "Escape") {
         return;
@@ -679,6 +692,7 @@ export class InputHandler {
         ].includes(e.code)
       ) {
         this.activeKeys.add(e.code);
+        this.updateKeyMovement();
       }
 
       // warship box selection mode.
@@ -690,7 +704,7 @@ export class InputHandler {
         this.canvas.style.cursor = "crosshair";
       }
     });
-    window.addEventListener("keyup", (e) => {
+    this.listen(window, "keyup", (e) => {
       const isTextInput = this.isTextInputTarget(e.target);
       if (isTextInput && !this.activeKeys.has(e.code)) {
         return;
@@ -726,6 +740,7 @@ export class InputHandler {
         }
       }
       this.activeKeys.delete(e.code);
+      this.updateKeyMovement();
 
       // Reset crosshair when Shift is released (unless selection box or multi-selection still active)
       if (
@@ -1193,11 +1208,60 @@ export class InputHandler {
   }
 
   destroy() {
-    if (this.moveInterval !== null) {
-      clearInterval(this.moveInterval);
-    }
+    this.domListeners.abort();
+    this.stopVisibility?.();
+    this.stopVisibility = null;
+    this.stopKeyMovement();
+    this.moveKeys = null;
+    if (this.longPressTimer !== null) clearTimeout(this.longPressTimer);
+    this.longPressTimer = null;
+    this.pointerDown = false;
+    this.pointers.clear();
     this.activeKeys.clear();
     this.lastGestureScale = null;
     this.keybindAndEvent = [];
+  }
+
+  private listen<K extends string>(
+    target: EventTarget,
+    name: K,
+    listener: (
+      event: K extends keyof WindowEventMap ? WindowEventMap[K] : Event,
+    ) => void,
+    options: AddEventListenerOptions = {},
+  ) {
+    target.addEventListener(name, listener as EventListener, {
+      ...options,
+      signal: this.domListeners.signal,
+    });
+  }
+
+  private stopKeyMovement() {
+    if (this.moveInterval !== null) clearInterval(this.moveInterval);
+    this.moveInterval = null;
+  }
+
+  private updateKeyMovement() {
+    const moving = [
+      this.keybinds.moveUp,
+      this.keybinds.moveDown,
+      this.keybinds.moveLeft,
+      this.keybinds.moveRight,
+      this.keybinds.zoomIn,
+      this.keybinds.zoomOut,
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "Minus",
+      "Equal",
+      "NumpadAdd",
+      "NumpadSubtract",
+    ].some((key) => this.activeKeys.has(key));
+    if (!moving) this.stopKeyMovement();
+    else if (this.moveInterval === null && this.moveKeys !== null) {
+      // Match the old browser-clamped repeat rate, but only while a key is held.
+      this.moveInterval = setInterval(this.moveKeys, 4);
+    }
   }
 }
