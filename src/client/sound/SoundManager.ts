@@ -32,6 +32,7 @@ export class SoundManager {
     e: SetBackgroundMusicVolumeEvent,
   ) => void;
   private onSetSoundEffectsVolume: (e: SetSoundEffectsVolumeEvent) => void;
+  private wasPlayingBeforeBackground = false;
 
   constructor(eventBus: EventBus, userSettings: UserSettings) {
     this.eventBus = eventBus;
@@ -72,6 +73,8 @@ export class SoundManager {
     eventBus.on(PlaySoundEffectEvent, this.onPlaySoundEffect);
     eventBus.on(SetBackgroundMusicVolumeEvent, this.onSetBackgroundMusicVolume);
     eventBus.on(SetSoundEffectsVolumeEvent, this.onSetSoundEffectsVolume);
+    document.addEventListener("visibilitychange", this.onVisibilityChange);
+    window.addEventListener("worldfront-app-state", this.onNativeAppState);
   }
 
   public dispose(): void {
@@ -82,6 +85,8 @@ export class SoundManager {
       this.onSetBackgroundMusicVolume,
     );
     this.eventBus.off(SetSoundEffectsVolumeEvent, this.onSetSoundEffectsVolume);
+    document.removeEventListener("visibilitychange", this.onVisibilityChange);
+    window.removeEventListener("worldfront-app-state", this.onNativeAppState);
     this.backgroundMusic.forEach((track) => {
       this.safely("stop background track", () => track.stop());
       this.safely("unload background track", () => track.unload());
@@ -92,6 +97,27 @@ export class SoundManager {
     });
     this.soundEffects.clear();
     this.activeSounds = [];
+  }
+
+  private onVisibilityChange = (): void => {
+    this.setBackgroundActive(document.visibilityState === "visible");
+  };
+
+  private onNativeAppState = (event: Event): void => {
+    const active = (event as CustomEvent<{ active?: boolean }>).detail?.active;
+    if (typeof active === "boolean") this.setBackgroundActive(active);
+  };
+
+  private setBackgroundActive(active: boolean): void {
+    if (!active) {
+      this.wasPlayingBeforeBackground = this.backgroundMusic.some((track) =>
+        track.playing(),
+      );
+      this.stopBackgroundMusic();
+      return;
+    }
+    if (this.wasPlayingBeforeBackground) this.playBackgroundMusic();
+    this.wasPlayingBeforeBackground = false;
   }
 
   private safely(action: string, fn: () => void): void {

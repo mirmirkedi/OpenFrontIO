@@ -5,7 +5,7 @@ import {
 } from "./sound/NativeAudioFocus";
 
 const MUSIC_ENABLED_KEY = "worldfront.music.enabled";
-const MENU_MUSIC_VOLUME = 0.3;
+const MENU_MUSIC_VOLUME = 0.45;
 
 /** Add tracks here when they are ready, for example: ["music/worldfront-theme.mp3"]. */
 const WORLD_FRONT_MUSIC_TRACKS: string[] = [
@@ -19,9 +19,12 @@ class WorldFrontMusicController {
   private audio: HTMLAudioElement | null = null;
   private trackIndex = 0;
   private enabled = this.readEnabledPreference();
+  private wasPlayingBeforeBackground = false;
 
   constructor() {
     this.shuffleTracks();
+    document.addEventListener("visibilitychange", this.onVisibilityChange);
+    window.addEventListener("worldfront-app-state", this.onNativeAppState);
   }
 
   isEnabled(): boolean {
@@ -56,10 +59,31 @@ class WorldFrontMusicController {
   }
 
   stop(): void {
+    this.wasPlayingBeforeBackground = false;
     releaseMixFriendlyAudioFocus();
     if (!this.audio) return;
     this.audio.pause();
     this.audio.currentTime = 0;
+  }
+
+  private onVisibilityChange = (): void => {
+    this.setBackgroundActive(document.visibilityState === "visible");
+  };
+
+  private onNativeAppState = (event: Event): void => {
+    const active = (event as CustomEvent<{ active?: boolean }>).detail?.active;
+    if (typeof active === "boolean") this.setBackgroundActive(active);
+  };
+
+  private setBackgroundActive(active: boolean): void {
+    if (!active) {
+      this.wasPlayingBeforeBackground = this.audio?.paused === false;
+      this.audio?.pause();
+      releaseMixFriendlyAudioFocus();
+      return;
+    }
+    if (this.wasPlayingBeforeBackground && this.enabled) void this.play();
+    this.wasPlayingBeforeBackground = false;
   }
 
   private async play(): Promise<void> {
