@@ -40,6 +40,7 @@ import { PlayerPanel } from "./layers/PlayerPanel";
 import { ReplayPanel } from "./layers/ReplayPanel";
 import { SettingsModal } from "./layers/SettingsModal";
 import { SpawnTimer } from "./layers/SpawnTimer";
+import { TutorialOverlay } from "./layers/TutorialOverlay";
 import { UnitDisplay } from "./layers/UnitDisplay";
 import { WinModal } from "./layers/WinModal";
 import { loadAllSprites } from "./SpriteLoader";
@@ -284,6 +285,17 @@ export function createRenderer(
   }
   inGamePromo.game = game;
 
+  const tutorialOverlay = document.querySelector(
+    "tutorial-overlay",
+  ) as TutorialOverlay;
+  if (!(tutorialOverlay instanceof TutorialOverlay)) {
+    console.error("tutorial overlay not found");
+  }
+  tutorialOverlay.game = game;
+  tutorialOverlay.eventBus = eventBus;
+  tutorialOverlay.uiState = uiState;
+  tutorialOverlay.transformHandler = transformHandler;
+
   const layers: Controller[] = [
     new WarshipSelectionController(
       game,
@@ -337,6 +349,7 @@ export function createRenderer(
     headsUpMessage,
     multiTabModal,
     inGamePromo,
+    tutorialOverlay,
     alertFrame,
     performanceOverlay,
   ];

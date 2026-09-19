@@ -44,6 +44,9 @@ export class NationExecution implements Execution {
   private triggerRatio: number;
   private reserveRatio: number;
   private expandRatio: number;
+  private tutorialHumanTiles = 0;
+  private tutorialBaselineReady = false;
+  private tutorialNextActionTick = 0;
 
   private readonly embargoMalusApplied = new Set<PlayerID>();
 
@@ -61,6 +64,11 @@ export class NationExecution implements Execution {
 
   init(mg: Game) {
     this.mg = mg;
+    // Tutorial nations should expand at the same gentle pace as the player,
+    // instead of sending the normal 10–20% attack waves immediately.
+    if (this.mg.config().gameConfig().tutorial) {
+      this.expandRatio = 0.1;
+    }
     this.attackRate = this.getAttackRate();
     this.attackTick = this.random.nextInt(0, this.attackRate);
 
@@ -88,6 +96,36 @@ export class NationExecution implements Execution {
   }
 
   tick(ticks: number) {
+    const gameConfig = this.mg.config().gameConfig();
+    if (
+      gameConfig.tutorial &&
+      !this.mg
+        .allPlayers()
+        .some(
+          (player) => player.type() === PlayerType.Human && player.hasSpawned(),
+        )
+    ) {
+      return;
+    }
+
+    if (gameConfig.tutorial) {
+      const human = this.mg
+        .allPlayers()
+        .find(
+          (player) => player.type() === PlayerType.Human && player.hasSpawned(),
+        );
+      if (!human) return;
+      if (!this.tutorialBaselineReady) {
+        this.tutorialHumanTiles = human.numTilesOwned();
+        this.tutorialBaselineReady = true;
+        return;
+      }
+      if (human.numTilesOwned() <= this.tutorialHumanTiles) return;
+      if (ticks < this.tutorialNextActionTick) return;
+      this.tutorialHumanTiles = human.numTilesOwned();
+      this.tutorialNextActionTick = ticks + 30;
+    }
+
     // Ship tracking
     if (
       this.behaviorsInitialized &&

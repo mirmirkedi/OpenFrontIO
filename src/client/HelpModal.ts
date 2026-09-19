@@ -84,6 +84,12 @@ export class HelpModal extends BaseModal {
               ></iframe>
             </div>
           </section>
+          <button
+            class="mb-6 flex w-full items-center justify-center rounded-xl border border-sky-300/30 bg-sky-500/10 px-4 py-3 text-sm font-bold text-sky-100 transition hover:bg-sky-500/20"
+            @click=${this.replayTutorial}
+          >
+            Replay Tutorial
+          </button>
 
           <section class="mt-8 border-t border-white/10 pt-5 text-center">
             <p class="mb-1 text-xs font-semibold text-white/60">WorldFront is based on OpenFront.</p>
@@ -866,6 +872,11 @@ export class HelpModal extends BaseModal {
         </div>
       </div>
     `;
+  }
+
+  private replayTutorial() {
+    this.close();
+    document.dispatchEvent(new CustomEvent("replay-tutorial"));
   }
 
   private openLanguagePicker() {

@@ -1,7 +1,7 @@
 import version from "resources/version.txt?raw";
 import { ClientEnv } from "src/client/ClientEnv";
-import { assetUrl } from "../core/AssetUrls";
 import { isTemporaryUsername, UserMeResponse } from "../core/ApiSchemas";
+import { assetUrl } from "../core/AssetUrls";
 import { EventBus } from "../core/EventBus";
 import {
   GAME_ID_REGEX,
@@ -18,14 +18,13 @@ import { UserSettings } from "../core/game/UserSettings";
 import "./AccountModal";
 import "./AccountSettingsModal";
 import { adGatekeeper } from "./AdGatekeeper";
-import { isOpenTroopApp } from "./AppMode";
 import { loadAdmiral, onAdmiralMeasured } from "./Admiral";
 import { getUserMe, invalidateUserMe } from "./Api";
+import { isOpenTroopApp } from "./AppMode";
 import { reauthAfterCrazyGamesChange, userAuth } from "./Auth";
 import "./ChangeUsernameModal";
 import "./ClanModal";
 import { joinLobby, type JoinLobbyResult } from "./ClientGameRunner";
-import { loadActiveLocalGame } from "./LocalPersistantStats";
 import {
   completeCosmeticPurchaseReturn,
   getPlayerCosmetics,
@@ -53,6 +52,7 @@ import "./LangSelector";
 import { LangSelector } from "./LangSelector";
 import { initLayout } from "./Layout";
 import "./LeaderboardModal";
+import { loadActiveLocalGame } from "./LocalPersistantStats";
 import "./Matchmaking";
 import { MatchmakingModal } from "./Matchmaking";
 import { modalRouter } from "./ModalRouter";
@@ -60,7 +60,6 @@ import { updateAccountNavButton } from "./NavAccountButton";
 import { initNavigation } from "./Navigation";
 import "./NewsModal";
 import "./PlayerProfileModal";
-import "./UserProfileModal";
 import { RewardsModal } from "./RewardsModal";
 import "./SinglePlayerModal";
 import {
@@ -78,6 +77,7 @@ import {
   SendToggleGameStartTimer,
   SendUpdateGameConfigIntentEvent,
 } from "./Transport";
+import "./UserProfileModal";
 import { UserSettingModal } from "./UserSettingModal";
 import "./UsernameInput";
 import { genAnonUsername, UsernameInput } from "./UsernameInput";
@@ -98,13 +98,13 @@ import "./components/PlayPage";
 import "./components/RankedModal";
 import "./components/baseComponents/Button";
 import "./components/baseComponents/Modal";
+import { installUiClickSound } from "./sound/UiClickSound";
 import "./styles.css";
 import "./styles/core/typography.css";
 import "./styles/core/variables.css";
 import "./styles/layout/container.css";
 import "./styles/layout/header.css";
 import "./styles/modal/chat.css";
-import { installUiClickSound } from "./sound/UiClickSound";
 
 declare global {
   interface Window {
@@ -217,8 +217,9 @@ class Client {
       // frame while bootstrapping the lobby underneath it. App launch always
       // starts at the lobby, so clear any stale result overlay immediately.
       document.body.classList.remove("in-game");
-      (document.querySelector("win-modal") as { hide?: () => void } | null)
-        ?.hide?.();
+      (
+        document.querySelector("win-modal") as { hide?: () => void } | null
+      )?.hide?.();
     }
 
     // Register modals with the URL router. Lobby modals (join/host) and
@@ -351,6 +352,12 @@ class Client {
     });
 
     document.addEventListener("join-lobby", this.handleJoinLobby.bind(this));
+    document.addEventListener("replay-tutorial", () => {
+      const singlePlayer = document.querySelector("single-player-modal") as {
+        open?: (args?: Record<string, unknown>) => void;
+      } | null;
+      singlePlayer?.open?.({ tutorial: true });
+    });
     document.addEventListener(
       "resume-local-game",
       this.handleResumeLocalGame.bind(this),
@@ -437,8 +444,7 @@ class Client {
     ) as SteamLinkModal;
     if (
       !isOpenTroopApp() &&
-      (!this.steamLinkModal ||
-        !(this.steamLinkModal instanceof SteamLinkModal))
+      (!this.steamLinkModal || !(this.steamLinkModal instanceof SteamLinkModal))
     ) {
       console.warn("Steam link modal element not found");
     }
@@ -637,11 +643,9 @@ class Client {
           history.pushState(null, "", this.currentUrl);
           showInGameConfirm(translateText("help_modal.exit_confirmation"), {
             variant: "neutral",
-          }).then(
-            (isConfirmed) => {
-              if (isConfirmed) leaveGame();
-            },
-          );
+          }).then((isConfirmed) => {
+            if (isConfirmed) leaveGame();
+          });
           return;
         }
 

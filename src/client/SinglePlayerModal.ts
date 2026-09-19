@@ -16,10 +16,10 @@ import {
 import { TeamCountConfig } from "../core/Schemas";
 import { generateID } from "../core/Util";
 import { hasLinkedAccount } from "./Api";
+import { isOpenTroopApp, openTroopMapIds } from "./AppMode";
 import "./components/baseComponents/Button";
 import "./components/baseComponents/Modal";
 import { BaseModal } from "./components/BaseModal";
-import { isOpenTroopApp, openTroopMapIds } from "./AppMode";
 import "./components/GameConfigSettings";
 import { MEDAL_ORDER, medalIcon } from "./components/map/Medals";
 import "./components/ToggleInputCard";
@@ -125,6 +125,7 @@ async function loadAchievementEligibleMaps(): Promise<Set<GameMapType> | null> {
 @customElement("single-player-modal")
 export class SinglePlayerModal extends BaseModal {
   protected routerName = "single-player";
+  private tutorialRequested = false;
 
   @state() private selectedMap: GameMapType = DEFAULT_OPTIONS.selectedMap;
   @state() private selectedDifficulty: Difficulty =
@@ -523,7 +524,9 @@ export class SinglePlayerModal extends BaseModal {
         </div>
 
         <!-- Footer Action -->
-        <div class="opentroop-setup-footer p-4 sm:p-6 border-t border-white/10 bg-black/20 shrink-0">
+        <div
+          class="opentroop-setup-footer p-4 sm:p-6 border-t border-white/10 bg-black/20 shrink-0"
+        >
           ${hasLinkedAccount(this.userMeResponse) && this.hasOptionsChanged()
             ? html`<div
                 class="mb-4 px-4 py-3 rounded-xl bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-bold uppercase tracking-wider text-center"
@@ -576,6 +579,7 @@ export class SinglePlayerModal extends BaseModal {
   }
 
   protected onClose(): void {
+    this.tutorialRequested = false;
     // Reset all transient form state to ensure clean slate
     this.selectedMap = DEFAULT_OPTIONS.selectedMap;
     this.selectedDifficulty = DEFAULT_OPTIONS.selectedDifficulty;
@@ -604,7 +608,8 @@ export class SinglePlayerModal extends BaseModal {
     this.doomsdayClockSpeed = DEFAULT_OPTIONS.doomsdayClockSpeed;
   }
 
-  protected onOpen(): void {
+  protected onOpen(args?: Record<string, unknown>): void {
+    this.tutorialRequested = args?.tutorial === true;
     void this.loadNationCount();
   }
 
@@ -843,6 +848,15 @@ export class SinglePlayerModal extends BaseModal {
   }
 
   private async startGame() {
+    const tutorialMode =
+      this.tutorialRequested ||
+      (localStorage.getItem("openfront.tutorial.completed") !== "true" &&
+        localStorage.getItem("openfront.tutorial.skipped") !== "true");
+    if (tutorialMode) {
+      localStorage.setItem("openfront.tutorial.active", "true");
+      localStorage.removeItem("openfront.tutorial.skipped");
+      localStorage.removeItem("openfront.tutorial.step");
+    }
     // Validate and clamp maxTimer setting before starting
     let finalMaxTimerValue: number | undefined = undefined;
     if (this.maxTimer) {
@@ -906,14 +920,17 @@ export class SinglePlayerModal extends BaseModal {
               gameType: GameType.Singleplayer,
               gameMode: this.gameMode,
               playerTeams: this.teamCount,
-              difficulty: this.selectedDifficulty,
+              difficulty: tutorialMode
+                ? Difficulty.Easy
+                : this.selectedDifficulty,
               maxTimerValue: finalMaxTimerValue,
-              bots: this.bots,
-              infiniteGold: this.infiniteGold,
+              bots: tutorialMode ? Math.min(this.bots, 5) : this.bots,
+              infiniteGold: tutorialMode || this.infiniteGold,
               donateGold: this.gameMode === GameMode.Team,
               donateTroops: this.gameMode === GameMode.Team,
-              infiniteTroops: this.infiniteTroops,
-              instantBuild: this.instantBuild,
+              infiniteTroops: tutorialMode ? false : this.infiniteTroops,
+              instantBuild: tutorialMode || this.instantBuild,
+              tutorial: tutorialMode,
               randomSpawn: this.randomSpawn,
               disabledUnits: this.disabledUnits
                 .map((u) => Object.values(UnitType).find((ut) => ut === u))

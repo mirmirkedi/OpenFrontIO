@@ -116,8 +116,13 @@ export class HeadsUpMessage extends LitElement implements Controller {
     this.isCatchingUp =
       this.catchingUpTicks >= HeadsUpMessage.CATCHING_UP_SHOW_THRESHOLD;
 
+    const tutorialOwnsSpawnPrompt =
+      this.game.inSpawnPhase() &&
+      this.game.config().gameConfig().gameType === GameType.Singleplayer &&
+      localStorage.getItem("openfront.tutorial.active") === "true";
+
     this.isVisible =
-      this.game.inSpawnPhase() ||
+      (this.game.inSpawnPhase() && !tutorialOwnsSpawnPrompt) ||
       this.isPaused ||
       this.isImmunityActive ||
       this.isCatchingUp;

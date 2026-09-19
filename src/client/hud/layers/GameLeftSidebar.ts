@@ -125,6 +125,7 @@ export class GameLeftSidebar extends LitElement implements Controller {
       >
         <div class="flex items-center gap-4 xl:gap-6 text-white">
           <div
+            data-tutorial-target="leaderboard"
             class="cursor-pointer p-0.5 bg-gray-700/50 hover:bg-gray-600 border rounded-md border-slate-500 transition-colors"
             @click=${this.togglePlayerStats}
             role="button"
@@ -202,7 +203,9 @@ export class GameLeftSidebar extends LitElement implements Controller {
               </div>
             `
           : null}
-        <div class="game-left-sidebar__stats flex flex-col gap-2 min-w-0 w-full">
+        <div
+          class="game-left-sidebar__stats flex flex-col gap-2 min-w-0 w-full"
+        >
           <player-stats
             class=${this.isPlayerStatsShown ? "block min-w-0" : "hidden"}
             .game=${this.game}

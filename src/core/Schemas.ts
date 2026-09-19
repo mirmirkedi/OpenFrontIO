@@ -382,6 +382,9 @@ export const GameConfigSchema = z.object({
   infiniteGold: z.boolean(),
   infiniteTroops: z.boolean(),
   instantBuild: z.boolean(),
+  // Single-player onboarding mode. Keeps nation AI idle until the player has
+  // chosen a starting location, without affecting normal games.
+  tutorial: z.boolean().optional(),
   disableNavMesh: z.boolean().optional(),
   disableAlliances: z.boolean().nullable().optional(),
   disableClanTags: z.boolean().optional(),

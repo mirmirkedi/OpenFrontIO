@@ -45,6 +45,19 @@ export class SpawnExecution implements Execution {
   }
 
   tick(ticks: number) {
+    // In the tutorial, hold the first bot until the player has chosen a
+    // starting point so we can place that opponent at a predictable distance.
+    if (
+      this.mg.config().gameConfig().tutorial &&
+      this.playerInfo.playerType === PlayerType.Bot &&
+      !this.mg
+        .allPlayers()
+        .some(
+          (player) => player.type() === PlayerType.Human && player.hasSpawned(),
+        )
+    ) {
+      return;
+    }
     this.active = false;
 
     // Security: `tile` arrives straight off a spawn intent. A fractional or
@@ -130,6 +143,44 @@ export class SpawnExecution implements Execution {
       }
 
       return { center, tiles };
+    }
+
+    if (
+      this.mg.config().gameConfig().tutorial &&
+      this.playerInfo.playerType === PlayerType.Bot &&
+      !this.mg
+        .allPlayers()
+        .some(
+          (player) => player.type() === PlayerType.Bot && player.hasSpawned(),
+        )
+    ) {
+      const human = this.mg
+        .allPlayers()
+        .find(
+          (player) => player.type() === PlayerType.Human && player.hasSpawned(),
+        );
+      const humanSpawn = human?.spawnTile();
+      if (humanSpawn !== undefined) {
+        const distance = 32;
+        const offsets = [
+          [distance, 0],
+          [-distance, 0],
+          [0, distance],
+          [0, -distance],
+          [distance, distance],
+          [-distance, -distance],
+        ];
+        for (const [dx, dy] of offsets) {
+          const x = this.mg.x(humanSpawn) + dx;
+          const y = this.mg.y(humanSpawn) + dy;
+          if (!this.mg.isValidCoord(x, y)) continue;
+          const candidate = this.mg.ref(x, y);
+          const tiles = getSpawnTiles(this.mg, candidate, true);
+          if (tiles && tiles.length > 0) {
+            return { center: candidate, tiles };
+          }
+        }
+      }
     }
 
     const spawnArea = this.getTeamSpawnArea();

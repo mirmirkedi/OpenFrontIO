@@ -1,4 +1,4 @@
-﻿import { Execution, Game, Player, Structures } from "../game/Game";
+﻿import { Execution, Game, Player, PlayerType, Structures } from "../game/Game";
 import { PseudoRandom } from "../PseudoRandom";
 import { simpleHash } from "../Util";
 import { AllianceExtensionExecution } from "./alliance/AllianceExtensionExecution";
@@ -17,6 +17,9 @@ export class TribeExecution implements Execution {
   private triggerRatio: number;
   private reserveRatio: number;
   private expandRatio: number;
+  private tutorialHumanTiles = 0;
+  private tutorialBaselineReady = false;
+  private tutorialNextActionTick = 0;
 
   constructor(private tribe: Player) {
     this.random = new PseudoRandom(simpleHash(tribe.id()));
@@ -33,10 +36,30 @@ export class TribeExecution implements Execution {
 
   init(mg: Game) {
     this.mg = mg;
+    if (this.mg.config().gameConfig().tutorial) {
+      this.expandRatio = 0.1;
+    }
   }
 
   tick(ticks: number) {
-    if (ticks % this.attackRate !== this.attackTick) return;
+    if (this.mg.config().gameConfig().tutorial) {
+      const human = this.mg
+        .allPlayers()
+        .find(
+          (player) => player.type() === PlayerType.Human && player.hasSpawned(),
+        );
+      if (!human || human.numTilesOwned() <= this.tutorialHumanTiles) return;
+      if (!this.tutorialBaselineReady) {
+        this.tutorialHumanTiles = human.numTilesOwned();
+        this.tutorialBaselineReady = true;
+        return;
+      }
+      if (ticks < this.tutorialNextActionTick) return;
+      this.tutorialHumanTiles = human.numTilesOwned();
+      this.tutorialNextActionTick = ticks + 30;
+    } else if (ticks % this.attackRate !== this.attackTick) {
+      return;
+    }
 
     if (!this.tribe.isAlive()) {
       //removeOnDeath is called from tribe's PlayerExecution

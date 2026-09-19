@@ -11,8 +11,8 @@ import {
   UnitType,
 } from "../../../core/game/Game";
 import { TileRef } from "../../../core/game/GameMap";
-import { Controller } from "../../Controller";
 import { isOpenTroopApp } from "../../AppMode";
+import { Controller } from "../../Controller";
 import {
   CloseViewEvent,
   MouseDownEvent,
@@ -124,6 +124,11 @@ export const buildTable: BuildItemDisplay[][] = [
 
 export const flattenedBuildTable = buildTable.flat();
 
+const TUTORIAL_ACTIVE_KEY = "openfront.tutorial.active";
+const TUTORIAL_STEP_KEY = "openfront.tutorial.step";
+// Keep the build menu closed until the scripted tutorial reaches a build step.
+const TUTORIAL_BUILD_STEPS = new Set([6, 7, 8, 10, 12, 14]);
+
 @customElement("build-menu")
 export class BuildMenu extends LitElement implements Controller {
   public game: GameView;
@@ -136,6 +141,16 @@ export class BuildMenu extends LitElement implements Controller {
 
   init() {
     this.eventBus.on(ShowBuildMenuEvent, (e) => {
+      const tutorialStep = Number(
+        localStorage.getItem(TUTORIAL_STEP_KEY) ?? -1,
+      );
+      if (
+        localStorage.getItem(TUTORIAL_ACTIVE_KEY) === "true" &&
+        !TUTORIAL_BUILD_STEPS.has(tutorialStep)
+      ) {
+        this.hideMenu();
+        return;
+      }
       if (!this.game.myPlayer()?.isAlive()) {
         return;
       }
@@ -282,10 +297,16 @@ export class BuildMenu extends LitElement implements Controller {
       font-size: 14px;
     }
     .opentroop-build-menu {
-      border: 1px solid rgba(117, 216, 255, .42);
+      border: 1px solid rgba(117, 216, 255, 0.42);
       border-radius: 18px;
-      background: linear-gradient(160deg, rgba(9, 45, 72, .98), rgba(2, 16, 29, .99));
-      box-shadow: 0 18px 52px rgba(0, 0, 0, .55), inset 0 1px rgba(211, 246, 255, .16);
+      background: linear-gradient(
+        160deg,
+        rgba(9, 45, 72, 0.98),
+        rgba(2, 16, 29, 0.99)
+      );
+      box-shadow:
+        0 18px 52px rgba(0, 0, 0, 0.55),
+        inset 0 1px rgba(211, 246, 255, 0.16);
     }
     .opentroop-build-title {
       width: 100%;
@@ -293,20 +314,20 @@ export class BuildMenu extends LitElement implements Controller {
       color: #80dcff;
       font-size: 11px;
       font-weight: 900;
-      letter-spacing: .18em;
+      letter-spacing: 0.18em;
       text-align: center;
     }
     .opentroop-build-menu .build-button {
-      border-color: rgba(121, 211, 255, .22);
-      background: rgba(1, 17, 29, .72);
-      box-shadow: inset 0 1px rgba(255, 255, 255, .05);
+      border-color: rgba(121, 211, 255, 0.22);
+      background: rgba(1, 17, 29, 0.72);
+      box-shadow: inset 0 1px rgba(255, 255, 255, 0.05);
     }
     .opentroop-build-menu .build-button:not(:disabled):hover {
-      border-color: rgba(103, 210, 255, .66);
-      background: rgba(13, 91, 139, .44);
+      border-color: rgba(103, 210, 255, 0.66);
+      background: rgba(13, 91, 139, 0.44);
     }
     .opentroop-build-menu .build-count-chip {
-      border-color: rgba(121, 211, 255, .28);
+      border-color: rgba(121, 211, 255, 0.28);
       background: #08283e;
     }
 
@@ -447,7 +468,10 @@ export class BuildMenu extends LitElement implements Controller {
     const openTroopApp = isOpenTroopApp();
     return html`
       <div
-        class="build-menu ${openTroopApp ? "opentroop-build-menu" : ""} ${this._hidden ? "hidden" : ""}"
+        class="build-menu ${openTroopApp ? "opentroop-build-menu" : ""} ${this
+          ._hidden
+          ? "hidden"
+          : ""}"
         @contextmenu=${(e: MouseEvent) => e.preventDefault()}
       >
         ${openTroopApp
@@ -469,6 +493,7 @@ export class BuildMenu extends LitElement implements Controller {
                 return html`
                   <button
                     class="build-button"
+                    data-tutorial-unit=${item.unitType}
                     @click=${() =>
                       this.sendBuildOrUpgrade(buildableUnit, this.clickedTile)}
                     ?disabled=${!enabled}

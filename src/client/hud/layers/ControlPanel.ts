@@ -530,6 +530,7 @@ export class ControlPanel extends LitElement implements Controller {
           >
         </div>
         <input
+          data-tutorial-target="troop-slider"
           type="range"
           min="1"
           max="100"
@@ -587,6 +588,7 @@ export class ControlPanel extends LitElement implements Controller {
         <!-- Attack ratio slider -->
         <div class="flex-1" translate="no">
           <input
+            data-tutorial-target="troop-slider"
             type="range"
             min="1"
             max="100"
