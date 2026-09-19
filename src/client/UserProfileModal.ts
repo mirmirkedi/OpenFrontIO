@@ -100,19 +100,6 @@ export class UserProfileModal extends BaseModal {
     }
   }
 
-  private generateRandomName() {
-    const newName = genAnonUsername();
-    this.username = newName;
-    this.validationError = "";
-    // Auto-save random name
-    localStorage.setItem("username", newName);
-    window.dispatchEvent(
-      new CustomEvent("username-updated", {
-        detail: { username: newName },
-      }),
-    );
-  }
-
   private selectFlag(code: string) {
     this.selectedFlagCode = code;
     // Auto-save flag
@@ -164,7 +151,7 @@ export class UserProfileModal extends BaseModal {
       <div class="custom-scrollbar p-3 sm:p-5 flex flex-col gap-5 max-w-4xl mx-auto">
         <!-- Identity Showcase Card -->
         <section
-          class="relative overflow-hidden rounded-2xl border border-sky-500/25 bg-gradient-to-r from-[#07192a]/95 via-[#0b243b]/90 to-[#07192a]/95 p-4 sm:p-5 shadow-2xl backdrop-blur-md"
+          class="relative overflow-hidden rounded-2xl border border-sky-500/25 bg-gradient-to-r from-[#07192a]/95 via-[#0b243b]/90 to-[#07192a]/95 py-5 sm:py-6 px-4 shadow-2xl backdrop-blur-md flex items-center justify-center min-h-[90px]"
         >
           <div
             class="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-sky-500/10 blur-3xl pointer-events-none"
@@ -173,32 +160,26 @@ export class UserProfileModal extends BaseModal {
             class="absolute -left-12 -bottom-12 w-48 h-48 rounded-full bg-blue-600/10 blur-3xl pointer-events-none"
           ></div>
 
-          <div class="relative z-10 flex items-center justify-center sm:justify-start gap-4 sm:gap-6">
+          <div class="relative z-10 flex items-center justify-center gap-3 sm:gap-4 flex-wrap text-center max-w-full w-full">
             ${this.selectedFlagCode
               ? html`
-                  <div class="relative shrink-0">
-                    <div
-                      class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-sky-400/40 bg-black/40 flex items-center justify-center shadow-[0_0_20px_rgba(56,189,248,0.2)]"
-                    >
-                      <img
-                        src=${assetUrl(
-                          `flags/${encodeURIComponent(this.selectedFlagCode)}.svg`,
-                        )}
-                        alt="Flag"
-                        class="w-full h-full object-cover"
-                        @error=${(e: Event) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                    </div>
-                  </div>
+                  <img
+                    src=${assetUrl(
+                      `flags/${encodeURIComponent(this.selectedFlagCode)}.svg`,
+                    )}
+                    alt="Flag"
+                    class="h-11 sm:h-14 md:h-16 w-auto max-w-[105px] object-contain rounded-md shadow-md shrink-0"
+                    @error=${(e: Event) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
                 `
               : null}
 
-            <!-- Identity Info (Clean player name only) -->
-            <div class="text-center sm:text-left min-w-0">
+            <!-- Identity Info (Clean player name with wrapping) -->
+            <div class="min-w-0 max-w-full px-2">
               <h2
-                class="text-2xl sm:text-3xl font-black tracking-wide text-white truncate drop-shadow-md"
+                class="text-xl sm:text-2xl md:text-3xl font-black tracking-wide text-white drop-shadow-md break-all [overflow-wrap:anywhere] leading-snug"
               >
                 ${this.username || "Operator"}
               </h2>
@@ -225,64 +206,43 @@ export class UserProfileModal extends BaseModal {
             </span>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-2.5">
-            <div class="relative flex-1">
-              <input
-                id="profile-username-input"
-                type="text"
-                .value=${this.username}
-                @input=${this.handleUsernameInput}
-                minlength="${MIN_USERNAME_LENGTH}"
-                maxlength="${MAX_USERNAME_LENGTH}"
-                placeholder="${translateText("user_profile.name_placeholder") || "Enter username..."}"
-                class="w-full h-12 bg-black/50 border ${
-                  this.validationError ? "border-red-500/80 focus:border-red-400 focus:ring-red-500/30" : "border-white/20 focus:border-sky-400 focus:ring-sky-500/30"
-                } rounded-xl px-4 text-white text-base sm:text-lg font-bold tracking-wider placeholder-white/30 focus:outline-none focus:ring-2 transition-all shadow-inner"
-              />
-              ${this.username
-                ? html`
-                    <button
-                      type="button"
-                      title="Clear name"
-                      aria-label="Clear name"
-                      @click=${() => {
-                        this.username = "";
-                        this.validationError = translateText("username.too_short", {
-                          min: MIN_USERNAME_LENGTH,
-                        });
-                      }}
-                      class="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1"
-                    >
-                      <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-                        <path
-                          fill-rule="evenodd"
-                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  `
-                : null}
-            </div>
-
-            <!-- Randomize Name button -->
-            <button
-              type="button"
-              @click=${this.generateRandomName}
-              title=${translateText("user_profile.random_name") || "Randomize"}
-              class="h-12 px-4 rounded-xl border border-sky-400/30 bg-sky-950/40 hover:bg-sky-900/60 text-sky-200 hover:text-white flex items-center justify-center gap-2 font-black text-xs uppercase tracking-wider transition-all duration-150 active:scale-95 shrink-0 cursor-pointer"
-            >
-              <!-- Dice Icon -->
-              <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none stroke-2">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                <circle cx="8" cy="8" r="1.5" fill="currentColor"></circle>
-                <circle cx="16" cy="8" r="1.5" fill="currentColor"></circle>
-                <circle cx="12" cy="12" r="1.5" fill="currentColor"></circle>
-                <circle cx="8" cy="16" r="1.5" fill="currentColor"></circle>
-                <circle cx="16" cy="16" r="1.5" fill="currentColor"></circle>
-              </svg>
-              <span>${translateText("user_profile.random_name") || "Randomize"}</span>
-            </button>
+          <div class="relative w-full">
+            <input
+              id="profile-username-input"
+              type="text"
+              .value=${this.username}
+              @input=${this.handleUsernameInput}
+              minlength="${MIN_USERNAME_LENGTH}"
+              maxlength="${MAX_USERNAME_LENGTH}"
+              placeholder="${translateText("user_profile.name_placeholder") || "Enter username..."}"
+              class="w-full h-12 bg-black/50 border ${
+                this.validationError ? "border-red-500/80 focus:border-red-400 focus:ring-red-500/30" : "border-white/20 focus:border-sky-400 focus:ring-sky-500/30"
+              } rounded-xl px-4 text-white text-base sm:text-lg font-bold tracking-wider placeholder-white/30 focus:outline-none focus:ring-2 transition-all shadow-inner"
+            />
+            ${this.username
+              ? html`
+                  <button
+                    type="button"
+                    title="Clear name"
+                    aria-label="Clear name"
+                    @click=${() => {
+                      this.username = "";
+                      this.validationError = translateText("username.too_short", {
+                        min: MIN_USERNAME_LENGTH,
+                      });
+                    }}
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1 cursor-pointer"
+                  >
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                      <path
+                        fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                `
+              : null}
           </div>
 
           ${this.validationError
