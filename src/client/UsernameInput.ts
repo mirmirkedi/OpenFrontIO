@@ -210,8 +210,25 @@ export class UsernameInput extends LitElement {
     });
   }
 
+  private handleExternalUsernameUpdate = () => {
+    this.loadStoredUsername();
+    this.requestUpdate();
+  };
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener(
+      "username-updated",
+      this.handleExternalUsernameUpdate,
+    );
+  }
+
   connectedCallback() {
     super.connectedCallback();
+    window.addEventListener(
+      "username-updated",
+      this.handleExternalUsernameUpdate,
+    );
     // Captured before loadStoredUsername(), which — when nothing is stored —
     // fills in a fresh anon username AND persists it immediately. Checking
     // localStorage afterwards would therefore never see it as empty.

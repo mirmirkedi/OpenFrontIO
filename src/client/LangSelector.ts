@@ -260,6 +260,7 @@ export class LangSelector extends LitElement {
       "account-modal",
       "game-stats-modal",
       "player-profile-modal",
+      "user-profile-modal",
       "game-info-view",
       "ranking-controls",
       "leaderboard-modal",

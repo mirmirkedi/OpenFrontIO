@@ -2079,5 +2079,25 @@
     "description": "(ALFA)",
     "login_required": "Aşamalı oynamak için giriş yap!",
     "must_login": "Aşamalı eşleştirme oynamak için giriş yapmanız gerek."
+  },
+  "user_profile": {
+    "title": "Oyuncu Profili",
+    "preview_heading": "TAKTİKSEL KİMLİK",
+    "player_name": "Oyuncu İsmi",
+    "name_placeholder": "İsim girin...",
+    "random_name": "Rastgele",
+    "characters": "{current}/{max}",
+    "flag_heading": "ÜLKE BAYRAĞI",
+    "search_flags": "Ülke veya kod ara...",
+    "no_flag": "Bayraksız",
+    "all_continents": "Tümü",
+    "continent_europe": "Avrupa",
+    "continent_asia": "Asya",
+    "continent_americas": "Amerika",
+    "continent_africa": "Afrika",
+    "continent_oceania": "Okyanusya",
+    "save": "Profili Kaydet",
+    "saved": "Profil başarıyla kaydedildi!",
+    "no_flags_found": "Aramanıza uygun bayrak bulunamadı."
   }
 }

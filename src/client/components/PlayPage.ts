@@ -100,6 +100,11 @@ export class PlayPage extends LitElement {
     window.showPage?.("page-help");
   };
 
+  private openProfile = () => {
+    this.settingsOpen = false;
+    window.showPage?.("page-user-profile");
+  };
+
   private openLanguagePicker() {
     this.settingsOpen = false;
     (
@@ -227,9 +232,9 @@ export class PlayPage extends LitElement {
                   </button>
                   <button
                     class="opentroop-icon-button"
-                    aria-label="Profile"
-                    title="Profile"
-                    @click=${(event: Event) => event.stopPropagation()}
+                    aria-label=${translateText("user_profile.title") || "Profile"}
+                    title=${translateText("user_profile.title") || "Profile"}
+                    @click=${this.openProfile}
                   >
                     <svg
                       viewBox="0 0 24 24"

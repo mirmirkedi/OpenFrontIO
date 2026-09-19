@@ -1873,5 +1873,25 @@
     "play_description": "Play against bots on any map.",
     "play_title": "Ready for battle?",
     "setup_header": "BATTLE SETUP"
+  },
+  "user_profile": {
+    "title": "Player Profile",
+    "preview_heading": "TACTICAL IDENTITY",
+    "player_name": "Player Name",
+    "name_placeholder": "Enter username...",
+    "random_name": "Randomize",
+    "characters": "{current}/{max}",
+    "flag_heading": "NATIONAL FLAG",
+    "search_flags": "Search country or code...",
+    "no_flag": "No Flag",
+    "all_continents": "All",
+    "continent_europe": "Europe",
+    "continent_asia": "Asia",
+    "continent_americas": "Americas",
+    "continent_africa": "Africa",
+    "continent_oceania": "Oceania",
+    "save": "Save Profile",
+    "saved": "Profile saved successfully!",
+    "no_flags_found": "No flags match your search."
   }
 }
