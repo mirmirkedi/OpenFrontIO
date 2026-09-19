@@ -675,7 +675,13 @@ export function resolvedToPlayerPattern(
 }
 
 export async function getPlayerCosmeticsRefs(): Promise<PlayerCosmeticRefs> {
-  if (isOpenTroopApp()) return {};
+  if (isOpenTroopApp()) {
+    const userSettings = new UserSettings();
+    const flag = userSettings.getFlag();
+    return {
+      flag: flag && flag !== "country:xx" ? flag : undefined,
+    };
+  }
   const userSettings = new UserSettings();
   // Resolve the profile first: getUserMe activates the per-player cosmetics
   // scope (UserSettings.setPlayerId), which must happen before selections are
@@ -810,7 +816,15 @@ export async function getPlayerCosmeticsRefs(): Promise<PlayerCosmeticRefs> {
 }
 
 export async function getPlayerCosmetics(): Promise<PlayerCosmetics> {
-  if (isOpenTroopApp()) return {};
+  if (isOpenTroopApp()) {
+    const userSettings = new UserSettings();
+    const flag = userSettings.getFlag();
+    const result: PlayerCosmetics = {};
+    if (flag && flag !== "country:xx") {
+      result.flag = await resolveFlagUrl(flag);
+    }
+    return result;
+  }
   const refs = await getPlayerCosmeticsRefs();
   const cosmetics = await fetchCosmetics();
 

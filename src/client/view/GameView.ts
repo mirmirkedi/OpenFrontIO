@@ -26,6 +26,7 @@ import { TerrainMapData } from "../../core/game/TerrainMapLoader";
 import { TerraNulliusImpl } from "../../core/game/TerraNulliusImpl";
 import { UnitGrid, UnitPredicate } from "../../core/game/UnitGrid";
 import { ClientID, GameID, Player, PlayerCosmetics } from "../../core/Schemas";
+import { UserSettings } from "../../core/game/UserSettings";
 import { formatPlayerDisplayName } from "../../core/Util";
 import { WorkerClient } from "../../core/worker/WorkerClient";
 import { computeAllianceClusters } from "../render/frame/derive/AllianceClusters";
@@ -159,6 +160,29 @@ export class GameView implements GameMap {
     this._cosmetics = new Map(
       humans.map((h) => [h.clientID, h.cosmetics ?? {}]),
     );
+
+    const userSettings = new UserSettings();
+    const myFlag = userSettings.getFlag();
+    if (myFlag && myFlag !== "country:xx") {
+      const code = myFlag.startsWith("country:")
+        ? myFlag.slice("country:".length)
+        : myFlag.startsWith("flag:")
+          ? myFlag.slice("flag:".length)
+          : myFlag;
+      if (code) {
+        const myFlagUrl = `/flags/${encodeURIComponent(code)}.svg`;
+        if (this._myClientID) {
+          const existing = this._cosmetics.get(this._myClientID) ?? {};
+          existing.flag = existing.flag ?? myFlagUrl;
+          this._cosmetics.set(this._myClientID, existing);
+        }
+        if (this._myUsername) {
+          const existing = this._cosmetics.get(this._myUsername) ?? {};
+          existing.flag = existing.flag ?? myFlagUrl;
+          this._cosmetics.set(this._myUsername, existing);
+        }
+      }
+    }
 
     for (const nation of this._mapData.nations) {
       // Nations don't have client ids, so we use their name as the key instead.
@@ -379,18 +403,37 @@ export class GameView implements GameMap {
           existing.nameData = nextNameData;
         }
       } else {
+        const cosmeticsForPlayer =
+          (pu.clientID ? this._cosmetics.get(pu.clientID) : undefined) ??
+          (pu.name ? this._cosmetics.get(pu.name) : undefined) ??
+          ((pu.clientID && pu.clientID === this._myClientID) ||
+          pu.name === this._myUsername
+            ? (this._cosmetics.get(this._myClientID ?? "") ??
+              this._cosmetics.get(this._myUsername))
+            : undefined) ??
+          (pu.playerType === PlayerType.Nation
+            ? this._cosmetics.get(pu.name!)
+            : undefined) ??
+          {};
+
+        if (
+          ((pu.clientID && pu.clientID === this._myClientID) ||
+            pu.name === this._myUsername) &&
+          !cosmeticsForPlayer.flag
+        ) {
+          const fallbackFlag =
+            this._cosmetics.get(this._myClientID ?? "")?.flag ??
+            this._cosmetics.get(this._myUsername)?.flag;
+          if (fallbackFlag) {
+            cosmeticsForPlayer.flag = fallbackFlag;
+          }
+        }
+
         const player = new PlayerView(
           this,
           pu,
           gu.playerNameViewData?.[pu.id],
-          // First check human by clientID, then check nation by name.
-          // Only match by name for actual Nations — not Bots (tribes) whose
-          // random names may coincidentally match a nation name.
-          this._cosmetics.get(pu.clientID ?? "") ??
-            (pu.playerType === PlayerType.Nation
-              ? this._cosmetics.get(pu.name!)
-              : undefined) ??
-            {},
+          cosmeticsForPlayer,
         );
         this._players.set(pu.id, player);
         this._playerStates.set(pu.smallID!, player.state);

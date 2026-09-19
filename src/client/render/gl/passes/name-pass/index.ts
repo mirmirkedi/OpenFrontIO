@@ -297,7 +297,10 @@ export class NamePass {
    */
   private resolveSlotFlag(slot: PlayerSlot): void {
     const url = slot.flagUrl;
-    if (!url) return;
+    if (!url) {
+      slot.flagLayerIdx = -1;
+      return;
+    }
     this.flagAtlas.request(url);
     const layer = this.flagAtlas.getLayer(url);
     if (layer >= 0) {
@@ -392,9 +395,14 @@ export class NamePass {
           this.resolveSlotFlag(slot);
           this.resolveSlotCrown(slot);
         } else {
+          const slot = this.slots.get(p.id)!;
+          if (slot.flagUrl !== p.flag) {
+            slot.flagUrl = p.flag;
+            this.resolveSlotFlag(slot);
+          }
           nextSlotIndex = Math.max(
             nextSlotIndex,
-            this.slots.get(p.id)!.index + 1,
+            slot.index + 1,
           );
         }
       }

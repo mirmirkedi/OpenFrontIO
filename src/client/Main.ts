@@ -28,6 +28,7 @@ import { joinLobby, type JoinLobbyResult } from "./ClientGameRunner";
 import { loadActiveLocalGame } from "./LocalPersistantStats";
 import {
   completeCosmeticPurchaseReturn,
+  getPlayerCosmetics,
   getPlayerCosmeticsRefs,
 } from "./Cosmetics";
 import { updateCrazyGamesNavButton } from "./CrazyGamesAccountButton";
@@ -901,9 +902,21 @@ class Client {
     return mode;
   }
 
-  private handleResumeLocalGame() {
+  private async handleResumeLocalGame() {
     const activeGame = loadActiveLocalGame();
     if (!activeGame) return;
+
+    if (activeGame.gameStartInfo?.players?.[0]) {
+      activeGame.gameStartInfo.players[0].cosmetics =
+        await getPlayerCosmetics();
+      const inputName = this.usernameInput?.getUsername();
+      const currentUsername =
+        (inputName && inputName.length > 0 ? inputName : null) ??
+        localStorage.getItem("username");
+      if (currentUsername) {
+        activeGame.gameStartInfo.players[0].username = currentUsername;
+      }
+    }
 
     document.dispatchEvent(
       new CustomEvent<JoinLobbyEvent>("join-lobby", {
