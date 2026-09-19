@@ -16,6 +16,7 @@ import "./StreamingNow";
 export class PlayPage extends LitElement {
   @state() private languageRevision = 0;
   @state() private musicEnabled = worldFrontMusic.isEnabled();
+  @state() private settingsOpen = false;
 
   connectedCallback() {
     super.connectedCallback();
@@ -26,6 +27,7 @@ export class PlayPage extends LitElement {
     window.addEventListener("worldfront-music-changed", this.refreshMusic);
     window.addEventListener("pointerdown", this.unlockMusic, { passive: true });
     window.addEventListener("keydown", this.unlockMusic);
+    document.addEventListener("pointerdown", this.closeSettingsOnOutside);
     document.addEventListener("leave-lobby", this.refreshSavedGame);
     document.addEventListener("visibilitychange", this.onVisibilityChange);
   }
@@ -38,6 +40,7 @@ export class PlayPage extends LitElement {
     window.removeEventListener("worldfront-music-changed", this.refreshMusic);
     window.removeEventListener("pointerdown", this.unlockMusic);
     window.removeEventListener("keydown", this.unlockMusic);
+    document.removeEventListener("pointerdown", this.closeSettingsOnOutside);
     document.removeEventListener("leave-lobby", this.refreshSavedGame);
     document.removeEventListener("visibilitychange", this.onVisibilityChange);
     super.disconnectedCallback();
@@ -78,6 +81,34 @@ export class PlayPage extends LitElement {
     this.requestUpdate();
   };
 
+  private toggleSettings = (event: Event) => {
+    event.stopPropagation();
+    this.settingsOpen = !this.settingsOpen;
+  };
+
+  private closeSettingsOnOutside = (event: PointerEvent) => {
+    if (!this.settingsOpen) return;
+    const target = event.target as Node | null;
+    const settings = this.querySelector(".opentroop-home__settings");
+    if (!target || !settings?.contains(target)) {
+      this.settingsOpen = false;
+    }
+  };
+
+  private openHelp = () => {
+    this.settingsOpen = false;
+    window.showPage?.("page-help");
+  };
+
+  private openLanguagePicker() {
+    this.settingsOpen = false;
+    (
+      document.querySelector("lang-selector") as {
+        openLanguagePicker?: () => Promise<void>;
+      } | null
+    )?.openLanguagePicker?.();
+  }
+
   createRenderRoot() {
     return this;
   }
@@ -107,25 +138,100 @@ export class PlayPage extends LitElement {
               />
             </div>
             <div class="opentroop-home__actions">
-              <button
-                class="opentroop-icon-button"
-                data-music-toggle
-                aria-label=${translateText(
-                  this.musicEnabled
-                    ? "worldfront.music_on"
-                    : "worldfront.music_off",
-                )}
-                title=${translateText(
-                  this.musicEnabled
-                    ? "worldfront.music_on"
-                    : "worldfront.music_off",
-                )}
-                aria-pressed=${this.musicEnabled}
-                data-music-enabled=${this.musicEnabled}
-                @click=${this.toggleMusic}
-              >
-                ${!hasMusicTracks
-                  ? html`<svg
+              <div class="opentroop-home__settings">
+                <div
+                  class="opentroop-home__settings-panel"
+                  data-open=${this.settingsOpen}
+                  aria-hidden=${!this.settingsOpen}
+                >
+                  <button
+                    class="opentroop-icon-button"
+                    data-music-toggle
+                    aria-label=${translateText(
+                      this.musicEnabled
+                        ? "worldfront.music_on"
+                        : "worldfront.music_off",
+                    )}
+                    title=${translateText(
+                      this.musicEnabled
+                        ? "worldfront.music_on"
+                        : "worldfront.music_off",
+                    )}
+                    aria-pressed=${this.musicEnabled}
+                    data-music-enabled=${this.musicEnabled}
+                    @click=${this.toggleMusic}
+                  >
+                    ${!hasMusicTracks
+                      ? html`<svg
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M4 14h3l4 3V7L7 10H4z"></path>
+                        </svg>`
+                      : this.musicEnabled
+                        ? html`<svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="M4 14h3l4 3V7L7 10H4z"></path>
+                            <path d="M15 9.5a4 4 0 0 1 0 5"></path>
+                            <path d="M17.5 7a7.5 7.5 0 0 1 0 10"></path>
+                          </svg>`
+                        : html`<svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="M4 14h3l4 3V7L7 10H4z"></path>
+                            <path d="M16 8l6 8M22 8l-6 8"></path>
+                          </svg>`}
+                  </button>
+                  <button
+                    class="opentroop-icon-button"
+                    aria-label=${translateText("select_lang.title")}
+                    @click=${this.openLanguagePicker}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                    >
+                      <circle cx="12" cy="12" r="8.5"></circle>
+                      <path
+                        d="M3.5 12h17M12 3.5c2.3 2.3 3.4 5.1 3.4 8.5S14.3 18.2 12 20.5C9.7 18.2 8.6 15.4 8.6 12S9.7 5.8 12 3.5Z"
+                      ></path>
+                    </svg>
+                  </button>
+                  <button
+                    class="opentroop-icon-button"
+                    aria-label="Help"
+                    @click=${this.openHelp}
+                  >
+                    ?
+                  </button>
+                  <button
+                    class="opentroop-icon-button"
+                    aria-label="Profile"
+                    title="Profile"
+                    @click=${(event: Event) => event.stopPropagation()}
+                  >
+                    <svg
                       viewBox="0 0 24 24"
                       aria-hidden="true"
                       fill="none"
@@ -134,60 +240,36 @@ export class PlayPage extends LitElement {
                       stroke-linecap="round"
                       stroke-linejoin="round"
                     >
-                      <path d="M4 14h3l4 3V7L7 10H4z"></path>
-                    </svg>`
-                  : this.musicEnabled
-                    ? html`<svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M4 14h3l4 3V7L7 10H4z"></path>
-                        <path d="M15 9.5a4 4 0 0 1 0 5"></path>
-                        <path d="M17.5 7a7.5 7.5 0 0 1 0 10"></path>
-                      </svg>`
-                    : html`<svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M4 14h3l4 3V7L7 10H4z"></path>
-                        <path d="M16 8l6 8M22 8l-6 8"></path>
-                      </svg>`}
-              </button>
-              <button
-                class="opentroop-icon-button"
-                aria-label=${translateText("select_lang.title")}
-                @click=${this.openLanguagePicker}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
+                      <circle cx="12" cy="8" r="3.2"></circle>
+                      <path
+                        d="M5.5 19.5c.8-3.1 3-4.7 6.5-4.7s5.7 1.6 6.5 4.7"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <button
+                  class="opentroop-icon-button opentroop-settings-button"
+                  aria-label="Settings"
+                  title="Settings"
+                  aria-expanded=${this.settingsOpen ? "true" : "false"}
+                  @click=${this.toggleSettings}
                 >
-                  <circle cx="12" cy="12" r="8.5"></circle>
-                  <path
-                    d="M3.5 12h17M12 3.5c2.3 2.3 3.4 5.1 3.4 8.5S14.3 18.2 12 20.5C9.7 18.2 8.6 15.4 8.6 12S9.7 5.8 12 3.5Z"
-                  ></path>
-                </svg>
-              </button>
-              <button
-                class="opentroop-icon-button"
-                aria-label="Help"
-                @click=${() => window.showPage?.("page-help")}
-              >
-                ?
-              </button>
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                      d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 1.7-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-2.4v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L8 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H6v-2.4h.9a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L8 8.6l1.7-1.7.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2h2.4v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.7 1.7-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2V14h-.2a1.7 1.7 0 0 0-1.5 1Z"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
             </div>
           </header>
 
@@ -361,13 +443,5 @@ export class PlayPage extends LitElement {
             ></steam-wishlist>`}
       </div>
     `;
-  }
-
-  private openLanguagePicker() {
-    (
-      document.querySelector("lang-selector") as {
-        openLanguagePicker?: () => Promise<void>;
-      } | null
-    )?.openLanguagePicker?.();
   }
 }

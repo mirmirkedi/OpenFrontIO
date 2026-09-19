@@ -268,6 +268,48 @@ body.opentroop-app #hex-grid {
   align-items: center;
   gap: 8px;
 }
+.opentroop-home__settings {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.opentroop-home__settings-panel {
+  position: absolute;
+  top: 0;
+  right: 52px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(8px) scale(0.98);
+  pointer-events: none;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    visibility 160ms ease;
+}
+
+.opentroop-home__settings-panel[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+}
+
+.opentroop-home__settings-panel .opentroop-icon-button {
+  font-size: 18px;
+}
+
+.opentroop-settings-button svg {
+  transition: transform 160ms ease;
+}
+
+.opentroop-settings-button[aria-expanded="true"] svg {
+  transform: rotate(22deg);
+}
+
 .opentroop-home__actions .opentroop-icon-button svg {
   width: 21px;
   height: 21px;
