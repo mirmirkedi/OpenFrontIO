@@ -303,6 +303,9 @@ body.opentroop-app #hex-grid {
 }
 
 .opentroop-settings-button svg {
+  display: block;
+  width: 22px;
+  height: 22px;
   transition: transform 160ms ease;
 }
 
@@ -1264,9 +1267,7 @@ body.opentroop-app #hex-grid {
     display: block;
     position: relative;
     top: calc(var(--wf-game-safe-top) + 140px);
-    height: calc(
-      100% - var(--wf-game-safe-top) - 140px
-    );
+    height: calc(100% - var(--wf-game-safe-top) - 140px);
   }
 
   /* Move only the leaderboard tables; keep the icon and its background fixed. */
