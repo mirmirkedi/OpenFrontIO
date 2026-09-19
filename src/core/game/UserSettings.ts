@@ -461,6 +461,18 @@ export class UserSettings {
       try {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
+          // Migrate old default that had clan included
+          if (
+            key === PLAYER_STATS_COLUMNS_KEY &&
+            parsed.length === 4 &&
+            parsed.includes("clan") &&
+            parsed.includes("tiles") &&
+            parsed.includes("gold") &&
+            parsed.includes("maxtroops")
+          ) {
+            this.setString(key, JSON.stringify(defaults));
+            return [...defaults];
+          }
           const filtered = COLUMN_IDS.filter((id) => parsed.includes(id));
           if (filtered.length > 0) return filtered;
         }

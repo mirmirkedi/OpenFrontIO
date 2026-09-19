@@ -133,7 +133,7 @@ export class ColumnPicker extends LitElement {
   render() {
     return html`
       <button
-        class="px-0.5 leading-none text-xs lg:text-sm border rounded-md border-slate-500 transition-colors text-white hover:bg-white/10 bg-gray-700/50"
+        class="leading-none text-xs lg:text-sm transition-opacity hover:opacity-80 text-white cursor-pointer select-none bg-transparent border-0 p-0"
         title=${translateText("leaderboard.configure_columns")}
         aria-expanded=${this.open}
         aria-haspopup="menu"
