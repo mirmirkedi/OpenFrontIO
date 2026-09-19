@@ -87,6 +87,22 @@ describe("Attack", () => {
     (game.config() as TestConfig).setDefaultNukeSpeed(50);
   });
 
+  test("allows follow-up troops against an active attack target", () => {
+    waitForImmunityToEnd();
+    const defenderInterior = [...defender.tiles()].find(
+      (tile) => !defender.borderTiles().has(tile),
+    );
+    expect(defenderInterior).toBeDefined();
+    vi.spyOn(attacker, "sharesBorderWith").mockReturnValue(false);
+    expect(attacker.canAttack(defenderInterior!)).toBe(false);
+
+    game.addExecution(new AttackExecution(100, attacker, defender.id()));
+    game.executeNextTick();
+
+    expect(attacker.outgoingAttacks()).toHaveLength(1);
+    expect(attacker.canAttack(defenderInterior!)).toBe(true);
+  });
+
   test("Nuke reduce attacking troop counts", async () => {
     // Not building exactly spawn to it's better protected from attacks (but still
     // on defender territory)

@@ -1713,6 +1713,21 @@ export class PlayerImpl implements Player {
     if (!this.mg.isLand(tile) || this.mg.isImpassable(tile)) {
       return false;
     }
+
+    // A follow-up attack against an already active target is valid even when
+    // the target tile is no longer on our current border. This keeps the
+    // radial attack action available so the player can send more troops.
+    if (
+      this.outgoingAttacks().some(
+        (attack) =>
+          attack.isActive() &&
+          !attack.retreating() &&
+          attack.target() === owner,
+      )
+    ) {
+      return true;
+    }
+
     if (this.mg.hasOwner(tile)) {
       return this.sharesBorderWith(owner);
     } else {

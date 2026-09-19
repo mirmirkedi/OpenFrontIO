@@ -92,8 +92,6 @@ describe("RadialMenuElements", () => {
   beforeEach(() => {
     mockPlayer = {
       id: () => 1,
-      smallID: () => 1,
-      outgoingAttacks: vi.fn(() => []),
       isAlliedWith: vi.fn(() => false),
       isPlayer: vi.fn(() => true),
       isTraitor: vi.fn(() => false),
@@ -381,25 +379,24 @@ describe("RadialMenuElements", () => {
       expect(allyMenu).toBeDefined();
     });
 
-    it("disables the center attack while the target already has an active attack", () => {
+    it("keeps the attack button available for deliberate follow-up troops", () => {
       const enemyPlayer = {
         id: () => 2,
-        smallID: () => 7,
         isPlayer: vi.fn(() => true),
         isFriendly: vi.fn(() => false),
       } as unknown as PlayerView;
       mockParams.selected = enemyPlayer;
-      mockPlayer.outgoingAttacks = vi.fn(() => [{ targetID: 7 }] as any);
       mockParams.playerActionHandler = {
         handleAttack: vi.fn(),
       } as any;
 
-      expect(centerButtonElement.disabled(mockParams)).toBe(true);
-
+      expect(centerButtonElement.disabled(mockParams)).toBe(false);
       centerButtonElement.action(mockParams);
-      expect(
-        mockParams.playerActionHandler.handleAttack,
-      ).not.toHaveBeenCalled();
+
+      expect(mockParams.playerActionHandler.handleAttack).toHaveBeenCalledWith(
+        mockParams.myPlayer,
+        enemyPlayer.id(),
+      );
     });
 
     it("should show extend element when inAllianceExtensionWindow is true", () => {
