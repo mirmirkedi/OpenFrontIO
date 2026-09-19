@@ -1980,5 +1980,29 @@
     "description": "（内测版）",
     "login_required": "登录后开始排位赛！",
     "must_login": "您必须登录才能玩排位赛。"
+  },
+  "user_profile": {
+    "title": "玩家个人资料",
+    "preview_heading": "战术身份",
+    "player_name": "玩家名称",
+    "name_placeholder": "输入昵称...",
+    "random_name": "随机",
+    "characters": "{current}/{max}",
+    "flag_heading": "国旗",
+    "search_flags": "搜索国家或代码...",
+    "no_flag": "无旗帜",
+    "all_continents": "全部",
+    "continent_europe": "欧洲",
+    "continent_asia": "亚洲",
+    "continent_americas": "美洲",
+    "continent_africa": "非洲",
+    "continent_oceania": "大洋洲",
+    "save": "保存资料",
+    "saved": "个人资料已保存！",
+    "no_flags_found": "未找到匹配的旗帜。",
+    "default_username": "玩家",
+    "clear_name": "清除名称",
+    "clear_search": "清除搜索",
+    "flag": "旗帜"
   }
 }

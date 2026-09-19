@@ -1950,5 +1950,29 @@
   },
   "steam": {
     "link_signpost": "既に OpenFront アカウントをお持ちですか? アカウント連携は後のアップデートで行われます。"
+  },
+  "user_profile": {
+    "title": "プレイヤープロフィール",
+    "preview_heading": "戦術的アイデンティティ",
+    "player_name": "プレイヤー名",
+    "name_placeholder": "ユーザー名を入力...",
+    "random_name": "ランダム",
+    "characters": "{current}/{max}",
+    "flag_heading": "国旗",
+    "search_flags": "国またはコードを検索...",
+    "no_flag": "旗なし",
+    "all_continents": "すべて",
+    "continent_europe": "ヨーロッパ",
+    "continent_asia": "アジア",
+    "continent_americas": "アメリカ",
+    "continent_africa": "アフリカ",
+    "continent_oceania": "オセアニア",
+    "save": "プロフィールを保存",
+    "saved": "プロフィールを保存しました！",
+    "no_flags_found": "一致する旗が見つかりません。",
+    "default_username": "プレイヤー",
+    "clear_name": "名前を消去",
+    "clear_search": "検索を消去",
+    "flag": "国旗"
   }
 }

@@ -1956,5 +1956,29 @@
     "warships": "Barcos de guerra",
     "health": "Vida",
     "attitude": "Actitud"
+  },
+  "user_profile": {
+    "title": "Perfil de jugador",
+    "preview_heading": "IDENTIDAD TÁCTICA",
+    "player_name": "Nombre de jugador",
+    "name_placeholder": "Introduce un nombre...",
+    "random_name": "Aleatorio",
+    "characters": "{current}/{max}",
+    "flag_heading": "BANDERA NACIONAL",
+    "search_flags": "Buscar país o código...",
+    "no_flag": "Sin bandera",
+    "all_continents": "Todos",
+    "continent_europe": "Europa",
+    "continent_asia": "Asia",
+    "continent_americas": "Américas",
+    "continent_africa": "África",
+    "continent_oceania": "Oceanía",
+    "save": "Guardar perfil",
+    "saved": "¡Perfil guardado con éxito!",
+    "no_flags_found": "No se encontraron banderas coincidentes.",
+    "default_username": "Jugador",
+    "clear_name": "Borrar nombre",
+    "clear_search": "Borrar búsqueda",
+    "flag": "Bandera"
   }
 }

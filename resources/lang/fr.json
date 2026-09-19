@@ -1950,5 +1950,29 @@
   },
   "steam": {
     "link_signpost": "Avez-vous déjà un compte OpenFront existant ? La liaison de compte arrive dans une mise à jour future."
+  },
+  "user_profile": {
+    "title": "Profil du joueur",
+    "preview_heading": "IDENTITÉ TACTIQUE",
+    "player_name": "Nom du joueur",
+    "name_placeholder": "Entrez un pseudo...",
+    "random_name": "Aléatoire",
+    "characters": "{current}/{max}",
+    "flag_heading": "DRAPEAU NATIONAL",
+    "search_flags": "Rechercher un pays ou un code...",
+    "no_flag": "Sans drapeau",
+    "all_continents": "Tous",
+    "continent_europe": "Europe",
+    "continent_asia": "Asie",
+    "continent_americas": "Amériques",
+    "continent_africa": "Afrique",
+    "continent_oceania": "Océanie",
+    "save": "Enregistrer le profil",
+    "saved": "Profil enregistré avec succès !",
+    "no_flags_found": "Aucun drapeau ne correspond à votre recherche.",
+    "default_username": "Joueur",
+    "clear_name": "Effacer le nom",
+    "clear_search": "Effacer la recherche",
+    "flag": "Drapeau"
   }
 }

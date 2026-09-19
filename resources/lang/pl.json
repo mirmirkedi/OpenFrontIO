@@ -2037,5 +2037,29 @@
     "redirecting": "Trwa przekierowanie...",
     "not_authorized": "Brak autoryzacji dostępu do tej strony.",
     "contact_admin": "Jeśli uważasz, że ta wiadomość wyświetla się przez pomyłkę, skontaktuj się z administratorem witryny."
+  },
+  "user_profile": {
+    "title": "Profil gracza",
+    "preview_heading": "TOŻSAMOŚĆ TAKTYCZNA",
+    "player_name": "Nazwa gracza",
+    "name_placeholder": "Wprowadź nazwę...",
+    "random_name": "Losowo",
+    "characters": "{current}/{max}",
+    "flag_heading": "FLAGA NARODOWA",
+    "search_flags": "Szukaj kraju lub kodu...",
+    "no_flag": "Brak flagi",
+    "all_continents": "Wszystkie",
+    "continent_europe": "Europa",
+    "continent_asia": "Azja",
+    "continent_americas": "Ameryki",
+    "continent_africa": "Afryka",
+    "continent_oceania": "Oceania",
+    "save": "Zapisz profil",
+    "saved": "Profil został pomyślnie zapisany!",
+    "no_flags_found": "Nie znaleziono pasujących flag.",
+    "default_username": "Gracz",
+    "clear_name": "Wyczyść nazwę",
+    "clear_search": "Wyczyść wyszukiwanie",
+    "flag": "Flaga"
   }
 }

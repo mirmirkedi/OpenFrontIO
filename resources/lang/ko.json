@@ -1991,5 +1991,29 @@
     "description": "(시험판)",
     "login_required": "승급전을 플레이하려면 로그인하세요!",
     "must_login": "승급전 매치메이킹을 플레이하려면 로그인해야 합니다."
+  },
+  "user_profile": {
+    "title": "플레이어 프로필",
+    "preview_heading": "전술적 정체성",
+    "player_name": "플레이어 이름",
+    "name_placeholder": "닉네임 입력...",
+    "random_name": "무작위",
+    "characters": "{current}/{max}",
+    "flag_heading": "국기",
+    "search_flags": "국가 또는 코드 검색...",
+    "no_flag": "깃발 없음",
+    "all_continents": "전체",
+    "continent_europe": "유럽",
+    "continent_asia": "아시아",
+    "continent_americas": "아메리카",
+    "continent_africa": "아프리카",
+    "continent_oceania": "오세아니아",
+    "save": "프로필 저장",
+    "saved": "프로필이 성공적으로 저장되었습니다!",
+    "no_flags_found": "일치하는 깃발이 없습니다.",
+    "default_username": "플레이어",
+    "clear_name": "이름 지우기",
+    "clear_search": "검색 지우기",
+    "flag": "깃발"
   }
 }

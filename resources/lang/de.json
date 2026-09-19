@@ -2048,5 +2048,29 @@
     "redirecting": "Du wirst weitergeleitet...",
     "not_authorized": "Du bist nicht berechtigt, auf diese Website zuzugreifen.",
     "contact_admin": "Wenn du glaubst, dass du diese Nachricht fälschlicherweise siehst, wende dich sich bitte an den Website-Administrator."
+  },
+  "user_profile": {
+    "title": "Spielerprofil",
+    "preview_heading": "TAKTISCHE IDENTITÄT",
+    "player_name": "Spielername",
+    "name_placeholder": "Benutzernamen eingeben...",
+    "random_name": "Zufällig",
+    "characters": "{current}/{max}",
+    "flag_heading": "NATIONALFLAGGE",
+    "search_flags": "Land oder Code suchen...",
+    "no_flag": "Keine Flagge",
+    "all_continents": "Alle",
+    "continent_europe": "Europa",
+    "continent_asia": "Asien",
+    "continent_americas": "Amerika",
+    "continent_africa": "Afrika",
+    "continent_oceania": "Ozeanien",
+    "save": "Profil speichern",
+    "saved": "Profil erfolgreich gespeichert!",
+    "no_flags_found": "Keine Flaggen gefunden.",
+    "default_username": "Spieler",
+    "clear_name": "Namen löschen",
+    "clear_search": "Suche löschen",
+    "flag": "Flagge"
   }
 }

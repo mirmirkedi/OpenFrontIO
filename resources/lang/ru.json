@@ -1953,5 +1953,29 @@
   },
   "steam": {
     "link_signpost": "Уже есть аккаунт OpenFront? Привязка аккаунта появится в будущих обновлениях."
+  },
+  "user_profile": {
+    "title": "Профиль игрока",
+    "preview_heading": "ТАКТИЧЕСКИЙ ПРОФИЛЬ",
+    "player_name": "Имя игрока",
+    "name_placeholder": "Введите имя...",
+    "random_name": "Случайно",
+    "characters": "{current}/{max}",
+    "flag_heading": "ГОСУДАРСТВЕННЫЙ ФЛАГ",
+    "search_flags": "Поиск страны или кода...",
+    "no_flag": "Без флага",
+    "all_continents": "Все",
+    "continent_europe": "Европа",
+    "continent_asia": "Азия",
+    "continent_americas": "Америка",
+    "continent_africa": "Африка",
+    "continent_oceania": "Океания",
+    "save": "Сохранить профиль",
+    "saved": "Профиль успешно сохранен!",
+    "no_flags_found": "Флаги не найдены.",
+    "default_username": "Игрок",
+    "clear_name": "Очистить имя",
+    "clear_search": "Очистить поиск",
+    "flag": "Флаг"
   }
 }

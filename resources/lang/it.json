@@ -1956,5 +1956,29 @@
     "warships": "Nave da guerra",
     "health": "Salute",
     "attitude": "Relazione"
+  },
+  "user_profile": {
+    "title": "Profilo Giocatore",
+    "preview_heading": "IDENTITÀ TATTICA",
+    "player_name": "Nome Giocatore",
+    "name_placeholder": "Inserisci un nome...",
+    "random_name": "Casuale",
+    "characters": "{current}/{max}",
+    "flag_heading": "BANDIERA NAZIONALE",
+    "search_flags": "Cerca paese o codice...",
+    "no_flag": "Nessuna Bandiera",
+    "all_continents": "Tutti",
+    "continent_europe": "Europa",
+    "continent_asia": "Asia",
+    "continent_americas": "Americhe",
+    "continent_africa": "Africa",
+    "continent_oceania": "Oceania",
+    "save": "Salva Profilo",
+    "saved": "Profilo salvato con successo!",
+    "no_flags_found": "Nessuna bandiera trovata.",
+    "default_username": "Giocatore",
+    "clear_name": "Cancella nome",
+    "clear_search": "Cancella ricerca",
+    "flag": "Bandiera"
   }
 }

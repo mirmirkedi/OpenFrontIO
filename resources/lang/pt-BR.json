@@ -1950,5 +1950,29 @@
   },
   "steam": {
     "link_signpost": "Já tem uma conta existente do OpenFront? O link de conta está vindo em um update futuro."
+  },
+  "user_profile": {
+    "title": "Perfil do Jogador",
+    "preview_heading": "IDENTIDADE TÁTICA",
+    "player_name": "Nome do Jogador",
+    "name_placeholder": "Digite um nome...",
+    "random_name": "Aleatório",
+    "characters": "{current}/{max}",
+    "flag_heading": "BANDEIRA NACIONAL",
+    "search_flags": "Buscar país ou código...",
+    "no_flag": "Sem Bandeira",
+    "all_continents": "Todos",
+    "continent_europe": "Europa",
+    "continent_asia": "Ásia",
+    "continent_americas": "Américas",
+    "continent_africa": "África",
+    "continent_oceania": "Oceania",
+    "save": "Salvar Perfil",
+    "saved": "Perfil salvo com sucesso!",
+    "no_flags_found": "Nenhuma bandeira encontrada.",
+    "default_username": "Jogador",
+    "clear_name": "Limpar nome",
+    "clear_search": "Limpar busca",
+    "flag": "Bandeira"
   }
 }
