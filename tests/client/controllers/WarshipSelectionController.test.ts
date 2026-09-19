@@ -81,6 +81,38 @@ describe("WarshipSelectionController", () => {
     );
   });
 
+  it("opens the menu on water instead of moving a selected warship", () => {
+    Object.assign(game, {
+      isValidCoord: () => true,
+      ref: () => 10,
+      inSpawnPhase: () => false,
+      isWater: () => true,
+    });
+    eventBus.emit = vi.fn();
+    transformHandler.screenToWorldCoordinates = () => ({ x: 10, y: 10 });
+    const controller = new WarshipSelectionController(
+      game,
+      eventBus,
+      transformHandler,
+      view,
+    );
+    const selectedUnit = {
+      id: () => 7,
+      isActive: () => true,
+      owner: () => game.myPlayer(),
+    };
+    controller["onUnitSelection"]({
+      isSelected: true,
+      unit: selectedUnit,
+    } as unknown as UnitSelectionEvent);
+
+    controller["onTouch"](new TouchEvent(20, 30));
+
+    expect(eventBus.emit).toHaveBeenCalledExactlyOnceWith(
+      new ContextMenuEvent(20, 30),
+    );
+  });
+
   it("tracks the selected unit on single-unit selection (rendering is WebGL)", () => {
     const ui = new WarshipSelectionController(
       game,

@@ -285,7 +285,13 @@ export function createRenderer(
   inGamePromo.game = game;
 
   const layers: Controller[] = [
-    new WarshipSelectionController(game, eventBus, transformHandler, view),
+    new WarshipSelectionController(
+      game,
+      eventBus,
+      transformHandler,
+      view,
+      uiState,
+    ),
     new BuildPreviewController(
       game,
       eventBus,

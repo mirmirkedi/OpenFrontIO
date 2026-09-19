@@ -2,6 +2,7 @@ import { vi, type Mock } from "vitest";
 import {
   attackMenuElement,
   buildMenuElement,
+  centerButtonElement,
   COLORS,
   MenuElementParams,
   rootMenuElement,
@@ -91,6 +92,8 @@ describe("RadialMenuElements", () => {
   beforeEach(() => {
     mockPlayer = {
       id: () => 1,
+      smallID: () => 1,
+      outgoingAttacks: vi.fn(() => []),
       isAlliedWith: vi.fn(() => false),
       isPlayer: vi.fn(() => true),
       isTraitor: vi.fn(() => false),
@@ -376,6 +379,27 @@ describe("RadialMenuElements", () => {
       const allyMenu = subMenu.find((item) => item.id === "ally_break");
 
       expect(allyMenu).toBeDefined();
+    });
+
+    it("disables the center attack while the target already has an active attack", () => {
+      const enemyPlayer = {
+        id: () => 2,
+        smallID: () => 7,
+        isPlayer: vi.fn(() => true),
+        isFriendly: vi.fn(() => false),
+      } as unknown as PlayerView;
+      mockParams.selected = enemyPlayer;
+      mockPlayer.outgoingAttacks = vi.fn(() => [{ targetID: 7 }] as any);
+      mockParams.playerActionHandler = {
+        handleAttack: vi.fn(),
+      } as any;
+
+      expect(centerButtonElement.disabled(mockParams)).toBe(true);
+
+      centerButtonElement.action(mockParams);
+      expect(
+        mockParams.playerActionHandler.handleAttack,
+      ).not.toHaveBeenCalled();
     });
 
     it("should show extend element when inAllianceExtensionWindow is true", () => {

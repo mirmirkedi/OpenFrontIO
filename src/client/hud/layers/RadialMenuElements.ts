@@ -146,6 +146,14 @@ function isDisconnectedTarget(params: MenuElementParams): boolean {
   return isDisconnected.call(selectedPlayer);
 }
 
+function hasActiveAttackOnTarget(params: MenuElementParams): boolean {
+  const selected = params.selected;
+  if (selected === null) return false;
+  return params.myPlayer
+    .outgoingAttacks()
+    .some((attack) => attack.targetID === selected.smallID());
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const infoChatElement: MenuElement = {
   id: "info_chat",
@@ -744,7 +752,7 @@ export const centerButtonElement: CenterButtonElement = {
       return !params.playerActions.interaction?.canDonateTroops;
     }
 
-    return !params.playerActions.canAttack;
+    return !params.playerActions.canAttack || hasActiveAttackOnTarget(params);
   },
   action: (params: MenuElementParams) => {
     if (params.game.inSpawnPhase()) {
@@ -761,6 +769,9 @@ export const centerButtonElement: CenterButtonElement = {
           );
         }
       } else {
+        if (hasActiveAttackOnTarget(params)) {
+          return;
+        }
         params.playerActionHandler.handleAttack(
           params.myPlayer,
           params.selected?.id() ?? null,

@@ -1,7 +1,6 @@
 import { Cell } from "src/core/game/Game";
 import { EventBus } from "../../core/EventBus";
 import { UnitType } from "../../core/game/Game";
-import { TileRef } from "../../core/game/GameMap";
 import { Controller } from "../Controller";
 import {
   CloseViewEvent,
@@ -16,10 +15,8 @@ import {
 } from "../InputHandler";
 import { MapRenderer } from "../render/gl";
 import { TransformHandler } from "../TransformHandler";
-import { MoveWarshipIntentEvent } from "../Transport";
+import { UIState } from "../UIState";
 import { GameView, UnitView } from "../view";
-
-const WARSHIP_SELECTION_RADIUS = 10;
 
 /**
  * Controller for warship selection state + click handling.
@@ -49,11 +46,11 @@ export class WarshipSelectionController implements Controller {
     private eventBus: EventBus,
     private transformHandler: TransformHandler,
     private view: MapRenderer,
+    private uiState?: UIState,
   ) {}
 
   tick() {
-    // Prune any destroyed warships from the multi-selection so callers
-    // (move-warship intent) don't try to act on dead units. The WebGL
+    // Prune any destroyed warships from the multi-selection. The WebGL
     // SelectionBoxPass also drops them automatically.
     this.multiSelectedWarships = this.multiSelectedWarships.filter((u) =>
       u.isActive(),
@@ -72,8 +69,8 @@ export class WarshipSelectionController implements Controller {
     this.eventBus.on(WarshipSelectionBoxCancelEvent, clearBox);
     this.eventBus.on(CloseViewEvent, clearBox);
 
-    // Warship select/move click flow (previously in the deleted UnitLayer).
-    this.eventBus.on(MouseUpEvent, (e) => this.onMouseUp(e));
+    // Normal map clicks are routed through the radial menu by
+    // ClientGameRunner. This controller only owns explicit warship selection.
     this.eventBus.on(TouchEvent, (e) => this.onTouch(e));
     this.eventBus.on(WarshipSelectionBoxCompleteEvent, (e) =>
       this.onSelectionBoxComplete(e),
@@ -137,80 +134,7 @@ export class WarshipSelectionController implements Controller {
     if (this.dragRectEl !== null) this.dragRectEl.style.display = "none";
   }
 
-  /**
-   * Find player-owned warships near the given cell, sorted by distance.
-   */
-  private findWarshipsNearCell(clickRef: TileRef): UnitView[] {
-    const myPlayer = this.game.myPlayer();
-    if (!myPlayer) return [];
-    return this.game
-      .units(UnitType.Warship)
-      .filter(
-        (unit) =>
-          unit.isActive() &&
-          unit.owner() === myPlayer &&
-          this.game.manhattanDist(unit.tile(), clickRef) <=
-            WARSHIP_SELECTION_RADIUS,
-      )
-      .sort(
-        (a, b) =>
-          this.game.manhattanDist(a.tile(), clickRef) -
-          this.game.manhattanDist(b.tile(), clickRef),
-      );
-  }
-
-  /**
-   * Resolve a left-click in the world:
-   *  - multi-selected warships present + clicked water → move them all
-   *  - single selected warship + clicked water → move it, then deselect
-   *  - otherwise → if there's a nearby warship, select the closest one
-   */
-  private onMouseUp(
-    event: MouseUpEvent,
-    clickRef?: TileRef,
-    nearbyWarships?: UnitView[],
-  ) {
-    if (clickRef === undefined) {
-      const cell = this.transformHandler.screenToWorldCoordinates(
-        event.x,
-        event.y,
-      );
-      if (!this.game.isValidCoord(cell.x, cell.y)) return;
-      clickRef = this.game.ref(cell.x, cell.y);
-    }
-    if (!this.game.isWater(clickRef)) return;
-
-    if (this.multiSelectedWarships.length > 0) {
-      const myPlayer = this.game.myPlayer();
-      const activeIds = this.multiSelectedWarships
-        .filter((u) => u.isActive() && u.owner() === myPlayer)
-        .map((u) => u.id());
-
-      if (activeIds.length > 0) {
-        this.eventBus.emit(new MoveWarshipIntentEvent(activeIds, clickRef));
-      }
-      this.eventBus.emit(new UnitSelectionEvent(null, false));
-      return;
-    }
-
-    if (this.selectedUnit) {
-      this.eventBus.emit(
-        new MoveWarshipIntentEvent([this.selectedUnit.id()], clickRef),
-      );
-      this.eventBus.emit(new UnitSelectionEvent(this.selectedUnit, false));
-      return;
-    }
-
-    nearbyWarships ??= this.findWarshipsNearCell(clickRef);
-    if (nearbyWarships.length > 0) {
-      this.eventBus.emit(new UnitSelectionEvent(nearbyWarships[0], true));
-    }
-  }
-
-  /**
-   * Touch handler mirroring mouse-up. On dry land with no selection, falls
-   * back to opening the radial menu.
-   */
+  /** Route every normal touch to the radial menu, including water tiles. */
   private onTouch(event: TouchEvent) {
     const cell = this.transformHandler.screenToWorldCoordinates(
       event.x,
@@ -225,24 +149,10 @@ export class WarshipSelectionController implements Controller {
       }
       return;
     }
-    if (!this.game.isWater(clickRef)) {
-      this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
+    if (this.uiState && this.uiState.ghostStructure !== null) {
       return;
     }
-    if (this.selectedUnit || this.multiSelectedWarships.length > 0) {
-      this.onMouseUp(new MouseUpEvent(event.x, event.y), clickRef);
-      return;
-    }
-    const nearbyWarships = this.findWarshipsNearCell(clickRef);
-    if (nearbyWarships.length > 0) {
-      this.onMouseUp(
-        new MouseUpEvent(event.x, event.y),
-        clickRef,
-        nearbyWarships,
-      );
-    } else {
-      this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
-    }
+    this.eventBus.emit(new ContextMenuEvent(event.x, event.y));
   }
 
   /**
