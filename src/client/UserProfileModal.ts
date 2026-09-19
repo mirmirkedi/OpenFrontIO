@@ -8,9 +8,14 @@ import {
   MIN_USERNAME_LENGTH,
   validateUsername,
 } from "../core/validations/username";
-import { genAnonUsername } from "./UsernameInput";
 import { BaseModal } from "./components/BaseModal";
 import { modalHeader } from "./components/ui/ModalHeader";
+import { genAnonUsername } from "./UsernameInput";
+import {
+  getActiveLanguage,
+  getLocalizedCountryName,
+  matchesCountryQuery,
+} from "./CountryLocalization";
 import { translateText } from "./Utils";
 
 interface CountryEntry {
@@ -41,6 +46,20 @@ export class UserProfileModal extends BaseModal {
       maxWidth: "820px",
     };
   }
+
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener("language-selected", this.handleLanguageChanged);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener("language-selected", this.handleLanguageChanged);
+  }
+
+  private handleLanguageChanged = () => {
+    this.requestUpdate();
+  };
 
   protected onOpen(): void {
     // Load cached username
@@ -113,8 +132,10 @@ export class UserProfileModal extends BaseModal {
   }
 
   private filteredCountries(): CountryEntry[] {
+    const currentLang = getActiveLanguage();
     const query = this.searchQuery.trim().toLowerCase();
-    return this.availableCountries.filter((country) => {
+
+    const filtered = this.availableCountries.filter((country) => {
       // Continent filter
       if (this.selectedContinent !== "all") {
         const continent = country.continent?.toLowerCase() ?? "";
@@ -125,14 +146,19 @@ export class UserProfileModal extends BaseModal {
         }
       }
 
-      // Search query filter
+      // Search query filter matching localized name, original English name, and code
       if (query) {
-        const matchesName = country.name.toLowerCase().includes(query);
-        const matchesCode = country.code.toLowerCase().includes(query);
-        return matchesName || matchesCode;
+        return matchesCountryQuery(country, query, currentLang);
       }
 
       return true;
+    });
+
+    // Sort alphabetically by localized name in the active language
+    return filtered.sort((a, b) => {
+      const nameA = getLocalizedCountryName(a.code, a.name, currentLang);
+      const nameB = getLocalizedCountryName(b.code, b.name, currentLang);
+      return nameA.localeCompare(nameB, currentLang);
     });
   }
 
@@ -181,7 +207,7 @@ export class UserProfileModal extends BaseModal {
               <h2
                 class="text-xl sm:text-2xl md:text-3xl font-black tracking-wide text-white drop-shadow-md break-all [overflow-wrap:anywhere] leading-snug"
               >
-                ${this.username || "Operator"}
+                ${this.username || translateText("user_profile.default_username") || "Player"}
               </h2>
             </div>
           </div>
@@ -223,8 +249,8 @@ export class UserProfileModal extends BaseModal {
               ? html`
                   <button
                     type="button"
-                    title="Clear name"
-                    aria-label="Clear name"
+                    title=${translateText("user_profile.clear_name") || "Clear name"}
+                    aria-label=${translateText("user_profile.clear_name") || "Clear name"}
                     @click=${() => {
                       this.username = "";
                       this.validationError = translateText("username.too_short", {
@@ -314,6 +340,8 @@ export class UserProfileModal extends BaseModal {
                 ? html`
                     <button
                       type="button"
+                      title=${translateText("user_profile.clear_search") || "Clear search"}
+                      aria-label=${translateText("user_profile.clear_search") || "Clear search"}
                       @click=${() => (this.searchQuery = "")}
                       class="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1 cursor-pointer"
                     >
@@ -367,12 +395,18 @@ export class UserProfileModal extends BaseModal {
                   </div>
                 `
               : filtered.map((country) => {
+                  const currentLang = getActiveLanguage();
                   const isSelected = this.selectedFlagCode === country.code;
+                  const localizedName = getLocalizedCountryName(
+                    country.code,
+                    country.name,
+                    currentLang,
+                  );
                   return html`
                     <button
                       type="button"
-                      title="${country.name} (${country.code.toUpperCase()})"
-                      aria-label="${country.name}"
+                      title="${localizedName} (${country.code.toUpperCase()})"
+                      aria-label="${localizedName}"
                       aria-pressed=${isSelected ? "true" : "false"}
                       @click=${() => this.selectFlag(country.code)}
                       class="group relative flex items-center gap-2.5 p-2 rounded-xl border text-left transition-all duration-150 cursor-pointer ${
@@ -383,7 +417,7 @@ export class UserProfileModal extends BaseModal {
                     >
                       <img
                         src=${assetUrl(`flags/${encodeURIComponent(country.code)}.svg`)}
-                        alt="${country.name}"
+                        alt="${localizedName}"
                         loading="lazy"
                         class="w-8 h-5.5 object-cover rounded shadow-sm shrink-0 border border-white/10"
                         @error=${(e: Event) => {
@@ -396,7 +430,7 @@ export class UserProfileModal extends BaseModal {
                             isSelected ? "text-white" : "text-white/90 group-hover:text-white"
                           }"
                         >
-                          ${country.name}
+                          ${localizedName}
                         </span>
                         <span
                           class="text-[10px] font-mono uppercase tracking-widest ${

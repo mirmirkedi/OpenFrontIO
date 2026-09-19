@@ -1892,6 +1892,10 @@
     "continent_oceania": "Oceania",
     "save": "Save Profile",
     "saved": "Profile saved successfully!",
-    "no_flags_found": "No flags match your search."
+    "no_flags_found": "No flags match your search.",
+    "default_username": "Player",
+    "clear_name": "Clear name",
+    "clear_search": "Clear search",
+    "flag": "Flag"
   }
 }

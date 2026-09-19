@@ -2098,6 +2098,10 @@
     "continent_oceania": "Okyanusya",
     "save": "Profili Kaydet",
     "saved": "Profil başarıyla kaydedildi!",
-    "no_flags_found": "Aramanıza uygun bayrak bulunamadı."
+    "no_flags_found": "Aramanıza uygun bayrak bulunamadı.",
+    "default_username": "Oyuncu",
+    "clear_name": "İsmi temizle",
+    "clear_search": "Aramayı temizle",
+    "flag": "Bayrak"
   }
 }
