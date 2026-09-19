@@ -126,9 +126,9 @@ class WorldFrontMusicController {
 
   private readEnabledPreference(): boolean {
     try {
-      return localStorage.getItem(MUSIC_ENABLED_KEY) !== "false";
+      return localStorage.getItem(MUSIC_ENABLED_KEY) === "true";
     } catch {
-      return true;
+      return false;
     }
   }
 }
