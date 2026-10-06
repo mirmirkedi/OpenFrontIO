@@ -29,7 +29,10 @@ const captureToast = (event: Event) => {
   toasts.push((event as CustomEvent<Toast>).detail);
 };
 
-function createSidebar(overrides: Partial<TimerState> = {}) {
+function createSidebar(
+  overrides: Partial<TimerState> = {},
+  gameType = GameType.Public,
+) {
   const state: TimerState = {
     elapsedSeconds: 0,
     inSpawnPhase: false,
@@ -42,7 +45,7 @@ function createSidebar(overrides: Partial<TimerState> = {}) {
     config: () => ({
       doomsdayClockConfig: () => undefined,
       gameConfig: () => ({
-        gameType: GameType.Public,
+        gameType,
         maxTimerValue: state.maxTimerValue,
       }),
       isReplay: () => false,
@@ -141,6 +144,26 @@ describe("GameRightSidebar end timer warnings", () => {
     expect(sidebar.querySelector("[data-game-timer]")?.className).toContain(
       "game-end-timer-flash",
     );
+  });
+
+  it("exposes tutorial speed and pause targets as accessible buttons", async () => {
+    const { sidebar } = createSidebar({}, GameType.Singleplayer);
+    await sidebar.updateComplete;
+
+    const speedButton = sidebar.querySelector<HTMLButtonElement>(
+      'button[data-tutorial-target="replay"]',
+    );
+    const pauseButton = sidebar.querySelector<HTMLButtonElement>(
+      'button[data-tutorial-target="pause"]',
+    );
+
+    expect(speedButton?.getAttribute("aria-label")).toBe(
+      "tutorial.controls.speed",
+    );
+    expect(pauseButton?.getAttribute("aria-label")).toBe(
+      "tutorial.controls.pause",
+    );
+    document.body.innerHTML = "";
   });
 
   it("flashes the whole sidebar for the last 10 seconds", async () => {

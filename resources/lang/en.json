@@ -1897,5 +1897,89 @@
     "clear_name": "Clear name",
     "clear_search": "Clear search",
     "flag": "Flag"
+  },
+  "tutorial": {
+    "progress": "STEP {current} OF {total}",
+    "zoom.assist": "Zoom in for me",
+    "spawn.assist": "Start here for me",
+    "expand.assist": "Expand here for me",
+    "attack.assist": "Attack this neighbor for me",
+    "controls.speed": "Open game speed controls",
+    "controls.pause": "Pause game",
+    "controls.resume": "Resume game",
+    "skip": "Skip tutorial",
+    "step": {
+      "zoom": {
+        "title": "Zoom in",
+        "hint": "Zoom into the highlighted area with +, scroll, or two fingers. Or use the Zoom In button."
+      },
+      "spawn": {
+        "title": "Choose your starting point",
+        "hint": "Tap the highlighted spot or another clear patch of land to choose where to start."
+      },
+      "expand": {
+        "title": "Expand your territory",
+        "hint": "Tap the highlighted open land, then choose Attack."
+      },
+      "attack": {
+        "title": "Attack a neighbor",
+        "hint": "Tap the highlighted neighboring country, then choose Attack."
+      },
+      "speed": {
+        "title": "Control game speed",
+        "hint": "Open the speed controls, then choose a speed."
+      },
+      "pause": {
+        "title": "Pause and resume",
+        "hint": "Tap Pause, then tap Resume to continue."
+      },
+      "city": {
+        "title": "Build a City",
+        "hint": "Tap the highlighted land, open Build, then choose City."
+      },
+      "factory": {
+        "title": "Build a Factory",
+        "hint": "Tap the highlighted land, open Build, then choose Factory."
+      },
+      "defense": {
+        "title": "Protect your border",
+        "hint": "Tap the highlighted land, open Build, then choose Defense Post."
+      },
+      "ally": {
+        "title": "Request an alliance",
+        "hint": "Tap the highlighted neighbor, then choose Request Alliance."
+      },
+      "port": {
+        "title": "Build a Port",
+        "hint": "Tap the highlighted coastal land, open Build, then choose Port."
+      },
+      "warship": {
+        "title": "Build a Warship",
+        "hint": "Tap the highlighted land, open Build, then choose Warship."
+      },
+      "silo": {
+        "title": "Build a Missile Silo",
+        "hint": "Tap the highlighted land, open Build, then choose Missile Silo."
+      },
+      "rocket": {
+        "title": "Launch an Atom Bomb",
+        "hint": "Tap the highlighted enemy, open Attack, then choose Atom Bomb."
+      },
+      "sam": {
+        "title": "Build a SAM Launcher",
+        "hint": "Tap the highlighted land, open Build, then choose SAM Launcher."
+      },
+      "leaderboard": {
+        "title": "Check the leaderboard",
+        "hint": "Open the leaderboard to compare your score with other players."
+      },
+      "win": {
+        "title": "Win the match",
+        "hint": "Attack the highlighted neighboring country. Keep expanding until you win."
+      }
+    },
+    "step.pause.resume": "The game is paused. Tap Resume to continue the tutorial.",
+    "skip.confirm": "Skip the tutorial? You can play it again from Help.",
+    "step.port.expand": "Expand with Attack until you reach a coast. The marker will point to a valid Port location."
   }
 }

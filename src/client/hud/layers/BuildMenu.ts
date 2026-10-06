@@ -127,7 +127,16 @@ export const flattenedBuildTable = buildTable.flat();
 const TUTORIAL_ACTIVE_KEY = "openfront.tutorial.active";
 const TUTORIAL_STEP_KEY = "openfront.tutorial.step";
 // Keep the build menu closed until the scripted tutorial reaches a build step.
-const TUTORIAL_BUILD_STEPS = new Set([6, 7, 8, 10, 12, 14]);
+export const TUTORIAL_BUILD_UNITS = new Map<number, UnitType>([
+  [6, UnitType.City],
+  [7, UnitType.Factory],
+  [8, UnitType.DefensePost],
+  [10, UnitType.Port],
+  [11, UnitType.Warship],
+  [12, UnitType.MissileSilo],
+  [14, UnitType.SAMLauncher],
+]);
+const TUTORIAL_BUILD_STEPS = new Set(TUTORIAL_BUILD_UNITS.keys());
 
 @customElement("build-menu")
 export class BuildMenu extends LitElement implements Controller {
@@ -466,6 +475,19 @@ export class BuildMenu extends LitElement implements Controller {
 
   render() {
     const openTroopApp = isOpenTroopApp();
+    const tutorialUnit =
+      localStorage.getItem(TUTORIAL_ACTIVE_KEY) === "true"
+        ? TUTORIAL_BUILD_UNITS.get(
+            Number(localStorage.getItem(TUTORIAL_STEP_KEY) ?? -1),
+          )
+        : undefined;
+    const visibleBuildTable = this.filteredBuildTable
+      .map((row) =>
+        tutorialUnit === undefined
+          ? row
+          : row.filter((item) => item.unitType === tutorialUnit),
+      )
+      .filter((row) => row.length > 0);
     return html`
       <div
         class="build-menu ${openTroopApp ? "opentroop-build-menu" : ""} ${this
@@ -477,7 +499,7 @@ export class BuildMenu extends LitElement implements Controller {
         ${openTroopApp
           ? html`<div class="opentroop-build-title">BUILD</div>`
           : null}
-        ${this.filteredBuildTable.map(
+        ${visibleBuildTable.map(
           (row) => html`
             <div class="build-row">
               ${row.map((item) => {

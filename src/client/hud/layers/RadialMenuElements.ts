@@ -17,7 +17,12 @@ import { Emoji, findClosestBy, flattenedEmojiTable } from "../../../core/Util";
 import { UIState } from "../../UIState";
 import { renderNumber, translateText } from "../../Utils";
 import { GameView, PlayerView } from "../../view";
-import { BuildItemDisplay, BuildMenu, flattenedBuildTable } from "./BuildMenu";
+import {
+  BuildItemDisplay,
+  BuildMenu,
+  flattenedBuildTable,
+  TUTORIAL_BUILD_UNITS,
+} from "./BuildMenu";
 import { ChatIntegration } from "./ChatIntegration";
 import { EmojiTable } from "./EmojiTable";
 import { PlayerActionHandler } from "./PlayerActionHandler";
@@ -128,6 +133,17 @@ export enum Slot {
   Ally = "ally",
   Back = "back",
   Delete = "delete",
+}
+
+function tutorialStep() {
+  return localStorage.getItem("openfront.tutorial.active") === "true"
+    ? Number(localStorage.getItem("openfront.tutorial.step") ?? -1)
+    : -1;
+}
+
+function tutorialExpectedUnit(): UnitType | undefined {
+  const step = tutorialStep();
+  return step === 13 ? UnitType.AtomBomb : TUTORIAL_BUILD_UNITS.get(step);
 }
 
 function isFriendlyTarget(params: MenuElementParams): boolean {
@@ -418,6 +434,7 @@ function createMenuElements(
     params.selected === params.myPlayer,
     params.game.config(),
   );
+  const requiredUnit = tutorialExpectedUnit();
 
   return flattenedBuildTable
     .filter(
@@ -425,7 +442,8 @@ function createMenuElements(
         unitTypes.has(item.unitType) &&
         (filterType === "attack"
           ? BuildableAttacks.has(item.unitType)
-          : !BuildableAttacks.has(item.unitType)),
+          : !BuildableAttacks.has(item.unitType)) &&
+        (requiredUnit === undefined || item.unitType === requiredUnit),
     )
     .map((item: BuildItemDisplay) => {
       return {
@@ -725,6 +743,14 @@ export const boatMenuElement: MenuElement = {
 
 export const centerButtonElement: CenterButtonElement = {
   disabled: (params: MenuElementParams): boolean => {
+    const step = tutorialStep();
+    if (
+      step !== -1 &&
+      ![1, 2, 3, 16].includes(step) &&
+      !(step === 10 && !params.game.hasOwner(params.tile))
+    ) {
+      return true;
+    }
     const tileOwner = params.game.owner(params.tile);
     const isLand = params.game.isLand(params.tile);
     if (!isLand) {
@@ -811,6 +837,22 @@ export const rootMenuElement: MenuElement = {
               : attackMenuElement,
           ]),
     ];
+
+    if (tutorialStep() !== -1) {
+      const step = tutorialStep();
+      if (isOwnTerritory && tutorialExpectedUnit() !== undefined) {
+        return [infoMenuElement, buildMenuElement];
+      }
+      if (step === 2 || step === 3 || step === 10 || step === 16) {
+        return [infoMenuElement];
+      }
+      if (step === 9) {
+        return [infoMenuElement, allyRequestElement];
+      }
+      if (step === 13) {
+        return [infoMenuElement, attackMenuElement];
+      }
+    }
 
     return menuItems.filter((item): item is MenuElement => item !== null);
   },

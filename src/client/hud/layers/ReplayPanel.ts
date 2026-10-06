@@ -100,6 +100,7 @@ export class ReplayPanel extends LitElement implements Controller {
 
     return html`
       <button
+        data-tutorial-target="replay-speed"
         class="py-0.5 px-1 text-sm text-white rounded-sm border transition border-gray-500 ${backgroundColor} hover:border-gray-200"
         @click=${() => this.onReplaySpeedChange(value)}
       >

@@ -17,9 +17,7 @@ export class TribeExecution implements Execution {
   private triggerRatio: number;
   private reserveRatio: number;
   private expandRatio: number;
-  private tutorialHumanTiles = 0;
-  private tutorialBaselineReady = false;
-  private tutorialNextActionTick = 0;
+  private tutorialAttackConsumed = false;
 
   constructor(private tribe: Player) {
     this.random = new PseudoRandom(simpleHash(tribe.id()));
@@ -48,15 +46,13 @@ export class TribeExecution implements Execution {
         .find(
           (player) => player.type() === PlayerType.Human && player.hasSpawned(),
         );
-      if (!human || human.numTilesOwned() <= this.tutorialHumanTiles) return;
-      if (!this.tutorialBaselineReady) {
-        this.tutorialHumanTiles = human.numTilesOwned();
-        this.tutorialBaselineReady = true;
+      if (!human) return;
+      if (human.outgoingAttacks().length === 0) {
+        this.tutorialAttackConsumed = false;
         return;
       }
-      if (ticks < this.tutorialNextActionTick) return;
-      this.tutorialHumanTiles = human.numTilesOwned();
-      this.tutorialNextActionTick = ticks + 30;
+      if (this.tutorialAttackConsumed) return;
+      this.tutorialAttackConsumed = true;
     } else if (ticks % this.attackRate !== this.attackTick) {
       return;
     }

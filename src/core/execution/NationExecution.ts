@@ -44,9 +44,7 @@ export class NationExecution implements Execution {
   private triggerRatio: number;
   private reserveRatio: number;
   private expandRatio: number;
-  private tutorialHumanTiles = 0;
-  private tutorialBaselineReady = false;
-  private tutorialNextActionTick = 0;
+  private tutorialAttackConsumed = false;
 
   private readonly embargoMalusApplied = new Set<PlayerID>();
 
@@ -115,15 +113,12 @@ export class NationExecution implements Execution {
           (player) => player.type() === PlayerType.Human && player.hasSpawned(),
         );
       if (!human) return;
-      if (!this.tutorialBaselineReady) {
-        this.tutorialHumanTiles = human.numTilesOwned();
-        this.tutorialBaselineReady = true;
+      if (human.outgoingAttacks().length === 0) {
+        this.tutorialAttackConsumed = false;
         return;
       }
-      if (human.numTilesOwned() <= this.tutorialHumanTiles) return;
-      if (ticks < this.tutorialNextActionTick) return;
-      this.tutorialHumanTiles = human.numTilesOwned();
-      this.tutorialNextActionTick = ticks + 30;
+      if (this.tutorialAttackConsumed) return;
+      this.tutorialAttackConsumed = true;
     }
 
     // Ship tracking

@@ -918,21 +918,26 @@ export class SinglePlayerModal extends BaseModal {
                 ? GameMapSize.Compact
                 : GameMapSize.Normal,
               gameType: GameType.Singleplayer,
-              gameMode: this.gameMode,
+              gameMode: tutorialMode ? GameMode.FFA : this.gameMode,
               playerTeams: this.teamCount,
               difficulty: tutorialMode
                 ? Difficulty.Easy
                 : this.selectedDifficulty,
-              maxTimerValue: finalMaxTimerValue,
-              bots: tutorialMode ? Math.min(this.bots, 5) : this.bots,
+              maxTimerValue: tutorialMode ? undefined : finalMaxTimerValue,
+              bots: tutorialMode
+                ? Math.max(1, Math.min(this.bots, 5))
+                : this.bots,
               infiniteGold: tutorialMode || this.infiniteGold,
               donateGold: this.gameMode === GameMode.Team,
               donateTroops: this.gameMode === GameMode.Team,
               infiniteTroops: tutorialMode ? false : this.infiniteTroops,
               instantBuild: tutorialMode || this.instantBuild,
               tutorial: tutorialMode,
-              randomSpawn: this.randomSpawn,
-              disabledUnits: this.disabledUnits
+              randomSpawn: tutorialMode ? false : this.randomSpawn,
+              disabledUnits: (tutorialMode
+                ? [UnitType.MIRV]
+                : this.disabledUnits
+              )
                 .map((u) => Object.values(UnitType).find((ut) => ut === u))
                 .filter((ut): ut is UnitType => ut !== undefined),
               nations: sliderToNationsConfig(
@@ -953,7 +958,7 @@ export class SinglePlayerModal extends BaseModal {
                 ? { customAllianceDuration: this.customAllianceMinutes ?? 0 }
                 : {}),
               ...(this.waterNukes ? { waterNukes: true } : {}),
-              ...(this.doomsdayClock
+              ...(!tutorialMode && this.doomsdayClock
                 ? {
                     doomsdayClock: {
                       enabled: true,

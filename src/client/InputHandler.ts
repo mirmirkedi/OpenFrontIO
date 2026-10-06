@@ -224,6 +224,7 @@ export class InputHandler {
   private lastPointerDownY: number = 0;
 
   private pointers: Map<number, PointerEvent> = new Map();
+  private tutorialSuppressedTouchPointers = new Set<number>();
 
   private lastPinchDistance: number = 0;
 
@@ -764,6 +765,25 @@ export class InputHandler {
       return;
     }
 
+    if (
+      event.pointerType === "touch" &&
+      localStorage.getItem("openfront.tutorial.active") === "true"
+    ) {
+      const tutorialStep = localStorage.getItem("openfront.tutorial.step");
+      if (tutorialStep === "0") {
+        this.tutorialSuppressedTouchPointers.add(event.pointerId);
+      } else if (this.pointers.size > 0) {
+        // Outside the zoom lesson, a second finger must not change the camera
+        // or become a map tap when either finger lifts.
+        for (const [pointerId, pointer] of this.pointers) {
+          if (pointer.pointerType === "touch") {
+            this.tutorialSuppressedTouchPointers.add(pointerId);
+          }
+        }
+        this.tutorialSuppressedTouchPointers.add(event.pointerId);
+      }
+    }
+
     // Tapping the battlefield returns to the uncluttered command view. Each
     // HUD layer decides whether it currently has a transient panel to close.
     this.eventBus.emit(new CloseViewEvent());
@@ -825,6 +845,9 @@ export class InputHandler {
     }
     this.pointerDown = false;
     this.pointers.clear();
+    const suppressTutorialTap = this.tutorialSuppressedTouchPointers.delete(
+      event.pointerId,
+    );
 
     // Clean up long-press state
     if (this.longPressTimer !== null) {
@@ -840,6 +863,15 @@ export class InputHandler {
       if (!this.selectionBoxActive) {
         this.suppressNextTap = true;
       }
+    }
+
+    // During the tutorial's initial zoom step, allow touch pointer movement
+    // through so two-finger pinch works, but don't interpret a one-finger tap
+    // as a spawn or map action.
+    if (suppressTutorialTap) {
+      this.selectionBoxActive = false;
+      this.suppressNextTap = false;
+      return;
     }
 
     // Complete selection box if it was active
@@ -1017,6 +1049,12 @@ export class InputHandler {
       this.lastPointerX = event.clientX;
       this.lastPointerY = event.clientY;
     } else if (this.pointers.size === 2) {
+      if (
+        localStorage.getItem("openfront.tutorial.active") === "true" &&
+        localStorage.getItem("openfront.tutorial.step") !== "0"
+      ) {
+        return;
+      }
       const currentPinchDistance = this.getPinchDistance();
       const pinchDelta = currentPinchDistance - this.lastPinchDistance;
 

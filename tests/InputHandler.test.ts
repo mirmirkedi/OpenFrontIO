@@ -3,10 +3,12 @@ import {
   ConfirmGhostStructureEvent,
   ContextMenuEvent,
   InputHandler,
+  TouchEvent,
   UnitSelectionEvent,
   WarshipSelectionBoxCancelEvent,
   WarshipSelectionBoxCompleteEvent,
   WarshipSelectionBoxUpdateEvent,
+  ZoomEvent,
 } from "../src/client/InputHandler";
 import { UIState } from "../src/client/UIState";
 import { GameView, PlayerView, UnitView } from "../src/client/view";
@@ -39,6 +41,154 @@ class MockPointerEvent {
 }
 
 global.PointerEvent = MockPointerEvent as any;
+
+describe("InputHandler tutorial zoom input", () => {
+  let inputHandler: InputHandler;
+  let eventBus: EventBus;
+
+  beforeEach(() => {
+    localStorage.removeItem("openfront.tutorial.active");
+    localStorage.removeItem("openfront.tutorial.step");
+    eventBus = new EventBus();
+    inputHandler = new InputHandler(
+      {
+        inSpawnPhase: () => true,
+        myPlayer: () => null,
+      } as GameView,
+      {
+        attackRatio: 20,
+        ghostStructure: null,
+        rocketDirectionUp: true,
+        upgradeMultiplier: 1,
+      },
+      document.createElement("canvas"),
+      eventBus,
+    );
+  });
+
+  afterEach(() => {
+    inputHandler.destroy();
+    localStorage.removeItem("openfront.tutorial.active");
+    localStorage.removeItem("openfront.tutorial.step");
+  });
+
+  test("suppresses a one-finger tap while the first tutorial step is zoom", () => {
+    localStorage.setItem("openfront.tutorial.active", "true");
+    localStorage.setItem("openfront.tutorial.step", "0");
+    const emit = vi.spyOn(eventBus, "emit");
+
+    inputHandler["onPointerDown"](
+      new PointerEvent("pointerdown", {
+        button: 0,
+        clientX: 200,
+        clientY: 200,
+        pointerId: 1,
+        pointerType: "touch",
+      }),
+    );
+    inputHandler["onPointerUp"](
+      new PointerEvent("pointerup", {
+        button: 0,
+        clientX: 200,
+        clientY: 200,
+        pointerId: 1,
+        pointerType: "touch",
+      }),
+    );
+
+    expect(emit).not.toHaveBeenCalledWith(expect.any(TouchEvent));
+  });
+
+  test("still emits zoom for a two-finger pinch during the zoom step", () => {
+    localStorage.setItem("openfront.tutorial.active", "true");
+    localStorage.setItem("openfront.tutorial.step", "0");
+    const emit = vi.spyOn(eventBus, "emit");
+
+    inputHandler["onPointerDown"](
+      new PointerEvent("pointerdown", {
+        button: 0,
+        clientX: 100,
+        clientY: 100,
+        pointerId: 1,
+        pointerType: "touch",
+      }),
+    );
+    inputHandler["onPointerDown"](
+      new PointerEvent("pointerdown", {
+        button: 0,
+        clientX: 150,
+        clientY: 100,
+        pointerId: 2,
+        pointerType: "touch",
+      }),
+    );
+    inputHandler["onPointerMove"](
+      new PointerEvent("pointermove", {
+        button: 0,
+        clientX: 170,
+        clientY: 100,
+        pointerId: 2,
+        pointerType: "touch",
+      }),
+    );
+
+    expect(emit.mock.calls.some(([event]) => event instanceof ZoomEvent)).toBe(
+      true,
+    );
+
+    // Completing the zoom step during the pinch must not turn either release
+    // into a spawn tap for the next tutorial step.
+    localStorage.setItem("openfront.tutorial.step", "1");
+    inputHandler["onPointerUp"](
+      new PointerEvent("pointerup", {
+        button: 0,
+        clientX: 100,
+        clientY: 100,
+        pointerId: 1,
+        pointerType: "touch",
+      }),
+    );
+    inputHandler["onPointerUp"](
+      new PointerEvent("pointerup", {
+        button: 0,
+        clientX: 170,
+        clientY: 100,
+        pointerId: 2,
+        pointerType: "touch",
+      }),
+    );
+    expect(emit.mock.calls.some(([event]) => event instanceof TouchEvent)).toBe(
+      false,
+    );
+  });
+
+  test("ignores two-finger zoom and both taps after the zoom lesson", () => {
+    localStorage.setItem("openfront.tutorial.active", "true");
+    localStorage.setItem("openfront.tutorial.step", "1");
+    const emit = vi.spyOn(eventBus, "emit");
+    const pointer = (type: string, x: number, pointerId: number) =>
+      new PointerEvent(type, {
+        button: 0,
+        clientX: x,
+        clientY: 100,
+        pointerId,
+        pointerType: "touch",
+      });
+
+    inputHandler["onPointerDown"](pointer("pointerdown", 100, 1));
+    inputHandler["onPointerDown"](pointer("pointerdown", 150, 2));
+    inputHandler["onPointerMove"](pointer("pointermove", 175, 2));
+    inputHandler["onPointerUp"](pointer("pointerup", 100, 1));
+    inputHandler["onPointerUp"](pointer("pointerup", 175, 2));
+
+    expect(emit.mock.calls.some(([event]) => event instanceof ZoomEvent)).toBe(
+      false,
+    );
+    expect(emit.mock.calls.some(([event]) => event instanceof TouchEvent)).toBe(
+      false,
+    );
+  });
+});
 
 describe("InputHandler AutoUpgrade", () => {
   let inputHandler: InputHandler;

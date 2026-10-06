@@ -23,6 +23,15 @@ vi.mock("../../../src/client/hud/layers/BuildMenu", async () => {
     typeof import("../../../src/core/game/Game")
   >("../../../src/core/game/Game");
   return {
+    TUTORIAL_BUILD_UNITS: new Map([
+      [6, UnitType.City],
+      [7, UnitType.Factory],
+      [8, UnitType.DefensePost],
+      [10, UnitType.Port],
+      [11, UnitType.Warship],
+      [12, UnitType.MissileSilo],
+      [14, UnitType.SAMLauncher],
+    ]),
     flattenedBuildTable: [
       {
         unitType: UnitType.City,

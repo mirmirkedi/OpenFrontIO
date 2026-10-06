@@ -2103,5 +2103,89 @@
     "clear_name": "İsmi temizle",
     "clear_search": "Aramayı temizle",
     "flag": "Bayrak"
+  },
+  "tutorial": {
+    "progress": "{total} ADIMIN {current}. ADIMI",
+    "zoom.assist": "Benim için yakınlaştır",
+    "spawn.assist": "Benim için buradan başla",
+    "expand.assist": "Benim için buradan genişle",
+    "attack.assist": "Benim için bu komşuya saldır",
+    "controls.speed": "Oyun hızı ayarlarını aç",
+    "controls.pause": "Oyunu duraklat",
+    "controls.resume": "Oyuna devam et",
+    "skip": "Eğitimi geç",
+    "step": {
+      "zoom": {
+        "title": "Haritayı yakınlaştır",
+        "hint": "Parlayan alana + tuşu, kaydırma veya iki parmakla yakınlaş. İstersen Yakınlaştır düğmesini kullan."
+      },
+      "spawn": {
+        "title": "Başlangıç noktanı seç",
+        "hint": "Başlangıç yerini seçmek için parlayan noktaya veya geniş ve boş bir araziye dokun."
+      },
+      "expand": {
+        "title": "Topraklarını genişlet",
+        "hint": "Parlayan boş araziye dokun, sonra Saldır seçeneğine bas."
+      },
+      "attack": {
+        "title": "Komşu ülkeye saldır",
+        "hint": "Parlayan komşu ülkeye dokun, sonra Saldır seçeneğine bas."
+      },
+      "speed": {
+        "title": "Oyun hızını ayarla",
+        "hint": "Hız kontrollerini aç, sonra bir hız seç."
+      },
+      "pause": {
+        "title": "Duraklat ve devam et",
+        "hint": "Duraklat düğmesine, ardından Devam et düğmesine bas."
+      },
+      "city": {
+        "title": "Şehir kur",
+        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve Şehir seç."
+      },
+      "factory": {
+        "title": "Fabrika kur",
+        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve Fabrika seç."
+      },
+      "defense": {
+        "title": "Sınırını koru",
+        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve Savunma Karakolu seç."
+      },
+      "ally": {
+        "title": "İttifak isteği gönder",
+        "hint": "Parlayan komşuna dokun ve İttifak İste seçeneğine bas."
+      },
+      "port": {
+        "title": "Liman kur",
+        "hint": "Parlayan kıyı arazine dokun, İnşa menüsünü aç ve Liman seç."
+      },
+      "warship": {
+        "title": "Savaş gemisi kur",
+        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve Savaş Gemisi seç."
+      },
+      "silo": {
+        "title": "Füze silosu kur",
+        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve Füze Silosu seç."
+      },
+      "rocket": {
+        "title": "Atom bombası fırlat",
+        "hint": "Parlayan düşmana dokun, Saldırı menüsünü aç ve Atom Bombası seç."
+      },
+      "sam": {
+        "title": "SAM fırlatıcısı kur",
+        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve SAM Fırlatıcısı seç."
+      },
+      "leaderboard": {
+        "title": "Skor tablosuna bak",
+        "hint": "Puanını diğer oyuncularla karşılaştırmak için skor tablosunu aç."
+      },
+      "win": {
+        "title": "Maçı kazan",
+        "hint": "Parlayan komşu ülkeye saldır. Kazanana kadar topraklarını genişlet."
+      }
+    },
+    "step.pause.resume": "Oyun duraklatıldı. Eğitime devam etmek için Devam et düğmesine bas.",
+    "skip.confirm": "Eğitimi geçmek istiyor musun? Yardım menüsünden yeniden oynayabilirsin.",
+    "step.port.expand": "Saldır seçeneğiyle kıyıya ulaşana kadar genişle. İşaretçi, Liman kurabileceğin yeri gösterecek."
   }
 }

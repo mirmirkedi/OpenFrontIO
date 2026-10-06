@@ -31,6 +31,8 @@ const LAST_MINUTE_SECONDS = 60;
 const FLASH_TIMER_SECONDS = 30;
 const FLASH_SIDEBAR_SECONDS = 10;
 const ONE_MINUTE_WARNING_DURATION_MS = 4_000;
+const TUTORIAL_ACTIVE_KEY = "openfront.tutorial.active";
+const TUTORIAL_STEP_KEY = "openfront.tutorial.step";
 
 @customElement("game-right-sidebar")
 export class GameRightSidebar extends LitElement implements Controller {
@@ -235,6 +237,13 @@ export class GameRightSidebar extends LitElement implements Controller {
     this.eventBus.emit(new PauseGameIntentEvent(this.isPaused));
   }
 
+  private isTutorialControlUnlocked(step: number) {
+    return (
+      localStorage.getItem(TUTORIAL_ACTIVE_KEY) !== "true" ||
+      localStorage.getItem(TUTORIAL_STEP_KEY) === String(step)
+    );
+  }
+
   private async onNewLobbyButtonClick() {
     if (this.newLobbyRequested) return;
     // Confirm so a stray click next to pause/exit doesn't yank everyone into a
@@ -408,6 +417,8 @@ export class GameRightSidebar extends LitElement implements Controller {
     const showPauseButton =
       isReplayOrSingleplayer ||
       (this.isLobbyCreator && !this.game.config().listed);
+    const replayUnlocked = this.isTutorialControlUnlocked(4);
+    const pauseUnlocked = this.isTutorialControlUnlocked(5);
     // The host of a private lobby can start a fresh lobby at any time, without
     // waiting to die or for the game to end.
     const showNewLobbyButton = this.isLobbyCreator && this.isPrivateLobby;
@@ -415,28 +426,43 @@ export class GameRightSidebar extends LitElement implements Controller {
     return html`
       ${isReplayOrSingleplayer
         ? html`
-            <div class="cursor-pointer" @click=${this.toggleReplayPanel}>
-              <img
-                data-tutorial-target="replay"
-                src=${FastForwardIconSolid}
-                alt="replay"
-                width="20"
-                height="20"
-              />
-            </div>
+            <button
+              type="button"
+              class="${replayUnlocked
+                ? "cursor-pointer"
+                : "cursor-not-allowed opacity-40"}"
+              data-tutorial-target="replay"
+              aria-label=${translateText("tutorial.controls.speed")}
+              ?disabled=${!replayUnlocked}
+              @click=${this.toggleReplayPanel}
+            >
+              <img src=${FastForwardIconSolid} alt="" width="20" height="20" />
+            </button>
           `
         : ""}
       ${showPauseButton
         ? html`
-            <div class="cursor-pointer" @click=${this.onPauseButtonClick}>
+            <button
+              type="button"
+              class="${pauseUnlocked
+                ? "cursor-pointer"
+                : "cursor-not-allowed opacity-40"}"
+              data-tutorial-target="pause"
+              aria-label=${translateText(
+                this.isPaused
+                  ? "tutorial.controls.resume"
+                  : "tutorial.controls.pause",
+              )}
+              ?disabled=${!pauseUnlocked}
+              @click=${this.onPauseButtonClick}
+            >
               <img
-                data-tutorial-target="pause"
                 src=${this.isPaused ? playIcon : pauseIcon}
-                alt="play/pause"
+                alt=""
                 width="20"
                 height="20"
               />
-            </div>
+            </button>
           `
         : ""}
       ${showNewLobbyButton
