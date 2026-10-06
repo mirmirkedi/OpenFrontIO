@@ -68,6 +68,7 @@ export class GameRightSidebar extends LitElement implements Controller {
   private newLobbyRequested = false;
   private spawnBarVisible = false;
   private immunityBarVisible = false;
+  private tutorialControlState = "";
 
   createRenderRoot() {
     // Stack the timer bar + doomsday-clock readout, centers aligned (the narrower
@@ -87,6 +88,7 @@ export class GameRightSidebar extends LitElement implements Controller {
       this.game?.config()?.gameConfig()?.gameType === GameType.Private;
     this._isVisible = true;
     this.hasShownOneMinuteWarning = false;
+    this.tutorialControlState = this.getTutorialControlState();
 
     this.eventBus.on(SpawnBarVisibleEvent, (e) => {
       this.spawnBarVisible = e.visible;
@@ -136,6 +138,12 @@ export class GameRightSidebar extends LitElement implements Controller {
   }
 
   tick() {
+    const tutorialControlState = this.getTutorialControlState();
+    if (tutorialControlState !== this.tutorialControlState) {
+      this.tutorialControlState = tutorialControlState;
+      this.requestUpdate();
+    }
+
     // Timer logic
     // Check if the player is the lobby creator
     if (!this.isLobbyCreator && this.game.myPlayer()?.isLobbyCreator()) {
@@ -242,6 +250,10 @@ export class GameRightSidebar extends LitElement implements Controller {
       localStorage.getItem(TUTORIAL_ACTIVE_KEY) !== "true" ||
       localStorage.getItem(TUTORIAL_STEP_KEY) === String(step)
     );
+  }
+
+  private getTutorialControlState() {
+    return `${localStorage.getItem(TUTORIAL_ACTIVE_KEY)}:${localStorage.getItem(TUTORIAL_STEP_KEY)}`;
   }
 
   private async onNewLobbyButtonClick() {

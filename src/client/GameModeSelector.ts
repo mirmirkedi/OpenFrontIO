@@ -1,7 +1,6 @@
 import { html, LitElement, nothing, type TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { ClientEnv } from "src/client/ClientEnv";
-import { isOpenTroopApp } from "./AppMode";
 import { assetUrl } from "../core/AssetUrls";
 import {
   Duos,
@@ -12,6 +11,7 @@ import {
   Trios,
 } from "../core/game/Game";
 import { PublicGameInfo, PublicGames } from "../core/Schemas";
+import { isOpenTroopApp } from "./AppMode";
 import "./components/IOSAddToHomeScreenBanner";
 import { HostLobbyModal } from "./HostLobbyModal";
 import { JoinLobbyModal } from "./JoinLobbyModal";
@@ -257,7 +257,9 @@ export class GameModeSelector extends LitElement {
         />
         <div class="opentroop-play-card__shade"></div>
         <div class="opentroop-play-card__content">
-          <div class="opentroop-play-card__badge">${translateText("worldfront.play_badge")}</div>
+          <div class="opentroop-play-card__badge">
+            ${translateText("worldfront.play_badge")}
+          </div>
           <div>
             <h2>${translateText("worldfront.play_title")}</h2>
             <p>${translateText("worldfront.play_description")}</p>
@@ -286,9 +288,19 @@ export class GameModeSelector extends LitElement {
 
   private openSinglePlayerModal = () => {
     if (!this.validateUsername()) return;
-    (
-      document.querySelector("single-player-modal") as SinglePlayerModal
-    )?.open();
+    const modal = document.querySelector(
+      "single-player-modal",
+    ) as SinglePlayerModal | null;
+    if (!modal) return;
+    void (async () => {
+      try {
+        if (await modal.startFirstGameWithDefaults()) return;
+        modal.open();
+      } catch (error) {
+        console.error("Failed to start first game with defaults", error);
+        modal.open();
+      }
+    })();
   };
 
   private openHostLobby = () => {

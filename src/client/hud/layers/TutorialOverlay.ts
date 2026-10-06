@@ -22,6 +22,7 @@ import {
 import type { UIState } from "../../UIState";
 import { translateText } from "../../Utils";
 import type { GameView } from "../../view";
+import { ShowReplayPanelEvent } from "./ReplayPanel";
 
 const ACTIVE_KEY = "openfront.tutorial.active";
 const COMPLETED_KEY = "openfront.tutorial.completed";
@@ -30,6 +31,8 @@ const STEP_KEY = "openfront.tutorial.step";
 const TUTORIAL_ZOOM_SCALE = 4.0;
 const TUTORIAL_ATTACK_RATIO = 0.15;
 const TARGET_REFRESH_INTERVAL_MS = 300;
+const EXPAND_ASSIST_INTERVAL_MS = 2_500;
+const EXPAND_ASSIST_MAX_ATTEMPTS = 8;
 
 type TutorialStep = {
   id: string;
@@ -307,6 +310,10 @@ export class TutorialOverlay extends LitElement implements Controller {
   private borderTilesRequest: Promise<void> | null = null;
   private nextBorderTilesRefreshAt = Number.NEGATIVE_INFINITY;
   private expandActionAt = Number.POSITIVE_INFINITY;
+  private expandAssistInterval: number | undefined;
+  private expandAssistAttempts = 0;
+  private rocketAssistInterval: number | undefined;
+  private rocketAssistAttempts = 0;
   private nextNeighborScanAt = Number.NEGATIVE_INFINITY;
 
   private readonly guardPointerDown = (event: PointerEvent) => {
@@ -554,15 +561,42 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   private expandForMe = () => {
     if (!this.active || this.current.id !== "expand") return;
-    const player = this.game.myPlayer();
-    if (!player) return;
-    this.eventBus.emit(
-      new SendAttackIntentEvent(
-        null,
-        player.troops() * this.uiState.attackRatio,
-      ),
+    if (this.expandAssistInterval !== undefined) return;
+    this.expandAssistAttempts = 0;
+    const expandOnce = () => {
+      if (!this.active || this.current.id !== "expand") {
+        this.stopExpandAssist();
+        return;
+      }
+      if (this.expandAssistAttempts >= EXPAND_ASSIST_MAX_ATTEMPTS) {
+        this.stopExpandAssist();
+        return;
+      }
+      this.expandAssistAttempts++;
+      const player = this.game.myPlayer();
+      if (!player) {
+        this.stopExpandAssist();
+        return;
+      }
+      this.eventBus.emit(
+        new SendAttackIntentEvent(
+          null,
+          player.troops() * this.uiState.attackRatio,
+        ),
+      );
+    };
+    expandOnce();
+    this.expandAssistInterval = window.setInterval(
+      expandOnce,
+      EXPAND_ASSIST_INTERVAL_MS,
     );
   };
+
+  private stopExpandAssist() {
+    if (this.expandAssistInterval === undefined) return;
+    window.clearInterval(this.expandAssistInterval);
+    this.expandAssistInterval = undefined;
+  }
 
   private attackForMe = () => {
     if (!this.active || this.current.id !== "attack") return;
@@ -584,6 +618,144 @@ export class TutorialOverlay extends LitElement implements Controller {
         player.troops() * this.uiState.attackRatio,
       ),
     );
+  };
+
+  private buildUnitForMe = () => {
+    const unit = this.current.unit;
+    if (!this.active || !unit) return;
+    const player = this.game.myPlayer();
+    if (unit === UnitType.Port && player && !this.hasCoastalTerritory(player)) {
+      return;
+    }
+    const target = this.findMapTarget();
+    if (!player || !target) return;
+    const cell = this.transformHandler.screenToWorldCoordinates(
+      target.left + target.width / 2,
+      target.top + target.height / 2,
+    );
+    if (!this.game.isValidCoord(cell.x, cell.y)) return;
+    const tile = this.game.ref(cell.x, cell.y);
+    if (
+      this.game.ownerID(tile) !== player.smallID() ||
+      this.game.isImpassable(tile)
+    ) {
+      return;
+    }
+    this.eventBus.emit(new BuildUnitIntentEvent(unit, tile));
+  };
+
+  private portForMe = () => {
+    if (!this.active || this.current.id !== "port") return;
+    const player = this.game.myPlayer();
+    if (!player) return;
+    if (this.hasCoastalTerritory(player)) {
+      this.buildUnitForMe();
+      return;
+    }
+    if (this.expandAssistInterval !== undefined) return;
+    this.expandAssistAttempts = 0;
+    const expandUntilCoast = () => {
+      if (!this.active || this.current.id !== "port") {
+        this.stopExpandAssist();
+        return;
+      }
+      const currentPlayer = this.game.myPlayer();
+      if (!currentPlayer) {
+        this.stopExpandAssist();
+        return;
+      }
+      if (this.hasCoastalTerritory(currentPlayer)) {
+        this.stopExpandAssist();
+        this.buildUnitForMe();
+        return;
+      }
+      if (this.expandAssistAttempts >= EXPAND_ASSIST_MAX_ATTEMPTS) {
+        this.stopExpandAssist();
+        return;
+      }
+      this.expandAssistAttempts++;
+      this.eventBus.emit(
+        new SendAttackIntentEvent(
+          null,
+          currentPlayer.troops() * this.uiState.attackRatio,
+        ),
+      );
+    };
+    expandUntilCoast();
+    this.expandAssistInterval = window.setInterval(
+      expandUntilCoast,
+      EXPAND_ASSIST_INTERVAL_MS,
+    );
+  };
+
+  private requestAllianceForMe = () => {
+    if (!this.active || this.current.id !== "ally") return;
+    const player = this.game.myPlayer();
+    const target = this.findMapTarget();
+    if (!player || !target) return;
+    const cell = this.transformHandler.screenToWorldCoordinates(
+      target.left + target.width / 2,
+      target.top + target.height / 2,
+    );
+    if (!this.game.isValidCoord(cell.x, cell.y)) return;
+    const tile = this.game.ref(cell.x, cell.y);
+    if (!this.game.hasOwner(tile)) return;
+    const recipient = this.game.owner(tile);
+    if (!recipient.isPlayer() || recipient.smallID() === player.smallID())
+      return;
+    this.eventBus.emit(new SendAllianceRequestIntentEvent(player, recipient));
+  };
+
+  private launchAtomBombForMe = () => {
+    if (!this.active || this.current.id !== "rocket") return;
+    const player = this.game.myPlayer();
+    if (!player || this.rocketAssistInterval !== undefined) return;
+    let siloBuildRequested = false;
+    let cameraFocusRequested = false;
+    const launchFromSilo = () => {
+      if (!this.active || this.current.id !== "rocket") {
+        this.stopRocketAssist();
+        return false;
+      }
+      const silo = this.game.myPlayer()?.units(UnitType.MissileSilo)[0];
+      if (!silo) return false;
+      this.stopRocketAssist();
+      this.eventBus.emit(
+        new BuildUnitIntentEvent(UnitType.AtomBomb, silo.tile()),
+      );
+      return true;
+    };
+    if (launchFromSilo()) return;
+
+    this.rocketAssistAttempts = 0;
+    const prepareAndLaunch = () => {
+      if (launchFromSilo()) return;
+      if (!siloBuildRequested) {
+        const tile = this.findOwnedLandTile(player);
+        if (tile !== undefined) {
+          siloBuildRequested = true;
+          this.eventBus.emit(
+            new BuildUnitIntentEvent(UnitType.MissileSilo, tile),
+          );
+        } else if (!cameraFocusRequested) {
+          // The rocket lesson highlights a neighboring enemy. The player's
+          // own territory can be outside the current viewport, so center it
+          // once to find a valid placement for the missing silo.
+          cameraFocusRequested = true;
+          this.eventBus.emit(new GoToPlayerEvent(player, 8));
+        }
+      }
+      this.rocketAssistAttempts++;
+      if (this.rocketAssistAttempts >= 20) this.stopRocketAssist();
+    };
+    this.rocketAssistInterval = window.setInterval(prepareAndLaunch, 500);
+    prepareAndLaunch();
+  };
+
+  private stopRocketAssist() {
+    if (this.rocketAssistInterval === undefined) return;
+    window.clearInterval(this.rocketAssistInterval);
+    this.rocketAssistInterval = undefined;
   };
 
   init() {
@@ -659,7 +831,10 @@ export class TutorialOverlay extends LitElement implements Controller {
     });
     this.eventBus.on(SendAttackIntentEvent, (event) => {
       if (this.current.id === "expand") {
-        this.expandActionAt = performance.now() + 2500;
+        this.expandActionAt = Math.min(
+          this.expandActionAt,
+          performance.now() + 2500,
+        );
       } else if (this.current.id === "attack" && event.targetID !== null) {
         // The spotlight is refreshed while the map grows, so the rendered
         // country can move by a few tiles between the hint and the tap. Any
@@ -679,7 +854,16 @@ export class TutorialOverlay extends LitElement implements Controller {
         this.complete("pause");
       }
     });
-    this.eventBus.on(ReplaySpeedChangeEvent, () => this.complete("speed"));
+    this.eventBus.on(ReplaySpeedChangeEvent, () => {
+      if (this.current.id !== "speed") return;
+      this.complete("speed");
+      this.eventBus.emit(
+        new ShowReplayPanelEvent(
+          false,
+          this.game.config().gameConfig().gameType === GameType.Singleplayer,
+        ),
+      );
+    });
     this.eventBus.on(SendWinnerEvent, (event) => {
       const player = this.game.myPlayer();
       const winner = event.winner;
@@ -731,6 +915,8 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   stop() {
     this.active = false;
+    this.stopExpandAssist();
+    this.stopRocketAssist();
     if (this.refreshTimer !== undefined)
       window.clearInterval(this.refreshTimer);
     if (this.zoomAnimationFrame !== undefined)
@@ -753,6 +939,8 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   private complete(id: string) {
     if (!this.active || this.current.id !== id) return;
+    this.stopExpandAssist();
+    this.stopRocketAssist();
     if (id === "expand") this.zoomOutForAttackStep();
     if (this.stepIndex >= STEPS.length - 1) {
       this.finish();
@@ -912,6 +1100,17 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (!this.transformHandler) return null;
     const player = this.game.myPlayer();
     if (!player && this.current.id !== "spawn") return null;
+    if (player && this.current.unit === UnitType.Warship) {
+      const port = player.units(UnitType.Port)[0];
+      if (!port) return null;
+      const point = this.transformHandler.worldToScreenCoordinates(
+        new Cell(
+          this.game.x(port.tile()) + 0.5,
+          this.game.y(port.tile()) + 0.5,
+        ),
+      );
+      return new DOMRect(point.x - 38, point.y - 38, 76, 76);
+    }
     if (
       player &&
       this.current.unit === UnitType.Port &&
@@ -967,6 +1166,35 @@ export class TutorialOverlay extends LitElement implements Controller {
       }
     }
     return best?.rect ?? null;
+  }
+
+  private findOwnedLandTile(player: TutorialPlayer) {
+    const left = Math.max(150, Math.min(430, window.innerWidth * 0.34));
+    const right = Math.max(left, window.innerWidth - 150);
+    const top = Math.max(140, window.innerHeight * 0.2);
+    const bottom = Math.max(top, window.innerHeight - 180);
+    const centerX = window.innerWidth * 0.5;
+    const centerY = window.innerHeight * 0.46;
+    let best: { tile: ReturnType<GameView["ref"]>; score: number } | null =
+      null;
+
+    for (let y = top; y <= bottom; y += 24) {
+      for (let x = left; x <= right; x += 24) {
+        const cell = this.transformHandler.screenToWorldCoordinates(x, y);
+        if (!this.game.isValidCoord(cell.x, cell.y)) continue;
+        const tile = this.game.ref(cell.x, cell.y);
+        if (
+          this.game.ownerID(tile) !== player.smallID() ||
+          !this.game.isLand(tile) ||
+          this.game.isImpassable(tile)
+        ) {
+          continue;
+        }
+        const score = Math.hypot(x - centerX, y - centerY);
+        if (!best || score < best.score) best = { tile, score };
+      }
+    }
+    return best?.tile;
   }
 
   private findAdjacentOpenLandTarget(
@@ -1287,6 +1515,31 @@ export class TutorialOverlay extends LitElement implements Controller {
       ${this.current.id === "attack"
         ? html`<button class="zoom-assist" @click=${this.attackForMe}>
             ${translateText("tutorial.attack.assist")}
+          </button>`
+        : null}
+      ${this.current.unit && this.current.unit !== UnitType.Port
+        ? html`<button class="zoom-assist" @click=${this.buildUnitForMe}>
+            ${translateText("tutorial.build.assist")}
+          </button>`
+        : null}
+      ${this.current.id === "ally"
+        ? html`<button class="zoom-assist" @click=${this.requestAllianceForMe}>
+            ${translateText("tutorial.ally.assist")}
+          </button>`
+        : null}
+      ${this.current.id === "port"
+        ? html`<button class="zoom-assist" @click=${this.portForMe}>
+            ${translateText(
+              this.game.myPlayer() &&
+                this.hasCoastalTerritory(this.game.myPlayer()!)
+                ? "tutorial.port.assist"
+                : "tutorial.port.coastAssist",
+            )}
+          </button>`
+        : null}
+      ${this.current.id === "rocket"
+        ? html`<button class="zoom-assist" @click=${this.launchAtomBombForMe}>
+            ${translateText("tutorial.rocket.assist")}
           </button>`
         : null}
     `;

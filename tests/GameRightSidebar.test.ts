@@ -84,6 +84,8 @@ describe("GameRightSidebar end timer warnings", () => {
 
   afterEach(() => {
     window.removeEventListener("show-message", captureToast);
+    localStorage.removeItem("openfront.tutorial.active");
+    localStorage.removeItem("openfront.tutorial.step");
     document.body.innerHTML = "";
   });
 
@@ -164,6 +166,34 @@ describe("GameRightSidebar end timer warnings", () => {
       "tutorial.controls.pause",
     );
     document.body.innerHTML = "";
+  });
+
+  it("unlocks speed and pause controls only on their tutorial steps", async () => {
+    localStorage.setItem("openfront.tutorial.active", "true");
+    localStorage.setItem("openfront.tutorial.step", "3");
+    const { sidebar } = createSidebar({}, GameType.Singleplayer);
+    await sidebar.updateComplete;
+
+    const speedButton = sidebar.querySelector<HTMLButtonElement>(
+      'button[data-tutorial-target="replay"]',
+    );
+    const pauseButton = sidebar.querySelector<HTMLButtonElement>(
+      'button[data-tutorial-target="pause"]',
+    );
+    expect(speedButton?.disabled).toBe(true);
+    expect(pauseButton?.disabled).toBe(true);
+
+    localStorage.setItem("openfront.tutorial.step", "4");
+    sidebar.tick();
+    await sidebar.updateComplete;
+    expect(speedButton?.disabled).toBe(false);
+    expect(pauseButton?.disabled).toBe(true);
+
+    localStorage.setItem("openfront.tutorial.step", "5");
+    sidebar.tick();
+    await sidebar.updateComplete;
+    expect(speedButton?.disabled).toBe(true);
+    expect(pauseButton?.disabled).toBe(false);
   });
 
   it("flashes the whole sidebar for the last 10 seconds", async () => {

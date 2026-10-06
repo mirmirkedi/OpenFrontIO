@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { ShowReplayPanelEvent } from "../../../../src/client/hud/layers/ReplayPanel";
 import { TutorialOverlay } from "../../../../src/client/hud/layers/TutorialOverlay";
 import {
   ReplaySpeedChangeEvent,
@@ -19,6 +20,7 @@ import { EventBus } from "../../../../src/core/EventBus";
 import { GameType, UnitType } from "../../../../src/core/game/Game";
 
 const ACTIVE_KEY = "openfront.tutorial.active";
+const COMPLETED_KEY = "openfront.tutorial.completed";
 const STEP_KEY = "openfront.tutorial.step";
 
 function createOverlay(step: number) {
@@ -160,6 +162,35 @@ describe("TutorialOverlay deterministic progression", () => {
     overlay.stop();
   });
 
+  test("expand assist retries at a bounded rate and stops after its limit", () => {
+    vi.useFakeTimers();
+    try {
+      const { eventBus, overlay } = createOverlay(2);
+      const sent: SendAttackIntentEvent[] = [];
+      eventBus.on(SendAttackIntentEvent, (event) => sent.push(event));
+      const player = {
+        troops: () => 100,
+        id: () => 1,
+        borderTiles: async () => ({ borderTiles: [] }),
+      };
+      overlay.game = {
+        myPlayer: () => player as never,
+      } as unknown as GameView;
+      const expandForMe = Reflect.get(overlay, "expandForMe") as
+        | (() => void)
+        | undefined;
+
+      expandForMe?.();
+      vi.advanceTimersByTime(20_000);
+      expect(sent).toHaveLength(8);
+      overlay.stop();
+      vi.advanceTimersByTime(5_000);
+      expect(sent).toHaveLength(8);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   test("attack assist targets the highlighted enemy", () => {
     const { eventBus, overlay } = createOverlay(3);
     const sent: SendAttackIntentEvent[] = [];
@@ -186,6 +217,172 @@ describe("TutorialOverlay deterministic progression", () => {
     expect(sent).toHaveLength(1);
     expect(sent[0].targetID).toBe("enemy");
     expect(sent[0].troops).toBe(15);
+    overlay.stop();
+  });
+
+  test("unit assist builds the current lesson unit on highlighted owned land", () => {
+    const { eventBus, overlay } = createOverlay(6);
+    const player = { smallID: () => 1 };
+    const received: BuildUnitIntentEvent[] = [];
+    eventBus.on(BuildUnitIntentEvent, (event) => received.push(event));
+    overlay.game = {
+      myPlayer: () => player,
+      isValidCoord: () => true,
+      ref: () => 42,
+      ownerID: () => 1,
+      isImpassable: () => false,
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      screenToWorldCoordinates: () => ({ x: 4, y: 9 }),
+    } as never;
+    Reflect.set(overlay, "findMapTarget", () => new DOMRect(100, 100, 76, 76));
+    const buildUnitForMe = Reflect.get(overlay, "buildUnitForMe") as
+      | (() => void)
+      | undefined;
+
+    expect(buildUnitForMe).toBeTypeOf("function");
+    buildUnitForMe?.call(overlay);
+    expect(received).toHaveLength(1);
+    expect(received[0].unit).toBe(UnitType.City);
+    expect(received[0].tile).toBe(42);
+    overlay.stop();
+  });
+
+  test("alliance assist requests an alliance with the highlighted neighbor", () => {
+    const { eventBus, overlay } = createOverlay(9);
+    const player = { smallID: () => 1 };
+    const neighbor = { smallID: () => 2, isPlayer: () => true };
+    const received: SendAllianceRequestIntentEvent[] = [];
+    eventBus.on(SendAllianceRequestIntentEvent, (event) =>
+      received.push(event),
+    );
+    overlay.game = {
+      myPlayer: () => player,
+      isValidCoord: () => true,
+      ref: () => 42,
+      hasOwner: () => true,
+      owner: () => neighbor,
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      screenToWorldCoordinates: () => ({ x: 4, y: 9 }),
+    } as never;
+    Reflect.set(overlay, "findMapTarget", () => new DOMRect(100, 100, 76, 76));
+    const requestAllianceForMe = Reflect.get(
+      overlay,
+      "requestAllianceForMe",
+    ) as (() => void) | undefined;
+
+    expect(requestAllianceForMe).toBeTypeOf("function");
+    requestAllianceForMe?.call(overlay);
+    expect(received).toHaveLength(1);
+    expect(received[0].requestor).toBe(player);
+    expect(received[0].recipient).toBe(neighbor);
+    overlay.stop();
+  });
+
+  test("port assist places a Port once a coast is available", () => {
+    const { eventBus, overlay } = createOverlay(10);
+    const player = { smallID: () => 1 };
+    const received: BuildUnitIntentEvent[] = [];
+    eventBus.on(BuildUnitIntentEvent, (event) => received.push(event));
+    overlay.game = {
+      myPlayer: () => player,
+      isValidCoord: () => true,
+      ref: () => 42,
+      ownerID: () => 1,
+      isImpassable: () => false,
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      screenToWorldCoordinates: () => ({ x: 4, y: 9 }),
+    } as never;
+    Reflect.set(overlay, "hasCoastalTerritory", () => true);
+    Reflect.set(overlay, "findMapTarget", () => new DOMRect(100, 100, 76, 76));
+    const portForMe = Reflect.get(overlay, "portForMe") as
+      | (() => void)
+      | undefined;
+
+    expect(portForMe).toBeTypeOf("function");
+    portForMe?.call(overlay);
+    expect(received).toHaveLength(1);
+    expect(received[0].unit).toBe(UnitType.Port);
+    expect(received[0].tile).toBe(42);
+    overlay.stop();
+  });
+
+  test("rocket assist launches from the player's Missile Silo", () => {
+    const { eventBus, overlay } = createOverlay(13);
+    const silo = { tile: () => 88 };
+    const player = { units: () => [silo] };
+    const received: BuildUnitIntentEvent[] = [];
+    eventBus.on(BuildUnitIntentEvent, (event) => received.push(event));
+    overlay.game = {
+      myPlayer: () => player,
+    } as unknown as GameView;
+    const launchAtomBombForMe = Reflect.get(overlay, "launchAtomBombForMe") as
+      | (() => void)
+      | undefined;
+
+    expect(launchAtomBombForMe).toBeTypeOf("function");
+    launchAtomBombForMe?.call(overlay);
+    expect(received).toHaveLength(1);
+    expect(received[0].unit).toBe(UnitType.AtomBomb);
+    expect(received[0].tile).toBe(88);
+    overlay.stop();
+  });
+
+  test("rocket assist builds a missing silo and launches when it is ready", () => {
+    vi.useFakeTimers();
+    try {
+      const { eventBus, overlay } = createOverlay(13);
+      const silo = { tile: () => 88 };
+      let silos: typeof silo[] = [];
+      const player = {
+        id: () => "player",
+        smallID: () => 1,
+        tiles: () => [42],
+        borderTiles: async () => ({ borderTiles: new Set<number>() }),
+        units: () => silos,
+      };
+      const received: BuildUnitIntentEvent[] = [];
+      eventBus.on(BuildUnitIntentEvent, (event) => received.push(event));
+      overlay.game = {
+        myPlayer: () => player,
+      } as unknown as GameView;
+      Reflect.set(overlay, "findOwnedLandTile", () => 42);
+      const launchAtomBombForMe = Reflect.get(overlay, "launchAtomBombForMe") as
+        | (() => void)
+        | undefined;
+
+      launchAtomBombForMe?.();
+      expect(received).toHaveLength(1);
+      expect(received[0].unit).toBe(UnitType.MissileSilo);
+      expect(received[0].tile).toBe(42);
+
+      silos = [silo];
+      vi.advanceTimersByTime(500);
+      expect(received).toHaveLength(2);
+      expect(received[1].unit).toBe(UnitType.AtomBomb);
+      expect(received[1].tile).toBe(88);
+      expect(localStorage.getItem(STEP_KEY)).toBe("14");
+      overlay.stop();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test("win lesson finishes only when the local player wins", () => {
+    const { eventBus, overlay } = createOverlay(16);
+    overlay.game = {
+      myPlayer: () => ({ clientID: () => "me", team: () => null }) as never,
+    } as unknown as GameView;
+
+    eventBus.emit(new SendWinnerEvent(["player", "other"], {} as never));
+    expect(localStorage.getItem(ACTIVE_KEY)).toBe("true");
+
+    eventBus.emit(new SendWinnerEvent(["player", "me"], {} as never));
+    expect(localStorage.getItem(ACTIVE_KEY)).toBeNull();
+    expect(localStorage.getItem(COMPLETED_KEY)).toBe("true");
+    expect(localStorage.getItem(STEP_KEY)).toBeNull();
     overlay.stop();
   });
 
@@ -328,8 +525,13 @@ describe("TutorialOverlay deterministic progression", () => {
     eventBus.emit(new SendAttackIntentEvent(2 as never, 100));
     expect(localStorage.getItem(STEP_KEY)).toBe("4");
 
+    let replayPanelVisible = true;
+    eventBus.on(ShowReplayPanelEvent, (event) => {
+      replayPanelVisible = event.visible;
+    });
     eventBus.emit(new ReplaySpeedChangeEvent(ReplaySpeedMultiplier.fast));
     expect(localStorage.getItem(STEP_KEY)).toBe("5");
+    expect(replayPanelVisible).toBe(false);
 
     eventBus.emit(new PauseGameIntentEvent(true));
     expect(localStorage.getItem(STEP_KEY)).toBe("5");

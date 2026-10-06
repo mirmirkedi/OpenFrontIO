@@ -78,6 +78,9 @@ const DEFAULT_OPTIONS = {
   doomsdayClockSpeed: "normal" as DoomsdayClockSpeed,
 } as const;
 
+const FIRST_SINGLEPLAYER_GAME_STARTED_KEY =
+  "openfront.singleplayer.first-game-started";
+
 const OPENTROOP_MAX_BOTS = 8;
 
 // A map earns achievements only if it has nations to conquer — the same rule
@@ -126,6 +129,7 @@ async function loadAchievementEligibleMaps(): Promise<Set<GameMapType> | null> {
 export class SinglePlayerModal extends BaseModal {
   protected routerName = "single-player";
   private tutorialRequested = false;
+  private firstGameStartPromise: Promise<void> | null = null;
 
   @state() private selectedMap: GameMapType = DEFAULT_OPTIONS.selectedMap;
   @state() private selectedDifficulty: Difficulty =
@@ -613,6 +617,28 @@ export class SinglePlayerModal extends BaseModal {
     void this.loadNationCount();
   }
 
+  /**
+   * Skip battle setup once so a new player can get into their first game
+   * immediately. Later visits still open the full configuration screen.
+   */
+  public async startFirstGameWithDefaults(): Promise<boolean> {
+    if (localStorage.getItem(FIRST_SINGLEPLAYER_GAME_STARTED_KEY) === "true") {
+      return false;
+    }
+
+    this.firstGameStartPromise ??= (async () => {
+      await this.loadNationCount();
+      await this.startGame();
+    })();
+
+    try {
+      await this.firstGameStartPromise;
+      return true;
+    } finally {
+      this.firstGameStartPromise = null;
+    }
+  }
+
   private handleSelectRandomMap() {
     if (isOpenTroopApp()) {
       this.handleMapSelection(GameMapType.World);
@@ -975,6 +1001,7 @@ export class SinglePlayerModal extends BaseModal {
         composed: true,
       }),
     );
+    localStorage.setItem(FIRST_SINGLEPLAYER_GAME_STARTED_KEY, "true");
     this.close();
   }
 
