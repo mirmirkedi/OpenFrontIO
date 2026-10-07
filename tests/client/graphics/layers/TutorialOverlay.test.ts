@@ -582,6 +582,8 @@ describe("TutorialOverlay deterministic progression", () => {
       hasOwner: () => true,
       ownerID: () => 1,
       unitsOwnedBy: () => [{ tile: () => structure, isActive: () => true }],
+      units: () => [{ tile: () => structure, isActive: () => true }],
+      config: () => ({ structureMinDist: () => 15 }),
     } as unknown as GameView;
     overlay.transformHandler = {
       screenToWorldCoordinates: (x: number, y: number) => ({ x, y }),
@@ -627,6 +629,8 @@ describe("TutorialOverlay deterministic progression", () => {
       hasOwner: (tile: number) => xOf(tile) < borderX,
       ownerID: () => 1,
       unitsOwnedBy: () => [{ tile: () => city, isActive: () => true }],
+      units: () => [{ tile: () => city, isActive: () => true }],
+      config: () => ({ structureMinDist: () => 15 }),
     } as unknown as GameView;
     overlay.transformHandler = {
       screenToWorldCoordinates: (x: number, y: number) => ({ x, y }),
@@ -647,6 +651,60 @@ describe("TutorialOverlay deterministic progression", () => {
       80,
     )).toBe(true);
     overlay.stop();
+  });
+
+  test("factory target remains findable in a narrow mobile viewport", () => {
+    const originalWidth = window.innerWidth;
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      value: 390,
+    });
+    const { overlay } = createOverlay(5);
+    const player = { smallID: () => 1, units: () => [] };
+    const width = 1000;
+    const borderX = 145;
+    const centerY = Math.round(window.innerHeight * 0.46);
+    const ref = (x: number, y: number) =>
+      Math.floor(y) * width + Math.floor(x);
+    const xOf = (tile: number) => tile % width;
+    const yOf = (tile: number) => Math.floor(tile / width);
+    const city = ref(100, centerY);
+    overlay.game = {
+      myPlayer: () => player,
+      isValidCoord: () => true,
+      ref,
+      x: xOf,
+      y: yOf,
+      isLand: () => true,
+      isImpassable: () => false,
+      hasOwner: (tile: number) => xOf(tile) < borderX,
+      ownerID: () => 1,
+      unitsOwnedBy: () => [{ tile: () => city, isActive: () => true }],
+      units: () => [{ tile: () => city, isActive: () => true }],
+      config: () => ({ structureMinDist: () => 15 }),
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      screenToWorldCoordinates: (x: number, y: number) => ({ x, y }),
+      worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
+    } as never;
+
+    try {
+      const target = Reflect.get(overlay, "findMapTarget").call(
+        overlay,
+      ) as DOMRect;
+      const centerX = target.left + target.width / 2;
+      const targetY = target.top + target.height / 2;
+
+      expect(target).not.toBeNull();
+      expect(centerX).toBeLessThan(borderX);
+      expect(Math.hypot(centerX - (xOf(city) + 0.5), targetY - (yOf(city) + 0.5))).toBeGreaterThan(15);
+    } finally {
+      overlay.stop();
+      Object.defineProperty(window, "innerWidth", {
+        configurable: true,
+        value: originalWidth,
+      });
+    }
   });
 
   test("attack step smoothly zooms out by 20 percent instead of fitting the whole map", () => {

@@ -2,7 +2,7 @@ import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { assetUrl } from "../../../core/AssetUrls";
 import { EventBus } from "../../../core/EventBus";
-import { Cell, GameType, UnitType } from "../../../core/game/Game";
+import { Cell, GameType, Structures, UnitType } from "../../../core/game/Game";
 import { activateTutorialForGame } from "../../TutorialProgress";
 import type { Controller } from "../../Controller";
 import {
@@ -1047,8 +1047,12 @@ export class TutorialOverlay extends LitElement implements Controller {
       return player ? this.findNeighborEnemyTarget(player) : null;
     }
 
-    const left = Math.max(150, Math.min(430, window.innerWidth * 0.34));
-    const right = Math.max(left, window.innerWidth - 150);
+    const sideMargin = Math.max(
+      MAP_SPOTLIGHT_RADIUS + 24,
+      Math.min(430, window.innerWidth * 0.12),
+    );
+    const left = sideMargin;
+    const right = Math.max(left, window.innerWidth - sideMargin);
     const top = Math.max(140, window.innerHeight * 0.2);
     const bottom = Math.max(top, window.innerHeight - 180);
     const targetX = window.innerWidth * 0.5;
@@ -1060,6 +1064,14 @@ export class TutorialOverlay extends LitElement implements Controller {
       player && (wantsOwnedLand || this.current.id === "expand")
         ? this.unitsOwnedBy(player)
         : [];
+    const buildStructures =
+      player && wantsOwnedLand
+        ? (this.game.units?.(...Structures.types) ?? []).filter((unit) =>
+            unit.isActive(),
+          )
+        : [];
+    const structureMinDistance =
+      this.game.config?.().structureMinDist?.() ?? 15;
 
     for (let y = top; y <= bottom; y += 16) {
       for (let x = left; x <= right; x += 16) {
@@ -1089,6 +1101,13 @@ export class TutorialOverlay extends LitElement implements Controller {
           !this.spotlightMatchesRegion(point.x, point.y, (sample) =>
             this.isLandOwnedBy(sample, ownerID),
           )
+        ) {
+          continue;
+        }
+        if (
+          player &&
+          wantsOwnedLand &&
+          !this.isValidStructureBuildTile(tile, buildStructures, structureMinDistance)
         ) {
           continue;
         }
@@ -1301,6 +1320,24 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   private unitsOwnedBy(player: TutorialPlayer) {
     return this.game.unitsOwnedBy?.(player.smallID()) ?? player.units?.() ?? [];
+  }
+
+  private isValidStructureBuildTile(
+    tile: number,
+    structures: readonly { tile: () => number }[],
+    minimumDistance: number,
+  ) {
+    const x = this.game.x(tile);
+    const y = this.game.y(tile);
+    return structures.every((structure) => {
+      const structureTile = structure.tile();
+      return (
+        Math.hypot(
+          x - this.game.x(structureTile),
+          y - this.game.y(structureTile),
+        ) >= minimumDistance
+      );
+    });
   }
 
   private hasUnitNearPoint(
