@@ -749,10 +749,7 @@ export const boatMenuElement: MenuElement = {
 export const centerButtonElement: CenterButtonElement = {
   disabled: (params: MenuElementParams): boolean => {
     const step = tutorialStep();
-    if (
-      step !== -1 &&
-      ![1, 2, 3, 14].includes(step)
-    ) {
+    if (step !== -1 && ![1, 2, 3, 14].includes(step)) {
       return true;
     }
     const tileOwner = params.game.owner(params.tile);
@@ -844,6 +841,14 @@ export const rootMenuElement: MenuElement = {
 
     if (tutorialStep() !== -1) {
       const step = tutorialStep();
+      if (step === 9) {
+        return [
+          { ...infoMenuElement, disabled: () => true },
+          { ...boatMenuElement, disabled: () => true },
+          { ...allyRequestElement, disabled: () => true },
+          attackMenuElement,
+        ];
+      }
       if (isOwnTerritory && tutorialExpectedUnit() !== undefined) {
         return step === 9
           ? [infoMenuElement, attackMenuElement]

@@ -27,6 +27,7 @@ import { modalHeader } from "./components/ui/ModalHeader";
 import { getPlayerCosmetics } from "./Cosmetics";
 import { crazyGamesSDK } from "./CrazyGamesSDK";
 import { clearActiveLocalGame } from "./LocalPersistantStats";
+import { prepareTutorialForGameStart } from "./TutorialProgress";
 import { JoinLobbyEvent } from "./Main";
 import { genAnonUsername, UsernameInput } from "./UsernameInput";
 import {
@@ -897,11 +898,6 @@ export class SinglePlayerModal extends BaseModal {
       this.tutorialRequested ||
       (localStorage.getItem("openfront.tutorial.completed") !== "true" &&
         localStorage.getItem("openfront.tutorial.skipped") !== "true");
-    if (tutorialMode) {
-      localStorage.setItem("openfront.tutorial.active", "true");
-      localStorage.removeItem("openfront.tutorial.skipped");
-      localStorage.removeItem("openfront.tutorial.step");
-    }
     // Validate and clamp maxTimer setting before starting
     let finalMaxTimerValue: number | undefined = undefined;
     if (this.maxTimer) {
@@ -939,6 +935,7 @@ export class SinglePlayerModal extends BaseModal {
     await usernameInput?.whenSeeded();
 
     await crazyGamesSDK.requestMidgameAd();
+    prepareTutorialForGameStart(tutorialMode);
     // The Continue Game action is the only route allowed to restore saved
     // turns. Starting a new battle always discards any older local snapshot.
     clearActiveLocalGame();

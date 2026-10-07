@@ -2,8 +2,17 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { CloseLeaderboardEvent } from "../../../../src/client/hud/layers/GameLeftSidebar";
 import { ShowReplayPanelEvent } from "../../../../src/client/hud/layers/ReplayPanel";
 import { TutorialOverlay } from "../../../../src/client/hud/layers/TutorialOverlay";
-import { MouseUpEvent, ZoomEvent } from "../../../../src/client/InputHandler";
-import { GoToPositionEvent } from "../../../../src/client/TransformHandler";
+import { TUTORIAL_LAUNCH_PENDING_KEY } from "../../../../src/client/TutorialProgress";
+import {
+  ContextMenuEvent,
+  MouseUpEvent,
+  TouchEvent,
+  ZoomEvent,
+} from "../../../../src/client/InputHandler";
+import {
+  GoToPlayerEvent,
+  GoToPositionEvent,
+} from "../../../../src/client/TransformHandler";
 import {
   BuildUnitIntentEvent,
   PauseGameIntentEvent,
@@ -26,7 +35,8 @@ function createOverlay(step: number) {
   localStorage.setItem(ACTIVE_KEY, "true");
   localStorage.setItem(STEP_KEY, String(step));
   localStorage.setItem(SPEED_STEP_REMOVED_KEY, "true");
-  localStorage.setItem(STEP_INDEX_VERSION_KEY, "2");
+  localStorage.setItem(STEP_INDEX_VERSION_KEY, "3");
+  sessionStorage.setItem(TUTORIAL_LAUNCH_PENDING_KEY, "true");
 
   const eventBus = new EventBus();
   const overlay = new TutorialOverlay();
@@ -49,6 +59,9 @@ describe("TutorialOverlay deterministic progression", () => {
     localStorage.removeItem(STEP_KEY);
     localStorage.removeItem(SPEED_STEP_REMOVED_KEY);
     localStorage.removeItem(STEP_INDEX_VERSION_KEY);
+    localStorage.removeItem(COMPLETED_KEY);
+    localStorage.removeItem("openfront.tutorial.skipped");
+    sessionStorage.removeItem(TUTORIAL_LAUNCH_PENDING_KEY);
   });
 
   afterEach(() => {
@@ -69,7 +82,7 @@ describe("TutorialOverlay deterministic progression", () => {
   test("closes any replay-speed panel when a tutorial starts", () => {
     localStorage.setItem(ACTIVE_KEY, "true");
     localStorage.setItem(STEP_KEY, "0");
-    localStorage.setItem(STEP_INDEX_VERSION_KEY, "2");
+    localStorage.setItem(STEP_INDEX_VERSION_KEY, "3");
     const eventBus = new EventBus();
     const visibleStates: boolean[] = [];
     eventBus.on(ShowReplayPanelEvent, (event) => {
@@ -89,6 +102,32 @@ describe("TutorialOverlay deterministic progression", () => {
 
     expect(visibleStates).toEqual([false]);
     overlay.stop();
+  });
+
+  test("renders step one immediately when tutorial starts after first render", async () => {
+    localStorage.setItem(ACTIVE_KEY, "true");
+    localStorage.setItem(STEP_KEY, "0");
+    localStorage.setItem(STEP_INDEX_VERSION_KEY, "3");
+    const overlay = new TutorialOverlay();
+    overlay.game = {
+      config: () => ({
+        gameConfig: () => ({ gameType: GameType.Singleplayer }),
+      }),
+      myPlayer: () => null,
+    } as unknown as GameView;
+    overlay.eventBus = new EventBus();
+    overlay.uiState = { attackRatio: 0.15 } as never;
+    overlay.transformHandler = {} as never;
+    document.body.append(overlay);
+    await overlay.updateComplete;
+
+    expect(overlay.shadowRoot?.querySelector(".hint")).toBeNull();
+    overlay.init();
+    await overlay.updateComplete;
+    const hint = overlay.shadowRoot?.querySelector(".hint");
+    overlay.remove();
+    overlay.stop();
+    expect(hint).not.toBeNull();
   });
 
   test("tutorial blocks clicks and keyboard activation on unrelated controls", () => {
@@ -163,7 +202,7 @@ describe("TutorialOverlay deterministic progression", () => {
   });
 
   test("renders icons on every tutorial action card with a matching asset", async () => {
-    for (const step of [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]) {
+    for (const step of [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]) {
       const { overlay } = createOverlay(step);
       document.body.append(overlay);
       await overlay.updateComplete;
@@ -403,6 +442,321 @@ describe("TutorialOverlay deterministic progression", () => {
     overlay.stop();
   });
 
+  test("map-target taps use the game's menu event at the exact selected tile", () => {
+    const { overlay, eventBus } = createOverlay(2);
+    const selections: ContextMenuEvent[] = [];
+    eventBus.on(ContextMenuEvent, (event) => selections.push(event));
+    overlay.game = {
+      x: () => 55,
+      y: () => 66,
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      worldToScreenCoordinates: () => ({ x: 455, y: 566 }),
+    } as never;
+    Reflect.set(overlay, "mapTargetTile", 42);
+    Reflect.set(overlay, "rect", new DOMRect(100, 100, 48, 48));
+    const canvas = document.createElement("canvas");
+    const down = {
+      pointerType: "mouse",
+      pointerId: 23,
+      button: 0,
+      clientX: 124,
+      clientY: 124,
+      composedPath: () => [canvas],
+      preventDefault: vi.fn(),
+      stopImmediatePropagation: vi.fn(),
+    } as unknown as PointerEvent;
+    Reflect.get(overlay, "guardPointerDown")(down);
+    const up = {
+      ...down,
+      type: "pointerup",
+      clientX: 125,
+      clientY: 125,
+    } as PointerEvent;
+    Reflect.get(overlay, "guardPointerEnd")(up);
+
+    expect(down.preventDefault).toHaveBeenCalled();
+    expect(down.stopImmediatePropagation).toHaveBeenCalled();
+    expect(selections).toHaveLength(1);
+    expect(selections[0]).toMatchObject({ x: 455, y: 566 });
+    overlay.stop();
+  });
+
+  test("touching a map target uses the game's touch path at its selected tile", () => {
+    const { overlay, eventBus } = createOverlay(2);
+    const selections: TouchEvent[] = [];
+    eventBus.on(TouchEvent, (event) => selections.push(event));
+    overlay.game = { x: () => 55, y: () => 66 } as unknown as GameView;
+    overlay.transformHandler = {
+      worldToScreenCoordinates: () => ({ x: 455, y: 566 }),
+    } as never;
+    Reflect.set(overlay, "mapTargetTile", 42);
+    Reflect.set(overlay, "rect", new DOMRect(100, 100, 48, 48));
+    const canvas = document.createElement("canvas");
+    const down = {
+      pointerType: "touch",
+      pointerId: 24,
+      button: 0,
+      clientX: 124,
+      clientY: 124,
+      composedPath: () => [canvas],
+      preventDefault: vi.fn(),
+      stopImmediatePropagation: vi.fn(),
+    } as unknown as PointerEvent;
+    Reflect.get(overlay, "guardPointerDown")(down);
+    Reflect.get(overlay, "guardPointerEnd")({
+      ...down,
+      type: "pointerup",
+      clientX: 125,
+      clientY: 125,
+    } as PointerEvent);
+
+    expect(selections).toHaveLength(1);
+    expect(selections[0]).toMatchObject({ x: 455, y: 566 });
+    overlay.stop();
+  });
+
+  test("expand target is entirely neutral land and clears the player's unit", () => {
+    const { overlay } = createOverlay(2);
+    const player = { smallID: () => 1, units: () => [] };
+    const width = 1000;
+    const ref = (x: number, y: number) => Math.floor(y) * width + Math.floor(x);
+    const xOf = (tile: number) => tile % width;
+    const yOf = (tile: number) => Math.floor(tile / width);
+    const occupied = ref(235, 394);
+    overlay.game = {
+      myPlayer: () => player,
+      isValidCoord: () => true,
+      ref,
+      x: xOf,
+      y: yOf,
+      isLand: () => true,
+      isImpassable: () => false,
+      hasFallout: () => false,
+      hasOwner: (tile: number) => tile === occupied,
+      ownerID: () => 1,
+      unitsOwnedBy: () => [{ tile: () => occupied, isActive: () => true }],
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      screenToWorldCoordinates: (x: number, y: number) => ({ x, y }),
+      worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
+    } as never;
+
+    const target = Reflect.get(overlay, "findMapTarget").call(overlay) as DOMRect;
+    const centerX = target.left + target.width / 2;
+    const centerY = target.top + target.height / 2;
+    const occupiedPoint = { x: xOf(occupied) + 0.5, y: yOf(occupied) + 0.5 };
+
+    expect(target).not.toBeNull();
+    expect(Reflect.get(overlay, "spotlightMatchesRegion").call(
+      overlay,
+      centerX,
+      centerY,
+      (tile: number) => !overlay.game.hasOwner(tile),
+    )).toBe(true);
+    expect(Math.hypot(centerX - occupiedPoint.x, centerY - occupiedPoint.y)).toBeGreaterThan(48);
+    overlay.stop();
+  });
+
+  test.each([
+    [5, UnitType.Factory],
+    [6, UnitType.DefensePost],
+    [10, UnitType.MissileSilo],
+    [12, UnitType.SAMLauncher],
+  ] as const)("build step %i targets empty owned land", (step, unitType) => {
+    const { overlay } = createOverlay(step);
+    const player = { smallID: () => 1, units: () => [] };
+    const width = 1000;
+    const ref = (x: number, y: number) => Math.floor(y) * width + Math.floor(x);
+    const xOf = (tile: number) => tile % width;
+    const yOf = (tile: number) => Math.floor(tile / width);
+    const structure = ref(235, 394);
+    overlay.game = {
+      myPlayer: () => player,
+      isValidCoord: () => true,
+      ref,
+      x: xOf,
+      y: yOf,
+      isLand: () => true,
+      isImpassable: () => false,
+      hasOwner: () => true,
+      ownerID: () => 1,
+      unitsOwnedBy: () => [{ tile: () => structure, isActive: () => true }],
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      screenToWorldCoordinates: (x: number, y: number) => ({ x, y }),
+      worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
+    } as never;
+
+    const target = Reflect.get(overlay, "findMapTarget").call(overlay) as DOMRect;
+    const centerX = target.left + target.width / 2;
+    const centerY = target.top + target.height / 2;
+    const structurePoint = { x: xOf(structure) + 0.5, y: yOf(structure) + 0.5 };
+
+    expect(target).not.toBeNull();
+    expect(Reflect.get(overlay, "current").unit).toBe(unitType);
+    expect(Reflect.get(overlay, "spotlightMatchesRegion").call(
+      overlay,
+      centerX,
+      centerY,
+      (tile: number) => overlay.game.ownerID(tile) === player.smallID(),
+    )).toBe(true);
+    expect(Math.hypot(centerX - structurePoint.x, centerY - structurePoint.y)).toBeGreaterThan(30);
+    overlay.stop();
+  });
+
+  test("build target favors the country's open interior over a nearby city and border", () => {
+    const { overlay } = createOverlay(5);
+    const player = { smallID: () => 1, units: () => [] };
+    const width = 1000;
+    const borderX = 560;
+    const centerY = Math.round(window.innerHeight * 0.46);
+    const ref = (x: number, y: number) =>
+      Math.floor(y) * width + Math.floor(x);
+    const xOf = (tile: number) => tile % width;
+    const yOf = (tile: number) => Math.floor(tile / width);
+    const city = ref(350, centerY);
+    overlay.game = {
+      myPlayer: () => player,
+      isValidCoord: () => true,
+      ref,
+      x: xOf,
+      y: yOf,
+      isLand: () => true,
+      isImpassable: () => false,
+      hasOwner: (tile: number) => xOf(tile) < borderX,
+      ownerID: () => 1,
+      unitsOwnedBy: () => [{ tile: () => city, isActive: () => true }],
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      screenToWorldCoordinates: (x: number, y: number) => ({ x, y }),
+      worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
+    } as never;
+
+    const target = Reflect.get(overlay, "findMapTarget").call(overlay) as DOMRect;
+    const centerX = target.left + target.width / 2;
+    const targetY = target.top + target.height / 2;
+
+    expect(centerX).toBeLessThan(borderX - 70);
+    expect(Math.hypot(centerX - (xOf(city) + 0.5), targetY - (yOf(city) + 0.5))).toBeGreaterThan(80);
+    expect(Reflect.get(overlay, "spotlightMatchesRegion").call(
+      overlay,
+      centerX,
+      targetY,
+      (tile: number) => overlay.game.hasOwner(tile) && overlay.game.ownerID(tile) === 1,
+      80,
+    )).toBe(true);
+    overlay.stop();
+  });
+
+  test("attack step smoothly zooms out by 20 percent instead of fitting the whole map", () => {
+    const { overlay, eventBus } = createOverlay(2);
+    const player = { smallID: () => 1 };
+    const emit = vi.spyOn(eventBus, "emit");
+    overlay.game = {
+      myPlayer: () => player,
+      width: () => 2000,
+    } as unknown as GameView;
+    overlay.transformHandler = { width: () => 400, scale: 4 } as never;
+
+    Reflect.get(overlay, "zoomOutForAttackStep").call(overlay);
+
+    expect(Reflect.get(overlay, "lockedZoomScale")).toBeCloseTo(3.2);
+    expect(emit).toHaveBeenCalledWith(
+      new GoToPlayerEvent(player as never, 3.2),
+    );
+    overlay.stop();
+  });
+
+  test("attack step does not zoom below the actual map-fit minimum", () => {
+    const { overlay, eventBus } = createOverlay(2);
+    const player = { smallID: () => 1 };
+    const emit = vi.spyOn(eventBus, "emit");
+    overlay.game = {
+      myPlayer: () => player,
+      width: () => 2000,
+    } as unknown as GameView;
+    overlay.transformHandler = { width: () => 400, scale: 0.25 } as never;
+
+    Reflect.get(overlay, "zoomOutForAttackStep").call(overlay);
+
+    expect(Reflect.get(overlay, "lockedZoomScale")).toBe(0.2);
+    expect(emit).toHaveBeenCalledWith(new GoToPlayerEvent(player as never, 0.2));
+    overlay.stop();
+  });
+
+  test("Warship spotlight is wholly ocean and keeps the Port as the clicked tile", () => {
+    const { overlay } = createOverlay(9);
+    const width = 1000;
+    const ref = (x: number, y: number) => Math.floor(y) * width + Math.floor(x);
+    const xOf = (tile: number) => tile % width;
+    const yOf = (tile: number) => Math.floor(tile / width);
+    const portTile = ref(200, 450);
+    const narrowSea = ref(225, 450);
+    const openSea = ref(300, 450);
+    const port = { tile: () => portTile, isActive: () => true };
+    const player = {
+      smallID: () => 1,
+      units: (type: UnitType) => (type === UnitType.Port ? [port] : []),
+    };
+    overlay.game = {
+      myPlayer: () => player,
+      isValidCoord: () => true,
+      ref,
+      x: xOf,
+      y: yOf,
+      isOcean: (tile: number) => xOf(tile) >= 276,
+      neighbors: (tile: number) =>
+        tile === portTile ? [narrowSea, openSea] : [],
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      screenToWorldCoordinates: (x: number, y: number) => ({ x, y }),
+      worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
+    } as never;
+
+    const target = Reflect.get(overlay, "findMapTarget").call(overlay) as DOMRect;
+    const centerX = target.left + target.width / 2;
+    const centerY = target.top + target.height / 2;
+
+    expect(target).not.toBeNull();
+    expect(Reflect.get(overlay, "mapTargetTile")).toBe(portTile);
+    expect(Reflect.get(overlay, "mapFocusTile")).toBe(openSea);
+    expect(Reflect.get(overlay, "spotlightMatchesRegion").call(
+      overlay,
+      centerX,
+      centerY,
+      (tile: number) => overlay.game.isOcean(tile),
+    )).toBe(true);
+    overlay.stop();
+  });
+
+  test("Warship lesson hides the spotlight when the Port has only a narrow sea edge", () => {
+    const { overlay } = createOverlay(9);
+    const portTile = 200;
+    const narrowSea = 225;
+    const port = { tile: () => portTile, isActive: () => true };
+    const player = {
+      smallID: () => 1,
+      units: (type: UnitType) => (type === UnitType.Port ? [port] : []),
+    };
+    overlay.game = {
+      myPlayer: () => player,
+      isValidCoord: () => true,
+      ref: (x: number) => Math.floor(x),
+      x: (tile: number) => tile,
+      y: () => 450,
+      isOcean: (tile: number) => tile >= 220,
+      neighbors: (tile: number) => (tile === portTile ? [narrowSea] : []),
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      screenToWorldCoordinates: (x: number, y: number) => ({ x, y }),
+      worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
+    } as never;
+
+    expect(Reflect.get(overlay, "findMapTarget").call(overlay)).toBeNull();
+    overlay.stop();
+  });
+
   test("Port lesson targets an owned ocean coast tile, not an inland lake shore", () => {
     const { overlay } = createOverlay(8);
     const centerX = window.innerWidth * 0.5;
@@ -412,12 +766,19 @@ describe("TutorialOverlay deterministic progression", () => {
       ownerID: () => 1,
       isOceanShore: (tile: number) => tile === 2,
       isShore: () => true,
+      isLand: () => true,
+      isFallout: () => false,
       isImpassable: () => false,
+      unitsOwnedBy: () => [],
+      neighbors: () => [],
+      isValidCoord: () => true,
+      ref: () => 1,
       x: (tile: number) => (tile === 2 ? centerX + 80 : centerX - 80),
       y: () => 300,
     } as unknown as GameView;
     overlay.transformHandler = {
       worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
+      screenToWorldCoordinates: () => ({ x: 1, y: 1 }),
     } as never;
     Reflect.set(overlay, "hasCoastalTerritory", () => true);
     Reflect.set(overlay, "enemyBorderTiles", new Set([1, 2]));
@@ -440,6 +801,11 @@ describe("TutorialOverlay deterministic progression", () => {
       x: (tile: number) => tile,
       y: () => 0,
       isOceanShore: (tile: number) => tile === 2,
+      isLand: () => true,
+      hasOwner: () => false,
+      isImpassable: () => false,
+      isValidCoord: () => true,
+      ref: () => 1,
     } as unknown as GameView;
     overlay.transformHandler = {
       worldToScreenCoordinates: (cell: { x: number }) => ({
@@ -473,12 +839,19 @@ describe("TutorialOverlay deterministic progression", () => {
       hasOwner: () => true,
       ownerID: () => 1,
       isOceanShore: () => true,
+      isLand: () => true,
+      hasFallout: () => false,
       isImpassable: () => false,
+      unitsOwnedBy: () => [],
+      neighbors: () => [],
+      isValidCoord: () => true,
+      ref: () => 1,
       x: (tile: number) => tile * 100,
       y: () => 300,
     } as unknown as GameView;
     overlay.transformHandler = {
       worldToScreenCoordinates: () => ({ x: 300, y: 300 }),
+      screenToWorldCoordinates: () => ({ x: 1, y: 1 }),
     } as never;
     Reflect.set(overlay, "hasCoastalTerritory", () => true);
     Reflect.set(overlay, "enemyBorderTiles", new Set([1, 2]));
@@ -503,30 +876,41 @@ describe("TutorialOverlay deterministic progression", () => {
     overlay.stop();
   });
 
-  test("attack lesson targets only a currently owned neighboring enemy tile", () => {
+  test("attack lesson puts the whole highlight inside a neighboring enemy country", () => {
     const { overlay } = createOverlay(3);
     const player = { smallID: () => 1 };
+    const width = 10_000;
+    const ref = (x: number, y: number) => Math.floor(y) * width + Math.floor(x);
+    const xOf = (tile: number) => tile % width;
+    const yOf = (tile: number) => Math.floor(tile / width);
+    const seed = ref(300, 300);
     overlay.game = {
       myPlayer: () => player,
+      isValidCoord: () => true,
+      ref,
+      x: xOf,
+      y: yOf,
       isLand: () => true,
       isImpassable: () => false,
       hasOwner: () => true,
-      ownerID: (tile: number) => (tile === 20 || tile === 30 ? 2 : 1),
-      neighbors: (tile: number) => (tile === 20 ? [10] : []),
-      x: () => 300,
-      y: () => 400,
+      ownerID: (tile: number) => (xOf(tile) >= 300 ? 2 : 1),
+      neighbors: (tile: number) => [tile - 1],
     } as unknown as GameView;
     overlay.transformHandler = {
-      worldToScreenCoordinates: () => ({ x: 300, y: 400 }),
+      screenToWorldCoordinates: (x: number, y: number) => ({ x, y }),
+      worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
     } as never;
-    Reflect.set(overlay, "adjacentEnemyTiles", new Set([10, 20, 30]));
+    Reflect.set(overlay, "adjacentEnemyTiles", new Set([seed]));
 
     const target = Reflect.get(overlay, "findNeighborEnemyTarget").call(
       overlay,
       player,
     ) as DOMRect | null;
 
-    expect(target).toEqual(new DOMRect(262, 362, 76, 76));
+    expect(target).not.toBeNull();
+    expect(target?.width).toBe(48);
+    expect(target!.left + target!.width / 2).toBeGreaterThan(300);
+    expect(Reflect.get(overlay, "mapTargetTile")).toBeGreaterThan(seed);
     overlay.stop();
   });
 
@@ -543,9 +927,11 @@ describe("TutorialOverlay deterministic progression", () => {
       neighbors: (tile: number) => (tile === 20 ? [10] : []),
       x: (tile: number) => tile,
       y: (tile: number) => tile,
+      isValidCoord: () => false,
     } as unknown as GameView;
     overlay.transformHandler = {
       worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
+      screenToWorldCoordinates: () => ({ x: 0, y: 0 }),
     } as never;
     Reflect.set(overlay, "adjacentEnemyTiles", new Set([20]));
 
@@ -553,6 +939,15 @@ describe("TutorialOverlay deterministic progression", () => {
 
     expect(target).toBeNull();
     expect(emit).toHaveBeenCalledWith(new GoToPositionEvent(20.5, 20.5));
+    overlay.stop();
+  });
+
+  test("map lessons do not show a fake center target before the player exists", () => {
+    const { overlay } = createOverlay(2);
+    overlay.game = { myPlayer: () => null } as unknown as GameView;
+    overlay.transformHandler = {} as never;
+
+    expect(Reflect.get(overlay, "findTarget").call(overlay)).toBeNull();
     overlay.stop();
   });
 
@@ -566,6 +961,7 @@ describe("TutorialOverlay deterministic progression", () => {
       hasOwner: () => true,
       ownerID: () => 1,
       neighbors: () => [],
+      isValidCoord: () => false,
     } as unknown as GameView;
     overlay.transformHandler = {
       worldToScreenCoordinates: () => ({ x: 300, y: 400 }),
@@ -577,7 +973,7 @@ describe("TutorialOverlay deterministic progression", () => {
   });
 
   test("final step hides Skip and restores controls only after confirmation", async () => {
-    const { overlay } = createOverlay(14);
+    const { overlay } = createOverlay(13);
     document.body.append(overlay);
     await overlay.updateComplete;
 
@@ -588,7 +984,7 @@ describe("TutorialOverlay deterministic progression", () => {
     expect(localStorage.getItem(ACTIVE_KEY)).toBe("true");
     // The test i18n stub returns the untranslated key, so verify the persisted
     // zero-based index instead of expecting translated interpolation text.
-    expect(localStorage.getItem(STEP_KEY)).toBe("14");
+    expect(localStorage.getItem(STEP_KEY)).toBe("13");
 
     const blocked = new KeyboardEvent("keydown", {
       bubbles: true,
@@ -649,6 +1045,7 @@ describe("TutorialOverlay deterministic progression", () => {
 
     localStorage.setItem(ACTIVE_KEY, "true");
     localStorage.setItem(STEP_KEY, "6");
+    sessionStorage.setItem(TUTORIAL_LAUNCH_PENDING_KEY, "true");
     const originalOverlay = makeOverlay();
     originalOverlay.init();
     expect(localStorage.getItem(STEP_KEY)).toBe("4");
@@ -657,10 +1054,34 @@ describe("TutorialOverlay deterministic progression", () => {
     localStorage.removeItem(STEP_INDEX_VERSION_KEY);
     localStorage.setItem(SPEED_STEP_REMOVED_KEY, "true");
     localStorage.setItem(STEP_KEY, "5");
+    sessionStorage.setItem(TUTORIAL_LAUNCH_PENDING_KEY, "true");
     const intermediateOverlay = makeOverlay();
     intermediateOverlay.init();
     expect(localStorage.getItem(STEP_KEY)).toBe("4");
     intermediateOverlay.stop();
+  });
+
+  test("moves v2 leaderboard and win saves to the new final step", () => {
+    localStorage.setItem(ACTIVE_KEY, "true");
+    localStorage.setItem(STEP_KEY, "14");
+    localStorage.setItem(STEP_INDEX_VERSION_KEY, "2");
+    sessionStorage.setItem(TUTORIAL_LAUNCH_PENDING_KEY, "true");
+    const overlay = new TutorialOverlay();
+    overlay.game = {
+      config: () => ({
+        gameConfig: () => ({ gameType: GameType.Singleplayer }),
+      }),
+      myPlayer: () => null,
+    } as unknown as GameView;
+    overlay.eventBus = new EventBus();
+    overlay.uiState = { attackRatio: 0.15 } as never;
+    overlay.transformHandler = {} as never;
+    overlay.init();
+
+    expect(localStorage.getItem(STEP_KEY)).toBe("13");
+    expect(localStorage.getItem(STEP_INDEX_VERSION_KEY)).toBe("3");
+    expect(Reflect.get(overlay, "current").id).toBe("win");
+    overlay.stop();
   });
 
   test("spawn lesson blocks unrelated HUD controls", () => {
@@ -752,7 +1173,7 @@ describe("TutorialOverlay deterministic progression", () => {
     overlay.stop();
   });
 
-  test("all 15 lessons advance from their intended successful action", async () => {
+  test("all 14 lessons advance from their intended successful action", async () => {
     const { eventBus, overlay } = createOverlay(0);
     const player = {
       hasSpawned: () => true,
@@ -766,9 +1187,11 @@ describe("TutorialOverlay deterministic progression", () => {
         gameConfig: () => ({ gameType: GameType.Singleplayer }),
       }),
       myPlayer: () => player,
+      width: () => 1000,
     } as unknown as GameView;
     const transformHandler = {
       scale: 4,
+      width: () => window.innerWidth,
       screenToCanvasCoordinates: () => ({ x: 0, y: 0 }),
       screenToWorldCoordinatesFloat: () => ({ x: 0, y: 0 }),
       worldToScreenCoordinates: () => ({ x: 200, y: 200 }),
@@ -824,32 +1247,18 @@ describe("TutorialOverlay deterministic progression", () => {
     eventBus.on(CloseLeaderboardEvent, () => {
       leaderboardCloseCount += 1;
     });
-    const requestFrame = vi
-      .spyOn(window, "requestAnimationFrame")
-      .mockImplementation((callback) => {
-        callback(0);
-        return 0;
-      });
-    const leaderboard = document.createElement("button");
-    leaderboard.dataset.tutorialTarget = "leaderboard";
-    document.body.append(leaderboard);
-    const leaderboardClick = {
-      composedPath: () => [leaderboard],
-      preventDefault: vi.fn(),
-      stopImmediatePropagation: vi.fn(),
-    } as unknown as MouseEvent;
-    (Reflect.get(overlay, "guardClick") as (event: MouseEvent) => void)(
-      leaderboardClick,
-    );
-    expect(localStorage.getItem(STEP_KEY)).toBe("14");
-    expect(leaderboardCloseCount).toBe(1);
-    leaderboard.remove();
-    await Promise.resolve();
-    expect(leaderboardCloseCount).toBe(3);
-    requestFrame.mockRestore();
-
+    expect(localStorage.getItem(STEP_KEY)).toBe("13");
+    expect(Reflect.get(overlay, "current").id).toBe("win");
+    document.body.append(overlay);
+    await overlay.updateComplete;
+    expect(overlay.shadowRoot?.querySelector(".continue")).not.toBeNull();
+    expect(localStorage.getItem(ACTIVE_KEY)).toBe("true");
     eventBus.emit(new SendWinnerEvent(["player", 1] as never, [] as never));
     expect(localStorage.getItem(ACTIVE_KEY)).toBe("true");
+    overlay.shadowRoot?.querySelector<HTMLButtonElement>(".continue")?.click();
+    expect(localStorage.getItem(ACTIVE_KEY)).toBeNull();
+    expect(leaderboardCloseCount).toBe(1);
+    overlay.remove();
     overlay.stop();
   });
 

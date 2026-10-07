@@ -440,6 +440,29 @@ describe("RadialMenuElements", () => {
       }
     });
 
+    it("dims Boat and leaves only Attack interactive for the Warship lesson", () => {
+      localStorage.setItem("openfront.tutorial.active", "true");
+      localStorage.setItem("openfront.tutorial.step", "9");
+      try {
+        const subMenu = rootMenuElement.subMenu!(mockParams);
+        const attack = subMenu.find((item) => item.id === Slot.Attack);
+        const boat = subMenu.find((item) => item.id === Slot.Boat);
+
+        expect(attack).toBeDefined();
+        expect(attack!.disabled(mockParams)).toBe(false);
+        expect(boat).toBeDefined();
+        expect(boat!.disabled(mockParams)).toBe(true);
+        expect(
+          subMenu
+            .filter((item) => item.id !== Slot.Attack)
+            .every((item) => item.disabled(mockParams)),
+        ).toBe(true);
+      } finally {
+        localStorage.removeItem("openfront.tutorial.active");
+        localStorage.removeItem("openfront.tutorial.step");
+      }
+    });
+
     it("should handle ally menu correctly", () => {
       const allyPlayer = {
         id: () => 2,
