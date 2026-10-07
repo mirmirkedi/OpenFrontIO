@@ -72,6 +72,22 @@ describe("BuildMenu tutorial silo choice", () => {
     localStorage.removeItem(STEP_KEY);
   });
 
+  test("treats the tutorial Silo as buildable in the radial-menu eligibility check", () => {
+    const menu = new BuildMenu();
+    menu.game = { myPlayer: () => ({}) } as unknown as GameView;
+    menu.playerBuildables = buildTable.flat().map((item) => ({
+      type: item.unitType,
+      canBuild: item.unitType === UnitType.MissileSilo ? false : 10,
+      canUpgrade: false,
+      cost: 10n,
+    })) as never;
+
+    const silo = buildTable.flat().find(
+      (item) => item.unitType === UnitType.MissileSilo,
+    )!;
+    expect(menu.canBuildOrUpgrade(silo)).toBe(true);
+  });
+
   test("keeps Missile Silo selectable and emits its build intent in the silo lesson", async () => {
     const menu = new BuildMenu();
     const eventBus = new EventBus();

@@ -2,6 +2,7 @@ import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { EventBus } from "../../../core/EventBus";
 import { Cell, GameType, UnitType } from "../../../core/game/Game";
+import { assetUrl } from "../../../core/AssetUrls";
 import type { Controller } from "../../Controller";
 import {
   AttackRatioEvent,
@@ -38,6 +39,7 @@ type TutorialStep = {
   hint: string;
   target?: string;
   unit?: UnitType;
+  icon?: string;
   mapTarget?: boolean;
 };
 
@@ -67,12 +69,14 @@ const STEPS: TutorialStep[] = [
     id: "attack",
     title: "tutorial.step.attack.title",
     hint: "tutorial.step.attack.hint",
+    icon: assetUrl("images/SwordIconWhite.svg"),
     mapTarget: true,
   },
   {
     id: "city",
     title: "tutorial.step.city.title",
     hint: "tutorial.step.city.hint",
+    icon: assetUrl("images/CityIconWhite.svg"),
     unit: UnitType.City,
     mapTarget: true,
   },
@@ -80,6 +84,7 @@ const STEPS: TutorialStep[] = [
     id: "factory",
     title: "tutorial.step.factory.title",
     hint: "tutorial.step.factory.hint",
+    icon: assetUrl("images/FactoryIconWhite.svg"),
     unit: UnitType.Factory,
     mapTarget: true,
   },
@@ -87,6 +92,7 @@ const STEPS: TutorialStep[] = [
     id: "defense",
     title: "tutorial.step.defense.title",
     hint: "tutorial.step.defense.hint",
+    icon: assetUrl("images/ShieldIconWhite.svg"),
     unit: UnitType.DefensePost,
     mapTarget: true,
   },
@@ -100,6 +106,7 @@ const STEPS: TutorialStep[] = [
     id: "port",
     title: "tutorial.step.port.title",
     hint: "tutorial.step.port.hint",
+    icon: assetUrl("images/PortIcon.svg"),
     unit: UnitType.Port,
     mapTarget: true,
   },
@@ -107,6 +114,7 @@ const STEPS: TutorialStep[] = [
     id: "warship",
     title: "tutorial.step.warship.title",
     hint: "tutorial.step.warship.hint",
+    icon: assetUrl("images/BattleshipIconWhite.svg"),
     unit: UnitType.Warship,
     mapTarget: true,
   },
@@ -114,6 +122,7 @@ const STEPS: TutorialStep[] = [
     id: "silo",
     title: "tutorial.step.silo.title",
     hint: "tutorial.step.silo.hint",
+    icon: assetUrl("images/MissileSiloIconWhite.svg"),
     unit: UnitType.MissileSilo,
     mapTarget: true,
   },
@@ -121,12 +130,14 @@ const STEPS: TutorialStep[] = [
     id: "rocket",
     title: "tutorial.step.rocket.title",
     hint: "tutorial.step.rocket.hint",
+    icon: assetUrl("images/NukeIconWhite.svg"),
     mapTarget: true,
   },
   {
     id: "sam",
     title: "tutorial.step.sam.title",
     hint: "tutorial.step.sam.hint",
+    icon: assetUrl("images/SamLauncherIconWhite.svg"),
     unit: UnitType.SAMLauncher,
     mapTarget: true,
   },
@@ -204,9 +215,22 @@ export class TutorialOverlay extends LitElement implements Controller {
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
+    .step-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin-bottom: 4px;
+    }
+    .step-icon {
+      width: 21px;
+      height: 21px;
+      flex: 0 0 auto;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+    }
     .step-title {
       display: block;
-      margin-bottom: 4px;
       color: #fff;
       font:
         700 14px/1.25 Inter,
@@ -1438,6 +1462,17 @@ export class TutorialOverlay extends LitElement implements Controller {
     return `${Math.max(safeTop, window.innerHeight - bottomReserve - hintHeight)}px`;
   }
 
+  private renderStepTitle() {
+    return html`
+      <span class="step-title-row">
+        ${this.current.icon
+          ? html`<img class="step-icon" src=${this.current.icon} alt="" aria-hidden="true" />`
+          : null}
+        <strong class="step-title">${translateText(this.current.title)}</strong>
+      </span>
+    `;
+  }
+
   render() {
     if (!this.active) return html``;
     if (!this.rect) {
@@ -1455,9 +1490,7 @@ export class TutorialOverlay extends LitElement implements Controller {
               total: STEPS.length,
             })}</span
           >
-          <strong class="step-title"
-            >${translateText(this.current.title)}</strong
-          >
+          ${this.renderStepTitle()}
           <span class="step-copy">${translateText(this.currentHintKey())}</span>
           ${this.renderContinueButton()}
         </div>
@@ -1493,7 +1526,7 @@ export class TutorialOverlay extends LitElement implements Controller {
             total: STEPS.length,
           })}</span
         >
-        <strong class="step-title">${translateText(this.current.title)}</strong>
+        ${this.renderStepTitle()}
         <span class="step-copy">${translateText(this.currentHintKey())}</span>
         ${this.renderContinueButton()}
       </div>

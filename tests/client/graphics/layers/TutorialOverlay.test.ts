@@ -146,6 +146,20 @@ describe("TutorialOverlay deterministic progression", () => {
     overlay.stop();
   });
 
+  test("shows the Missile Silo icon in its tutorial hint", async () => {
+    const { overlay } = createOverlay(10);
+    document.body.append(overlay);
+    await overlay.updateComplete;
+
+    const icon = overlay.shadowRoot?.querySelector<HTMLImageElement>(
+      ".step-title-row .step-icon",
+    );
+    expect(icon?.getAttribute("src")).toContain("MissileSiloIconWhite.svg");
+    expect(icon?.getAttribute("alt")).toBe("");
+    overlay.remove();
+    overlay.stop();
+  });
+
   test("zoom lesson has no tutorial auto-zoom action", async () => {
     const { overlay } = createOverlay(0);
     Reflect.set(overlay, "rect", new DOMRect(100, 100, 76, 76));

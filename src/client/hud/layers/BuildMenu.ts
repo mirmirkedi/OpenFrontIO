@@ -137,6 +137,13 @@ export const TUTORIAL_BUILD_UNITS = new Map<number, UnitType>([
 ]);
 const TUTORIAL_BUILD_STEPS = new Set(TUTORIAL_BUILD_UNITS.keys());
 
+function currentTutorialBuildUnit(): UnitType | undefined {
+  if (localStorage.getItem(TUTORIAL_ACTIVE_KEY) !== "true") return undefined;
+  return TUTORIAL_BUILD_UNITS.get(
+    Number(localStorage.getItem(TUTORIAL_STEP_KEY) ?? -1),
+  );
+}
+
 @customElement("build-menu")
 export class BuildMenu extends LitElement implements Controller {
   public game: GameView;
@@ -149,6 +156,12 @@ export class BuildMenu extends LitElement implements Controller {
 
   init() {
     this.eventBus.on(ShowBuildMenuEvent, (e) => {
+      // The tutorial uses the radial build submenu. Keep the legacy full
+      // build grid out of the tutorial so it cannot cover the lesson target.
+      if (localStorage.getItem(TUTORIAL_ACTIVE_KEY) === "true") {
+        this.hideMenu();
+        return;
+      }
       const tutorialStep = Number(
         localStorage.getItem(TUTORIAL_STEP_KEY) ?? -1,
       );
@@ -440,7 +453,11 @@ export class BuildMenu extends LitElement implements Controller {
       return false;
     }
     const unit = this.playerBuildables.find((u) => u.type === item.unitType);
-    return unit ? unit.canBuild !== false || unit.canUpgrade !== false : false;
+    return unit
+      ? unit.canBuild !== false ||
+          unit.canUpgrade !== false ||
+          currentTutorialBuildUnit() === item.unitType
+      : false;
   }
 
   public cost(item: BuildItemDisplay): Gold {
@@ -462,11 +479,7 @@ export class BuildMenu extends LitElement implements Controller {
   }
 
   public sendBuildOrUpgrade(buildableUnit: BuildableUnit, tile: TileRef): void {
-    const tutorialBuild =
-      localStorage.getItem(TUTORIAL_ACTIVE_KEY) === "true" &&
-      TUTORIAL_BUILD_UNITS.get(
-        Number(localStorage.getItem(TUTORIAL_STEP_KEY) ?? -1),
-      ) === buildableUnit.type;
+    const tutorialBuild = currentTutorialBuildUnit() === buildableUnit.type;
     if (buildableUnit.canUpgrade !== false) {
       this.eventBus.emit(
         new SendUpgradeStructureIntentEvent(
@@ -489,12 +502,7 @@ export class BuildMenu extends LitElement implements Controller {
 
   render() {
     const openTroopApp = isOpenTroopApp();
-    const tutorialUnit =
-      localStorage.getItem(TUTORIAL_ACTIVE_KEY) === "true"
-        ? TUTORIAL_BUILD_UNITS.get(
-            Number(localStorage.getItem(TUTORIAL_STEP_KEY) ?? -1),
-          )
-        : undefined;
+    const tutorialUnit = currentTutorialBuildUnit();
     // Keep the full build menu visible during the lesson. The active lesson
     // choice is enabled; alternatives stay visible but cannot be selected.
     const visibleBuildTable = this.filteredBuildTable;
