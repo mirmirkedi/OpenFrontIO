@@ -155,9 +155,31 @@ describe("TutorialOverlay deterministic progression", () => {
       ".step-title-row .step-icon",
     );
     expect(icon?.getAttribute("src")).toContain("MissileSiloIconWhite.svg");
+    expect(icon?.getAttribute("width")).toBe("32");
+    expect(icon?.getAttribute("height")).toBe("32");
     expect(icon?.getAttribute("alt")).toBe("");
     overlay.remove();
     overlay.stop();
+  });
+
+  test("renders icons on every tutorial action card with a matching asset", async () => {
+    for (const step of [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]) {
+      const { overlay } = createOverlay(step);
+      document.body.append(overlay);
+      await overlay.updateComplete;
+
+      const icon = overlay.shadowRoot?.querySelector<HTMLImageElement>(
+        ".step-title-row .step-icon",
+      );
+      expect(
+        icon,
+        `step ${step + 1} should render its action icon`,
+      ).not.toBeNull();
+      expect(icon?.getAttribute("src")).toContain("/images/");
+      expect(icon?.getAttribute("width")).toBe("32");
+      overlay.remove();
+      overlay.stop();
+    }
   });
 
   test("zoom lesson has no tutorial auto-zoom action", async () => {
@@ -405,6 +427,35 @@ describe("TutorialOverlay deterministic progression", () => {
     expect(target).not.toBeNull();
     expect(target.left + target.width / 2).toBeGreaterThan(centerX);
     expect(Reflect.get(overlay, "portTargetTile")).toBe(2);
+    overlay.stop();
+  });
+
+  test("Port expansion highlight never falls back to inland land", () => {
+    const { overlay } = createOverlay(8);
+    const player = { smallID: () => 1 };
+    const centerX = window.innerWidth * 0.5;
+    const centerY = window.innerHeight * 0.46;
+    overlay.game = {
+      myPlayer: () => player,
+      x: (tile: number) => tile,
+      y: () => 0,
+      isOceanShore: (tile: number) => tile === 2,
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      worldToScreenCoordinates: (cell: { x: number }) => ({
+        x: cell.x === 1.5 ? centerX : centerX + 80,
+        y: centerY,
+      }),
+    } as never;
+    Reflect.set(overlay, "adjacentUnownedLandTiles", new Set([1, 2]));
+
+    const target = Reflect.get(overlay, "findAdjacentOpenLandTarget").call(
+      overlay,
+      player,
+      true,
+    ) as DOMRect;
+
+    expect(target.left + target.width / 2).toBe(centerX + 80);
     overlay.stop();
   });
 
@@ -769,10 +820,16 @@ describe("TutorialOverlay deterministic progression", () => {
     eventBus.emit(new BuildUnitIntentEvent(UnitType.SAMLauncher, 42));
     expect(localStorage.getItem(STEP_KEY)).toBe("13");
 
-    let leaderboardClosed = false;
+    let leaderboardCloseCount = 0;
     eventBus.on(CloseLeaderboardEvent, () => {
-      leaderboardClosed = true;
+      leaderboardCloseCount += 1;
     });
+    const requestFrame = vi
+      .spyOn(window, "requestAnimationFrame")
+      .mockImplementation((callback) => {
+        callback(0);
+        return 0;
+      });
     const leaderboard = document.createElement("button");
     leaderboard.dataset.tutorialTarget = "leaderboard";
     document.body.append(leaderboard);
@@ -785,9 +842,11 @@ describe("TutorialOverlay deterministic progression", () => {
       leaderboardClick,
     );
     expect(localStorage.getItem(STEP_KEY)).toBe("14");
+    expect(leaderboardCloseCount).toBe(1);
     leaderboard.remove();
     await Promise.resolve();
-    expect(leaderboardClosed).toBe(true);
+    expect(leaderboardCloseCount).toBe(3);
+    requestFrame.mockRestore();
 
     eventBus.emit(new SendWinnerEvent(["player", 1] as never, [] as never));
     expect(localStorage.getItem(ACTIVE_KEY)).toBe("true");

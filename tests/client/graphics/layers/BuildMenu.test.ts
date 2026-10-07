@@ -3,10 +3,11 @@ import {
   BuildMenu,
   buildTable,
 } from "../../../../src/client/hud/layers/BuildMenu";
+import { ShowBuildMenuEvent } from "../../../../src/client/InputHandler";
+import { BuildUnitIntentEvent } from "../../../../src/client/Transport";
 import type { GameView } from "../../../../src/client/view";
 import { EventBus } from "../../../../src/core/EventBus";
 import { UnitType } from "../../../../src/core/game/Game";
-import { BuildUnitIntentEvent } from "../../../../src/client/Transport";
 
 const ACTIVE_KEY = "openfront.tutorial.active";
 const STEP_KEY = "openfront.tutorial.step";
@@ -57,8 +58,22 @@ describe("BuildMenu tutorial choices", () => {
         ),
     ).toBe(true);
   });
-});
 
+  test("does not open the legacy full build grid during the tutorial", () => {
+    const menu = new BuildMenu();
+    const eventBus = new EventBus();
+    menu.eventBus = eventBus;
+    menu.game = {
+      myPlayer: () => ({ isAlive: () => true }),
+    } as unknown as GameView;
+    menu.transformHandler = {
+      screenToWorldCoordinates: () => ({ x: 0, y: 0 }),
+    } as never;
+    menu.init();
+    eventBus.emit(new ShowBuildMenuEvent(10, 10));
+    expect(menu.isVisible).toBe(false);
+  });
+});
 
 describe("BuildMenu tutorial silo choice", () => {
   beforeEach(() => {
@@ -82,9 +97,9 @@ describe("BuildMenu tutorial silo choice", () => {
       cost: 10n,
     })) as never;
 
-    const silo = buildTable.flat().find(
-      (item) => item.unitType === UnitType.MissileSilo,
-    )!;
+    const silo = buildTable
+      .flat()
+      .find((item) => item.unitType === UnitType.MissileSilo)!;
     expect(menu.canBuildOrUpgrade(silo)).toBe(true);
   });
 

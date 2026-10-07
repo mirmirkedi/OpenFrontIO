@@ -1,11 +1,12 @@
 import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { assetUrl } from "../../../core/AssetUrls";
 import { EventBus } from "../../../core/EventBus";
 import { Cell, GameType, UnitType } from "../../../core/game/Game";
-import { assetUrl } from "../../../core/AssetUrls";
 import type { Controller } from "../../Controller";
 import {
   AttackRatioEvent,
+  CloseViewEvent,
   MouseUpEvent,
   ZOOM_DELTA_DIVISOR,
   ZoomEvent,
@@ -63,6 +64,7 @@ const STEPS: TutorialStep[] = [
     id: "expand",
     title: "tutorial.step.expand.title",
     hint: "tutorial.step.expand.hint",
+    icon: assetUrl("images/SwordIconWhite.svg"),
     mapTarget: true,
   },
   {
@@ -100,6 +102,7 @@ const STEPS: TutorialStep[] = [
     id: "ally",
     title: "tutorial.step.ally.title",
     hint: "tutorial.step.ally.hint",
+    icon: assetUrl("images/AllianceRequestWhiteIcon.svg"),
     mapTarget: true,
   },
   {
@@ -145,12 +148,14 @@ const STEPS: TutorialStep[] = [
     id: "leaderboard",
     title: "tutorial.step.leaderboard.title",
     hint: "tutorial.step.leaderboard.hint",
+    icon: assetUrl("images/LeaderboardIconRegularWhite.svg"),
     target: "leaderboard",
   },
   {
     id: "win",
     title: "tutorial.step.win.title",
     hint: "tutorial.step.win.hint",
+    icon: assetUrl("images/CrownIcon.svg"),
     mapTarget: true,
   },
 ];
@@ -219,15 +224,18 @@ export class TutorialOverlay extends LitElement implements Controller {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
+      gap: 9px;
       margin-bottom: 4px;
     }
     .step-icon {
-      width: 21px;
-      height: 21px;
+      display: block;
+      width: 32px;
+      height: 32px;
       flex: 0 0 auto;
       object-fit: contain;
-      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+      padding: 4px;
+      border-radius: 8px;
+      background: rgba(131, 223, 255, 0.14);
     }
     .step-title {
       display: block;
@@ -642,6 +650,7 @@ export class TutorialOverlay extends LitElement implements Controller {
     window.addEventListener("gesturestart", this.guardGesture, true);
     window.addEventListener("gestureend", this.guardGesture, true);
     this.eventBus.emit(new ShowReplayPanelEvent(false, isSinglePlayer));
+    this.eventBus.emit(new CloseViewEvent());
 
     this.eventBus.on(ZoomEvent, (event) => {
       if (!this.active) return;
@@ -783,9 +792,15 @@ export class TutorialOverlay extends LitElement implements Controller {
     this.tutorialAllowedPointers.clear();
     localStorage.setItem(STEP_KEY, String(this.stepIndex));
     if (id === "leaderboard") {
-      // The click opens the panel after this capture-phase handler advances the
-      // tutorial, so close it once the click has finished bubbling.
-      queueMicrotask(() => this.eventBus.emit(new CloseLeaderboardEvent()));
+      // Close immediately in case the panel was already open, then close once
+      // more after the click bubbles so the toggle cannot reopen it.
+      this.eventBus.emit(new CloseLeaderboardEvent());
+      queueMicrotask(() => {
+        this.eventBus.emit(new CloseLeaderboardEvent());
+        requestAnimationFrame(() =>
+          this.eventBus.emit(new CloseLeaderboardEvent()),
+        );
+      });
     }
     this.rect = null;
     this.requestUpdate();
@@ -799,6 +814,7 @@ export class TutorialOverlay extends LitElement implements Controller {
   }
 
   private finish() {
+    this.eventBus.emit(new CloseLeaderboardEvent());
     this.stop();
     localStorage.removeItem(ACTIVE_KEY);
     localStorage.setItem(COMPLETED_KEY, "true");
@@ -1137,13 +1153,24 @@ export class TutorialOverlay extends LitElement implements Controller {
     const centerX = window.innerWidth * 0.5;
     const centerY = window.innerHeight * 0.46;
     let best: { rect: DOMRect; score: number; tile: number } | null = null;
+    let bestCoast: {
+      point: { x: number; y: number };
+      score: number;
+      tile: number;
+    } | null = null;
 
     for (const tile of this.adjacentUnownedLandTiles) {
+      const isOceanCoast = this.game.isOceanShore(tile);
+      if (preferCoast && !isOceanCoast) continue;
       const x = this.game.x(tile);
       const y = this.game.y(tile);
       const point = this.transformHandler.worldToScreenCoordinates(
         new Cell(x + 0.5, y + 0.5),
       );
+      const score = Math.hypot(point.x - centerX, point.y - centerY);
+      if (preferCoast && (!bestCoast || score < bestCoast.score)) {
+        bestCoast = { tile, point, score };
+      }
       if (
         point.x < left ||
         point.x > right ||
@@ -1152,10 +1179,6 @@ export class TutorialOverlay extends LitElement implements Controller {
       ) {
         continue;
       }
-      const coastPriority =
-        preferCoast && !this.game.isOceanShore(tile) ? 10_000 : 0;
-      const score =
-        coastPriority + Math.hypot(point.x - centerX, point.y - centerY);
       if (!best || score < best.score) {
         best = {
           rect: new DOMRect(point.x - 38, point.y - 38, 76, 76),
@@ -1163,6 +1186,17 @@ export class TutorialOverlay extends LitElement implements Controller {
           tile,
         };
       }
+    }
+    if (!best && preferCoast && bestCoast && !this.portFocusRequested) {
+      this.portFocusRequested = true;
+      this.eventBus.emit(
+        new GoToPositionEvent(
+          this.game.x(bestCoast.tile) + 0.5,
+          this.game.y(bestCoast.tile) + 0.5,
+        ),
+      );
+    } else if (best && preferCoast) {
+      this.portFocusRequested = false;
     }
     return best?.rect ?? null;
   }
@@ -1466,7 +1500,14 @@ export class TutorialOverlay extends LitElement implements Controller {
     return html`
       <span class="step-title-row">
         ${this.current.icon
-          ? html`<img class="step-icon" src=${this.current.icon} alt="" aria-hidden="true" />`
+          ? html`<img
+              class="step-icon"
+              src=${this.current.icon}
+              width="32"
+              height="32"
+              alt=""
+              aria-hidden="true"
+            />`
           : null}
         <strong class="step-title">${translateText(this.current.title)}</strong>
       </span>
