@@ -255,6 +255,16 @@ export class BuildMenu extends LitElement implements Controller {
     .build-button:disabled img {
       opacity: 0.5;
     }
+    .build-button.tutorial-dimmed {
+      opacity: 0.42;
+      filter: saturate(0.65);
+    }
+    .build-button.tutorial-dimmed img {
+      opacity: 0.85;
+    }
+    .build-button.tutorial-dimmed:disabled .build-cost {
+      color: rgba(255, 255, 255, 0.78);
+    }
     .build-button:disabled .build-cost {
       color: #ff4444;
     }
@@ -481,13 +491,9 @@ export class BuildMenu extends LitElement implements Controller {
             Number(localStorage.getItem(TUTORIAL_STEP_KEY) ?? -1),
           )
         : undefined;
-    const visibleBuildTable = this.filteredBuildTable
-      .map((row) =>
-        tutorialUnit === undefined
-          ? row
-          : row.filter((item) => item.unitType === tutorialUnit),
-      )
-      .filter((row) => row.length > 0);
+    // Keep the full build menu visible during the lesson. The active lesson
+    // choice is enabled; alternatives stay visible but cannot be selected.
+    const visibleBuildTable = this.filteredBuildTable;
     return html`
       <div
         class="build-menu ${openTroopApp ? "opentroop-build-menu" : ""} ${this
@@ -512,13 +518,17 @@ export class BuildMenu extends LitElement implements Controller {
                 const enabled =
                   buildableUnit.canBuild !== false ||
                   buildableUnit.canUpgrade !== false;
+                const tutorialDimmed =
+                  tutorialUnit !== undefined && item.unitType !== tutorialUnit;
                 return html`
                   <button
-                    class="build-button"
+                    class="build-button ${tutorialDimmed
+                      ? "tutorial-dimmed"
+                      : ""}"
                     data-tutorial-unit=${item.unitType}
                     @click=${() =>
                       this.sendBuildOrUpgrade(buildableUnit, this.clickedTile)}
-                    ?disabled=${!enabled}
+                    ?disabled=${!enabled || tutorialDimmed}
                     title=${!enabled
                       ? translateText("build_menu.not_enough_money")
                       : ""}

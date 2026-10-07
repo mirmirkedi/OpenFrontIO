@@ -10,7 +10,7 @@ import {
   ZoomEvent,
 } from "../../InputHandler";
 import type { TransformHandler } from "../../TransformHandler";
-import { GoToPlayerEvent } from "../../TransformHandler";
+import { GoToPlayerEvent, GoToPositionEvent } from "../../TransformHandler";
 import {
   BuildUnitIntentEvent,
   PauseGameIntentEvent,
@@ -278,12 +278,17 @@ export class TutorialOverlay extends LitElement implements Controller {
   private refreshTimer: number | undefined;
   private lockedZoomScale: number | null = null;
   private zoomCenterWorld: { x: number; y: number } | null = null;
+  private attackNeighborFocusRequested = false;
   private tutorialGestureScale: number | null = null;
   private pauseStepPaused = false;
   private tutorialAllowedPointers = new Set<number>();
   private enemyBorderTiles: ReadonlySet<number> = new Set();
   private adjacentEnemyTiles: ReadonlySet<number> = new Set();
   private adjacentUnownedLandTiles: ReadonlySet<number> = new Set();
+  private invalidPortTargets = new Set<number>();
+  private portTargetTile: ReturnType<GameView["ref"]> | null = null;
+  private portTargetRequest: Promise<void> | null = null;
+  private portFocusRequested = false;
   private mapActionMenuAllowed = false;
   private borderTilesRequest: Promise<void> | null = null;
   private nextBorderTilesRefreshAt = Number.NEGATIVE_INFINITY;
@@ -669,6 +674,8 @@ export class TutorialOverlay extends LitElement implements Controller {
       return;
     }
     this.stepIndex += 1;
+    this.attackNeighborFocusRequested = false;
+    this.portFocusRequested = false;
     this.mapActionMenuAllowed = false;
     this.pauseStepPaused = false;
     this.tutorialAllowedPointers.clear();
@@ -793,7 +800,7 @@ export class TutorialOverlay extends LitElement implements Controller {
       .some((node) => node instanceof Element && node.matches(selector));
   }
 
-  private findTarget(): DOMRect {
+  private findTarget(): DOMRect | null {
     const selector = this.currentTargetSelector();
     const element = selector ? this.findElement(selector) : null;
     if (element && this.isVisibleElement(selector!))
@@ -802,6 +809,12 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (this.current.mapTarget) {
       const mapTarget = this.findMapTarget();
       if (mapTarget) return mapTarget;
+    }
+
+    // Enemy-target lessons must never silently point at the map center: at
+    // some zoom levels that is the player's own country.
+    if (["attack", "ally", "rocket", "win"].includes(this.current.id)) {
+      return null;
     }
 
     const width = this.current.id === "leaderboard" ? 58 : 116;
@@ -818,6 +831,12 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (!this.transformHandler) return null;
     const player = this.game.myPlayer();
     if (!player && this.current.id !== "spawn") return null;
+    if (player && this.current.unit === UnitType.Port) {
+      if (!this.hasCoastalTerritory(player)) {
+        return this.findAdjacentOpenLandTarget(player, true);
+      }
+      return this.findOwnedOceanCoastTarget(player);
+    }
     if (player && this.current.unit === UnitType.Warship) {
       const port = player.units(UnitType.Port)[0];
       if (!port) return null;
@@ -828,13 +847,6 @@ export class TutorialOverlay extends LitElement implements Controller {
         ),
       );
       return new DOMRect(point.x - 38, point.y - 38, 76, 76);
-    }
-    if (
-      player &&
-      this.current.unit === UnitType.Port &&
-      !this.hasCoastalTerritory(player)
-    ) {
-      return this.findAdjacentOpenLandTarget(player, true);
     }
     if (this.current.id === "expand" && player) {
       return this.findAdjacentOpenLandTarget(player);
@@ -865,12 +877,22 @@ export class TutorialOverlay extends LitElement implements Controller {
         if (!this.game.isValidCoord(cell.x, cell.y)) continue;
         const tile = this.game.ref(cell.x, cell.y);
         if (
+          this.current.unit === UnitType.Port &&
+          this.invalidPortTargets.has(tile)
+        ) {
+          continue;
+        }
+        if (
           wantsOwnedLand &&
           (!player || this.game.ownerID(tile) !== player.smallID())
         )
           continue;
-        if (this.current.unit === UnitType.Port && !this.game.isShore(tile))
+        if (
+          this.current.unit === UnitType.Port &&
+          !this.game.isOceanShore(tile)
+        ) {
           continue;
+        }
         if (wantsEmptyLand && !this.isOpenLand(cell.x, cell.y, tile)) continue;
         if (!wantsEmptyLand && !wantsEnemy && !this.game.isLand(tile)) continue;
         if (this.game.isImpassable(tile)) continue;
@@ -884,6 +906,92 @@ export class TutorialOverlay extends LitElement implements Controller {
       }
     }
     return best?.rect ?? null;
+  }
+
+  private findOwnedOceanCoastTarget(player: TutorialPlayer): DOMRect | null {
+    const inView = (point: { x: number; y: number }) =>
+      point.x >= 80 &&
+      point.x <= window.innerWidth - 80 &&
+      point.y >= 100 &&
+      point.y <= window.innerHeight - 140;
+
+    if (
+      this.portTargetTile !== null &&
+      !this.invalidPortTargets.has(this.portTargetTile) &&
+      this.game.hasOwner(this.portTargetTile) &&
+      this.game.ownerID(this.portTargetTile) === player.smallID() &&
+      this.game.isOceanShore(this.portTargetTile) &&
+      !this.game.isImpassable(this.portTargetTile)
+    ) {
+      const point = this.transformHandler.worldToScreenCoordinates(
+        new Cell(
+          this.game.x(this.portTargetTile) + 0.5,
+          this.game.y(this.portTargetTile) + 0.5,
+        ),
+      );
+      if (inView(point)) return new DOMRect(point.x - 38, point.y - 38, 76, 76);
+      if (!this.portFocusRequested) {
+        this.portFocusRequested = true;
+        this.eventBus.emit(
+          new GoToPositionEvent(
+            this.game.x(this.portTargetTile) + 0.5,
+            this.game.y(this.portTargetTile) + 0.5,
+          ),
+        );
+      }
+      return null;
+    }
+
+    this.portTargetTile = null;
+    this.portFocusRequested = false;
+    const centerX = window.innerWidth * 0.5;
+    const centerY = window.innerHeight * 0.46;
+    let bestVisible: {
+      tile: number;
+      point: { x: number; y: number };
+      score: number;
+    } | null = null;
+    let bestAny: {
+      tile: number;
+      point: { x: number; y: number };
+      score: number;
+    } | null = null;
+
+    for (const tile of this.enemyBorderTiles) {
+      if (
+        this.invalidPortTargets.has(tile) ||
+        !this.game.hasOwner(tile) ||
+        this.game.ownerID(tile) !== player.smallID() ||
+        !this.game.isOceanShore(tile) ||
+        this.game.isImpassable(tile)
+      ) {
+        continue;
+      }
+      const point = this.transformHandler.worldToScreenCoordinates(
+        new Cell(this.game.x(tile) + 0.5, this.game.y(tile) + 0.5),
+      );
+      const score = Math.hypot(point.x - centerX, point.y - centerY);
+      const candidate = { tile, point, score };
+      if (!bestAny || score < bestAny.score) bestAny = candidate;
+      if (inView(point) && (!bestVisible || score < bestVisible.score)) {
+        bestVisible = candidate;
+      }
+    }
+
+    const target = bestVisible ?? bestAny;
+    if (!target) return null;
+    this.portTargetTile = target.tile;
+    if (!inView(target.point)) {
+      this.portFocusRequested = true;
+      this.eventBus.emit(
+        new GoToPositionEvent(
+          this.game.x(target.tile) + 0.5,
+          this.game.y(target.tile) + 0.5,
+        ),
+      );
+      return null;
+    }
+    return new DOMRect(target.point.x - 38, target.point.y - 38, 76, 76);
   }
 
   private findAdjacentOpenLandTarget(
@@ -913,7 +1021,7 @@ export class TutorialOverlay extends LitElement implements Controller {
         continue;
       }
       const coastPriority =
-        preferCoast && !this.game.isShore(tile) ? 10_000 : 0;
+        preferCoast && !this.game.isOceanShore(tile) ? 10_000 : 0;
       const score =
         coastPriority + Math.hypot(point.x - centerX, point.y - centerY);
       if (!best || score < best.score) {
@@ -932,7 +1040,10 @@ export class TutorialOverlay extends LitElement implements Controller {
     const centerY = window.innerHeight * 0.46;
     let best: { rect: DOMRect; score: number } | null = null;
 
+    let focusTile: number | null = null;
     for (const tile of this.adjacentEnemyTiles) {
+      if (!this.isCurrentEnemyNeighbor(tile, player)) continue;
+      focusTile ??= tile;
       const point = this.transformHandler.worldToScreenCoordinates(
         new Cell(this.game.x(tile) + 0.5, this.game.y(tile) + 0.5),
       );
@@ -949,7 +1060,35 @@ export class TutorialOverlay extends LitElement implements Controller {
         best = { rect: new DOMRect(point.x - 38, point.y - 38, 76, 76), score };
       }
     }
-    return best?.rect ?? null;
+    if (best) return best.rect;
+    if (focusTile !== null && !this.attackNeighborFocusRequested) {
+      this.attackNeighborFocusRequested = true;
+      this.eventBus.emit(
+        new GoToPositionEvent(
+          this.game.x(focusTile) + 0.5,
+          this.game.y(focusTile) + 0.5,
+        ),
+      );
+    }
+    return null;
+  }
+
+  private isCurrentEnemyNeighbor(tile: number, player: TutorialPlayer) {
+    if (
+      !this.game.isLand(tile) ||
+      this.game.isImpassable(tile) ||
+      !this.game.hasOwner(tile) ||
+      this.game.ownerID(tile) === player.smallID()
+    ) {
+      return false;
+    }
+    return this.game
+      .neighbors(tile)
+      .some(
+        (neighbor) =>
+          this.game.hasOwner(neighbor) &&
+          this.game.ownerID(neighbor) === player.smallID(),
+      );
   }
 
   private cacheAdjacentTargets(
@@ -1010,7 +1149,7 @@ export class TutorialOverlay extends LitElement implements Controller {
     for (const tile of this.enemyBorderTiles) {
       if (
         this.game.ownerID(tile) === player.smallID() &&
-        this.game.isShore(tile)
+        this.game.isOceanShore(tile)
       ) {
         return true;
       }
@@ -1021,8 +1160,18 @@ export class TutorialOverlay extends LitElement implements Controller {
   private refreshTarget() {
     if (!this.active) return;
     const player = this.game.myPlayer();
-    if (player) this.refreshBorderTiles(player);
+    if (player) {
+      this.refreshBorderTiles(player);
+      this.refreshPortTarget(player);
+    }
     const next = this.findTarget();
+    if (!next) {
+      if (this.rect) {
+        this.rect = null;
+        this.requestUpdate();
+      }
+      return;
+    }
     if (
       !this.rect ||
       Math.abs(this.rect.x - next.x) > 1 ||
@@ -1032,6 +1181,51 @@ export class TutorialOverlay extends LitElement implements Controller {
       this.rect = next;
       this.requestUpdate();
     }
+  }
+
+  private refreshPortTarget(player: TutorialPlayer) {
+    if (
+      this.current.unit !== UnitType.Port ||
+      !this.hasCoastalTerritory(player) ||
+      this.portTargetTile !== null ||
+      this.portTargetRequest
+    ) {
+      return;
+    }
+    if (this.portTargetTile === null) this.findMapTarget();
+    const tile = this.portTargetTile;
+    if (
+      tile === null ||
+      this.invalidPortTargets.has(tile) ||
+      !this.game.hasOwner(tile) ||
+      this.game.ownerID(tile) !== player.smallID() ||
+      !this.game.isOceanShore(tile)
+    ) {
+      return;
+    }
+
+    this.portTargetRequest = player
+      .buildables(tile, [UnitType.Port])
+      .then((buildables) => {
+        if (!this.active || this.current.unit !== UnitType.Port) return;
+        const port = buildables.find((unit) => unit.type === UnitType.Port);
+        if (port && port.canBuild !== false) {
+          this.portTargetTile = tile;
+        } else {
+          this.invalidPortTargets.add(tile);
+          if (this.portTargetTile === tile) this.portTargetTile = null;
+        }
+      })
+      .catch(() => {
+        this.invalidPortTargets.add(tile);
+        if (this.portTargetTile === tile) this.portTargetTile = null;
+      })
+      .finally(() => {
+        this.portTargetRequest = null;
+        if (this.active && this.current.unit === UnitType.Port) {
+          this.refreshTarget();
+        }
+      });
   }
 
   private refreshBorderTiles(player: TutorialPlayer) {
@@ -1137,7 +1331,32 @@ export class TutorialOverlay extends LitElement implements Controller {
   }
 
   render() {
-    if (!this.active || !this.rect) return html``;
+    if (!this.active) return html``;
+    if (!this.rect) {
+      return html`
+        <div class="veil"></div>
+        <div
+          class="hint"
+          style="top:${this.hintTop()}"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="progress"
+            >${translateText("tutorial.progress", {
+              current: this.stepIndex + 1,
+              total: STEPS.length,
+            })}</span
+          >
+          <strong class="step-title"
+            >${translateText(this.current.title)}</strong
+          >
+          <span class="step-copy">${translateText(this.currentHintKey())}</span>
+        </div>
+        <button class="skip" @click=${this.skip}>
+          ${translateText("tutorial.skip")}
+        </button>
+      `;
+    }
     const isMapStep = this.isMapStep();
     const spotlightWidth = isMapStep ? 76 : this.rect.width + 24;
     const spotlightHeight = isMapStep

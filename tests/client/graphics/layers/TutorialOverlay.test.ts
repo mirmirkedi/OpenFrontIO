@@ -5,6 +5,7 @@ import {
   ReplaySpeedChangeEvent,
   ZoomEvent,
 } from "../../../../src/client/InputHandler";
+import { GoToPositionEvent } from "../../../../src/client/TransformHandler";
 import {
   BuildUnitIntentEvent,
   PauseGameIntentEvent,
@@ -196,6 +197,150 @@ describe("TutorialOverlay deterministic progression", () => {
     ) as () => string;
 
     expect(hintTop()).toBe(`${window.innerHeight - 264}px`);
+    overlay.stop();
+  });
+
+  test("Port lesson targets an owned ocean coast tile, not an inland lake shore", () => {
+    const { overlay } = createOverlay(10);
+    const centerX = window.innerWidth * 0.5;
+    overlay.game = {
+      myPlayer: () => ({ smallID: () => 1 }),
+      hasOwner: () => true,
+      ownerID: () => 1,
+      isOceanShore: (tile: number) => tile === 2,
+      isShore: () => true,
+      isImpassable: () => false,
+      x: (tile: number) => (tile === 2 ? centerX + 80 : centerX - 80),
+      y: () => 300,
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
+    } as never;
+    Reflect.set(overlay, "hasCoastalTerritory", () => true);
+    Reflect.set(overlay, "enemyBorderTiles", new Set([1, 2]));
+
+    const target = Reflect.get(overlay, "findMapTarget").call(overlay);
+
+    expect(target).not.toBeNull();
+    expect(target.left + target.width / 2).toBeGreaterThan(centerX);
+    expect(Reflect.get(overlay, "portTargetTile")).toBe(2);
+    overlay.stop();
+  });
+
+  test("Port lesson skips ocean coast tiles where a Port cannot be built", async () => {
+    const { overlay } = createOverlay(10);
+    const player = {
+      smallID: () => 1,
+      buildables: vi
+        .fn()
+        .mockResolvedValueOnce([{ type: UnitType.Port, canBuild: false }])
+        .mockResolvedValueOnce([{ type: UnitType.Port, canBuild: 42 }]),
+    };
+    overlay.game = {
+      myPlayer: () => player,
+      hasOwner: () => true,
+      ownerID: () => 1,
+      isOceanShore: () => true,
+      isImpassable: () => false,
+      x: (tile: number) => tile * 100,
+      y: () => 300,
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      worldToScreenCoordinates: () => ({ x: 300, y: 300 }),
+    } as never;
+    Reflect.set(overlay, "hasCoastalTerritory", () => true);
+    Reflect.set(overlay, "enemyBorderTiles", new Set([1, 2]));
+    Reflect.set(overlay, "refreshTarget", vi.fn());
+
+    const refreshPortTarget = Reflect.get(overlay, "refreshPortTarget").bind(
+      overlay,
+    ) as (player: unknown) => void;
+    refreshPortTarget(player);
+    await Reflect.get(overlay, "portTargetRequest");
+
+    expect(Reflect.get(overlay, "invalidPortTargets").has(1)).toBe(true);
+    expect(Reflect.get(overlay, "portTargetTile")).toBeNull();
+
+    refreshPortTarget(player);
+    await Reflect.get(overlay, "portTargetRequest");
+
+    expect(Reflect.get(overlay, "portTargetTile")).toBe(2);
+    expect(player.buildables).toHaveBeenCalledTimes(2);
+    expect(player.buildables).toHaveBeenNthCalledWith(1, 1, [UnitType.Port]);
+    expect(player.buildables).toHaveBeenNthCalledWith(2, 2, [UnitType.Port]);
+    overlay.stop();
+  });
+
+  test("attack lesson targets only a currently owned neighboring enemy tile", () => {
+    const { overlay } = createOverlay(3);
+    const player = { smallID: () => 1 };
+    overlay.game = {
+      myPlayer: () => player,
+      isLand: () => true,
+      isImpassable: () => false,
+      hasOwner: () => true,
+      ownerID: (tile: number) => (tile === 20 || tile === 30 ? 2 : 1),
+      neighbors: (tile: number) => (tile === 20 ? [10] : []),
+      x: () => 300,
+      y: () => 400,
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      worldToScreenCoordinates: () => ({ x: 300, y: 400 }),
+    } as never;
+    Reflect.set(overlay, "adjacentEnemyTiles", new Set([10, 20, 30]));
+
+    const target = Reflect.get(overlay, "findNeighborEnemyTarget").call(
+      overlay,
+      player,
+    ) as DOMRect | null;
+
+    expect(target).toEqual(new DOMRect(262, 362, 76, 76));
+    overlay.stop();
+  });
+
+  test("attack lesson pans to a real off-screen neighbor instead of highlighting map center", () => {
+    const { eventBus, overlay } = createOverlay(3);
+    const player = { smallID: () => 1 };
+    const emit = vi.spyOn(eventBus, "emit");
+    overlay.game = {
+      myPlayer: () => player,
+      isLand: () => true,
+      isImpassable: () => false,
+      hasOwner: () => true,
+      ownerID: (tile: number) => (tile === 20 ? 2 : 1),
+      neighbors: (tile: number) => (tile === 20 ? [10] : []),
+      x: (tile: number) => tile,
+      y: (tile: number) => tile,
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
+    } as never;
+    Reflect.set(overlay, "adjacentEnemyTiles", new Set([20]));
+
+    const target = Reflect.get(overlay, "findTarget").call(overlay);
+
+    expect(target).toBeNull();
+    expect(emit).toHaveBeenCalledWith(new GoToPositionEvent(20.5, 20.5));
+    overlay.stop();
+  });
+
+  test("attack lesson does not fall back to a spotlight over the player's own country", () => {
+    const { overlay } = createOverlay(3);
+    const player = { smallID: () => 1 };
+    overlay.game = {
+      myPlayer: () => player,
+      isLand: () => true,
+      isImpassable: () => false,
+      hasOwner: () => true,
+      ownerID: () => 1,
+      neighbors: () => [],
+    } as unknown as GameView;
+    overlay.transformHandler = {
+      worldToScreenCoordinates: () => ({ x: 300, y: 400 }),
+    } as never;
+    Reflect.set(overlay, "adjacentEnemyTiles", new Set([10]));
+
+    expect(Reflect.get(overlay, "findTarget").call(overlay)).toBeNull();
     overlay.stop();
   });
 

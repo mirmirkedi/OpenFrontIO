@@ -2153,7 +2153,7 @@
       },
       "port": {
         "title": "Liman kur",
-        "hint": "Parlayan kıyı arazine dokun, İnşa menüsünü aç ve Liman seç."
+        "hint": "Parlayan deniz kıyısındaki araziye dokun, İnşa menüsünü aç ve Liman seç."
       },
       "warship": {
         "title": "Savaş gemisi kur",
@@ -2182,6 +2182,6 @@
     },
     "step.pause.resume": "Oyun duraklatıldı. Eğitime devam etmek için Devam et düğmesine bas.",
     "skip.confirm": "Eğitimi geçmek istiyor musun? Yardım menüsünden yeniden oynayabilirsin.",
-    "step.port.expand": "Saldır seçeneğiyle kıyıya ulaşana kadar genişle. İşaretçi, Liman kurabileceğin yeri gösterecek."
+    "step.port.expand": "Saldır seçeneğiyle deniz kıyısına ulaşana kadar genişle. İşaretçi, Liman kurabileceğin yeri gösterecek."
   }
 }
