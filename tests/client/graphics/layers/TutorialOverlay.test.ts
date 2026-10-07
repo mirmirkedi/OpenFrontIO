@@ -127,6 +127,25 @@ describe("TutorialOverlay deterministic progression", () => {
     overlay.stop();
   });
 
+  test("tutorial allows the Player Panel close button through its input guard", () => {
+    const { overlay } = createOverlay(10);
+    const panel = document.createElement("player-panel");
+    const close = document.createElement("button");
+    close.setAttribute("aria-label", "Close");
+    panel.append(close);
+    document.body.append(panel);
+    const click = {
+      composedPath: () => [close, panel],
+    } as unknown as MouseEvent;
+
+    expect(
+      Reflect.get(overlay, "canInteractAt").call(overlay, 0, 0, click),
+    ).toBe(true);
+
+    panel.remove();
+    overlay.stop();
+  });
+
   test("zoom lesson has no tutorial auto-zoom action", async () => {
     const { overlay } = createOverlay(0);
     Reflect.set(overlay, "rect", new DOMRect(100, 100, 76, 76));

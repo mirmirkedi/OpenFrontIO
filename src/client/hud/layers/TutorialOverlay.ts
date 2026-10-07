@@ -856,7 +856,8 @@ export class TutorialOverlay extends LitElement implements Controller {
           (node) =>
             node instanceof Element &&
             (node.classList.contains("skip") ||
-              node.classList.contains("continue")),
+              node.classList.contains("continue") ||
+              node.matches('player-panel button[aria-label="Close"]')),
         )
     ) {
       return true;
