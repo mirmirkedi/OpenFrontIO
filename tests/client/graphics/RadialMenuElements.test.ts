@@ -302,6 +302,23 @@ describe("RadialMenuElements", () => {
       });
     });
 
+    it("keeps other build choices visible but disabled during the City lesson", () => {
+      localStorage.setItem("openfront.tutorial.active", "true");
+      localStorage.setItem("openfront.tutorial.step", "6");
+      try {
+        const subMenu = buildMenuElement.subMenu!(mockParams);
+        const city = subMenu.find((item) => item.id === "build_City");
+        const factory = subMenu.find((item) => item.id === "build_Factory");
+
+        expect(subMenu.map((item) => item.id)).toContain("build_Factory");
+        expect(city?.disabled(mockParams)).toBe(false);
+        expect(factory?.disabled(mockParams)).toBe(true);
+      } finally {
+        localStorage.removeItem("openfront.tutorial.active");
+        localStorage.removeItem("openfront.tutorial.step");
+      }
+    });
+
     it("should not include attack units in build menu", () => {
       const subMenu = buildMenuElement.subMenu!(mockParams);
 
@@ -369,6 +386,42 @@ describe("RadialMenuElements", () => {
       const infoMenu = subMenu.find((item) => item.id === Slot.Info);
 
       expect(infoMenu).toBeDefined();
+    });
+
+    it("shows the radial layout with disabled outer buttons during early tutorials", () => {
+      localStorage.setItem("openfront.tutorial.active", "true");
+      localStorage.setItem("openfront.tutorial.step", "2");
+
+      const subMenu = rootMenuElement.subMenu!(mockParams);
+
+      expect(subMenu.length).toBeGreaterThan(1);
+      expect(subMenu.every((item) => item.disabled(mockParams))).toBe(true);
+
+      localStorage.removeItem("openfront.tutorial.active");
+      localStorage.removeItem("openfront.tutorial.step");
+    });
+
+    it("keeps Attack available and dims other root choices during the neighbor lesson", () => {
+      localStorage.setItem("openfront.tutorial.active", "true");
+      localStorage.setItem("openfront.tutorial.step", "3");
+      try {
+        const subMenu = rootMenuElement.subMenu!(mockParams);
+        const attack = subMenu.find((item) => item.id === Slot.Attack);
+
+        expect(attack).toBeDefined();
+        expect(attack!.disabled(mockParams)).toBe(false);
+        expect(
+          subMenu.filter((item) => item.id !== Slot.Attack).length,
+        ).toBeGreaterThan(0);
+        expect(
+          subMenu
+            .filter((item) => item.id !== Slot.Attack)
+            .every((item) => item.disabled(mockParams)),
+        ).toBe(true);
+      } finally {
+        localStorage.removeItem("openfront.tutorial.active");
+        localStorage.removeItem("openfront.tutorial.step");
+      }
     });
 
     it("should handle ally menu correctly", () => {

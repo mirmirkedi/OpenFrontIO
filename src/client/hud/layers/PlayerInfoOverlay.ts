@@ -140,6 +140,7 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
 
   public maybeShow(x: number, y: number) {
     this.hide();
+    if (localStorage.getItem("openfront.tutorial.active") === "true") return;
     const worldCoord = this.transform.screenToWorldCoordinates(x, y);
     if (!this.game.isValidCoord(worldCoord.x, worldCoord.y)) {
       return;
@@ -170,6 +171,10 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
   }
 
   tick() {
+    if (localStorage.getItem("openfront.tutorial.active") === "true") {
+      this.hide();
+      return;
+    }
     this.requestUpdate();
   }
 

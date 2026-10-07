@@ -11,7 +11,6 @@ import {
   SendAllianceRequestIntentEvent,
   SendAttackIntentEvent,
   SendBoatAttackIntentEvent,
-  SendSpawnIntentEvent,
   SendWinnerEvent,
 } from "../../../../src/client/Transport";
 import { ReplaySpeedMultiplier } from "../../../../src/client/utilities/ReplaySpeedMultiplier";
@@ -101,273 +100,103 @@ describe("TutorialOverlay deterministic progression", () => {
     overlay.stop();
   });
 
-  test("zoom lesson keeps its accessible zoom action interactive", () => {
+  test("zoom lesson has no tutorial auto-zoom action", async () => {
     const { overlay } = createOverlay(0);
-    const assist = document.createElement("button");
-    assist.classList.add("zoom-assist");
-    const event = { composedPath: () => [assist] } as unknown as Event;
+    Reflect.set(overlay, "rect", new DOMRect(100, 100, 76, 76));
+    document.body.append(overlay);
+    await overlay.updateComplete;
+
+    expect(overlay.shadowRoot?.querySelector(".zoom-assist")).toBeNull();
+    expect(overlay.shadowRoot?.querySelectorAll("button")).toHaveLength(1);
+    overlay.remove();
+    overlay.stop();
+  });
+
+  test("spawn tap is passed through for normal game validation", () => {
+    const { overlay } = createOverlay(1);
+    const canvas = document.createElement("canvas");
+    const event = { composedPath: () => [canvas] } as unknown as Event;
     const canInteractAt = Reflect.get(overlay, "canInteractAt").bind(
       overlay,
     ) as (x: number, y: number, event: Event) => boolean;
 
-    expect(canInteractAt(0, 0, event)).toBe(true);
+    expect(canInteractAt(100, 100, event)).toBe(true);
     overlay.stop();
   });
 
-  test("spawn assist sends the highlighted valid tile", () => {
-    const { eventBus, overlay } = createOverlay(1);
-    const expectedTile = 42;
-    const received: SendSpawnIntentEvent[] = [];
-    eventBus.on(SendSpawnIntentEvent, (event) => received.push(event));
-    overlay.game = {
-      myPlayer: () => null,
-      isValidCoord: () => true,
-      ref: () => expectedTile,
-      isLand: () => true,
-      hasOwner: () => false,
-      isImpassable: () => false,
-    } as unknown as GameView;
-    overlay.transformHandler = {
-      screenToWorldCoordinates: () => ({ x: 4, y: 9 }),
-    } as never;
-    Reflect.set(overlay, "rect", new DOMRect(100, 100, 76, 76));
-    Reflect.set(overlay, "findMapTarget", () => new DOMRect(100, 100, 76, 76));
-    const chooseStartingPoint = Reflect.get(overlay, "chooseStartingPoint") as
-      | (() => void)
-      | undefined;
-
-    expect(chooseStartingPoint).toBeTypeOf("function");
-    chooseStartingPoint?.call(overlay);
-    expect(received).toHaveLength(1);
-    expect(received[0].tile).toBe(expectedTile);
-    overlay.stop();
-  });
-
-  test("expand assist requests the tutorial's controlled expansion", () => {
-    const { eventBus, overlay } = createOverlay(2);
-    const sent: SendAttackIntentEvent[] = [];
-    eventBus.on(SendAttackIntentEvent, (event) => sent.push(event));
-    overlay.game = {
-      myPlayer: () => ({ troops: () => 100 }) as never,
-    } as unknown as GameView;
-    const expandForMe = Reflect.get(overlay, "expandForMe") as
-      | (() => void)
-      | undefined;
-
-    expect(expandForMe).toBeTypeOf("function");
-    expandForMe?.call(overlay);
-    expect(sent).toHaveLength(1);
-    expect(sent[0].targetID).toBeNull();
-    expect(sent[0].troops).toBe(15);
-    overlay.stop();
-  });
-
-  test("expand assist retries at a bounded rate and stops after its limit", () => {
-    vi.useFakeTimers();
-    try {
-      const { eventBus, overlay } = createOverlay(2);
-      const sent: SendAttackIntentEvent[] = [];
-      eventBus.on(SendAttackIntentEvent, (event) => sent.push(event));
-      const player = {
-        troops: () => 100,
-        id: () => 1,
-        borderTiles: async () => ({ borderTiles: [] }),
-      };
-      overlay.game = {
-        myPlayer: () => player as never,
-      } as unknown as GameView;
-      const expandForMe = Reflect.get(overlay, "expandForMe") as
-        | (() => void)
-        | undefined;
-
-      expandForMe?.();
-      vi.advanceTimersByTime(20_000);
-      expect(sent).toHaveLength(8);
-      overlay.stop();
-      vi.advanceTimersByTime(5_000);
-      expect(sent).toHaveLength(8);
-    } finally {
-      vi.useRealTimers();
-    }
-  });
-
-  test("attack assist targets the highlighted enemy", () => {
-    const { eventBus, overlay } = createOverlay(3);
-    const sent: SendAttackIntentEvent[] = [];
-    eventBus.on(SendAttackIntentEvent, (event) => sent.push(event));
-    const player = { smallID: () => 1, troops: () => 100 };
-    const enemy = { smallID: () => 2, id: () => "enemy" };
-    overlay.game = {
-      myPlayer: () => player,
-      isValidCoord: () => true,
-      ref: () => 42,
-      hasOwner: () => true,
-      owner: () => enemy,
-    } as unknown as GameView;
-    overlay.transformHandler = {
-      screenToWorldCoordinates: () => ({ x: 4, y: 9 }),
-    } as never;
-    Reflect.set(overlay, "findMapTarget", () => new DOMRect(100, 100, 76, 76));
-    const attackForMe = Reflect.get(overlay, "attackForMe") as
-      | (() => void)
-      | undefined;
-
-    expect(attackForMe).toBeTypeOf("function");
-    attackForMe?.call(overlay);
-    expect(sent).toHaveLength(1);
-    expect(sent[0].targetID).toBe("enemy");
-    expect(sent[0].troops).toBe(15);
-    overlay.stop();
-  });
-
-  test("unit assist builds the current lesson unit on highlighted owned land", () => {
-    const { eventBus, overlay } = createOverlay(6);
-    const player = { smallID: () => 1 };
-    const received: BuildUnitIntentEvent[] = [];
-    eventBus.on(BuildUnitIntentEvent, (event) => received.push(event));
-    overlay.game = {
-      myPlayer: () => player,
-      isValidCoord: () => true,
-      ref: () => 42,
-      ownerID: () => 1,
-      isImpassable: () => false,
-    } as unknown as GameView;
-    overlay.transformHandler = {
-      screenToWorldCoordinates: () => ({ x: 4, y: 9 }),
-    } as never;
-    Reflect.set(overlay, "findMapTarget", () => new DOMRect(100, 100, 76, 76));
-    const buildUnitForMe = Reflect.get(overlay, "buildUnitForMe") as
-      | (() => void)
-      | undefined;
-
-    expect(buildUnitForMe).toBeTypeOf("function");
-    buildUnitForMe?.call(overlay);
-    expect(received).toHaveLength(1);
-    expect(received[0].unit).toBe(UnitType.City);
-    expect(received[0].tile).toBe(42);
-    overlay.stop();
-  });
-
-  test("alliance assist requests an alliance with the highlighted neighbor", () => {
-    const { eventBus, overlay } = createOverlay(9);
-    const player = { smallID: () => 1 };
-    const neighbor = { smallID: () => 2, isPlayer: () => true };
-    const received: SendAllianceRequestIntentEvent[] = [];
-    eventBus.on(SendAllianceRequestIntentEvent, (event) =>
-      received.push(event),
+  test("spawn taps over the game canvas pass through even if the event path is retargeted", () => {
+    const { overlay } = createOverlay(1);
+    const canvas = document.createElement("canvas");
+    Reflect.set(overlay, "findElement", () => canvas);
+    vi.spyOn(canvas, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 500, 500),
     );
-    overlay.game = {
-      myPlayer: () => player,
-      isValidCoord: () => true,
-      ref: () => 42,
-      hasOwner: () => true,
-      owner: () => neighbor,
-    } as unknown as GameView;
-    overlay.transformHandler = {
-      screenToWorldCoordinates: () => ({ x: 4, y: 9 }),
-    } as never;
-    Reflect.set(overlay, "findMapTarget", () => new DOMRect(100, 100, 76, 76));
-    const requestAllianceForMe = Reflect.get(
+    const event = {
+      composedPath: () => [document.createElement("div")],
+    } as unknown as Event;
+    const canInteractAt = Reflect.get(overlay, "canInteractAt").bind(
       overlay,
-      "requestAllianceForMe",
-    ) as (() => void) | undefined;
+    ) as (x: number, y: number, event: Event) => boolean;
 
-    expect(requestAllianceForMe).toBeTypeOf("function");
-    requestAllianceForMe?.call(overlay);
-    expect(received).toHaveLength(1);
-    expect(received[0].requestor).toBe(player);
-    expect(received[0].recipient).toBe(neighbor);
+    expect(canInteractAt(250, 250, event)).toBe(true);
+    expect(canInteractAt(550, 250, event)).toBe(false);
     overlay.stop();
   });
 
-  test("port assist places a Port once a coast is available", () => {
-    const { eventBus, overlay } = createOverlay(10);
-    const player = { smallID: () => 1 };
-    const received: BuildUnitIntentEvent[] = [];
-    eventBus.on(BuildUnitIntentEvent, (event) => received.push(event));
-    overlay.game = {
-      myPlayer: () => player,
-      isValidCoord: () => true,
-      ref: () => 42,
-      ownerID: () => 1,
-      isImpassable: () => false,
-    } as unknown as GameView;
-    overlay.transformHandler = {
-      screenToWorldCoordinates: () => ({ x: 4, y: 9 }),
-    } as never;
-    Reflect.set(overlay, "hasCoastalTerritory", () => true);
-    Reflect.set(overlay, "findMapTarget", () => new DOMRect(100, 100, 76, 76));
-    const portForMe = Reflect.get(overlay, "portForMe") as
-      | (() => void)
-      | undefined;
+  test("mobile map taps inside an expand target pass through when retargeted", () => {
+    const { overlay } = createOverlay(2);
+    const canvas = document.createElement("canvas");
+    Reflect.set(overlay, "rect", new DOMRect(100, 100, 76, 76));
+    Reflect.set(overlay, "findElement", () => canvas);
+    vi.spyOn(canvas, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 500, 500),
+    );
+    const event = {
+      pointerType: "touch",
+      pointerId: 7,
+      clientX: 120,
+      clientY: 120,
+      composedPath: () => [document.createElement("div")],
+      preventDefault: vi.fn(),
+      stopImmediatePropagation: vi.fn(),
+    } as unknown as PointerEvent;
 
-    expect(portForMe).toBeTypeOf("function");
-    portForMe?.call(overlay);
-    expect(received).toHaveLength(1);
-    expect(received[0].unit).toBe(UnitType.Port);
-    expect(received[0].tile).toBe(42);
+    Reflect.get(overlay, "guardPointerDown")(event);
+
+    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(Reflect.get(overlay, "mapActionMenuAllowed")).toBe(true);
     overlay.stop();
   });
 
-  test("rocket assist launches from the player's Missile Silo", () => {
-    const { eventBus, overlay } = createOverlay(13);
-    const silo = { tile: () => 88 };
-    const player = { units: () => [silo] };
-    const received: BuildUnitIntentEvent[] = [];
-    eventBus.on(BuildUnitIntentEvent, (event) => received.push(event));
-    overlay.game = {
-      myPlayer: () => player,
-    } as unknown as GameView;
-    const launchAtomBombForMe = Reflect.get(overlay, "launchAtomBombForMe") as
-      | (() => void)
-      | undefined;
+  test("expand target taps are accepted by the visible circle, but controls are not", () => {
+    const { overlay } = createOverlay(2);
+    Reflect.set(overlay, "rect", new DOMRect(100, 100, 76, 76));
+    const canInteractAt = Reflect.get(overlay, "canInteractAt").bind(
+      overlay,
+    ) as (x: number, y: number, event: Event) => boolean;
+    const mapEvent = {
+      composedPath: () => [document.createElement("div")],
+    } as unknown as Event;
+    const button = document.createElement("button");
+    const controlEvent = {
+      composedPath: () => [button],
+    } as unknown as Event;
 
-    expect(launchAtomBombForMe).toBeTypeOf("function");
-    launchAtomBombForMe?.call(overlay);
-    expect(received).toHaveLength(1);
-    expect(received[0].unit).toBe(UnitType.AtomBomb);
-    expect(received[0].tile).toBe(88);
+    expect(canInteractAt(138, 138, mapEvent)).toBe(true);
+    expect(canInteractAt(250, 250, mapEvent)).toBe(false);
+    expect(canInteractAt(138, 138, controlEvent)).toBe(false);
     overlay.stop();
   });
 
-  test("rocket assist builds a missing silo and launches when it is ready", () => {
-    vi.useFakeTimers();
-    try {
-      const { eventBus, overlay } = createOverlay(13);
-      const silo = { tile: () => 88 };
-      let silos: typeof silo[] = [];
-      const player = {
-        id: () => "player",
-        smallID: () => 1,
-        tiles: () => [42],
-        borderTiles: async () => ({ borderTiles: new Set<number>() }),
-        units: () => silos,
-      };
-      const received: BuildUnitIntentEvent[] = [];
-      eventBus.on(BuildUnitIntentEvent, (event) => received.push(event));
-      overlay.game = {
-        myPlayer: () => player,
-      } as unknown as GameView;
-      Reflect.set(overlay, "findOwnedLandTile", () => 42);
-      const launchAtomBombForMe = Reflect.get(overlay, "launchAtomBombForMe") as
-        | (() => void)
-        | undefined;
+  test("speed hint moves below replay controls instead of covering them", () => {
+    const { overlay } = createOverlay(4);
+    Reflect.set(overlay, "rect", new DOMRect(850, 80, 60, 50));
+    const hintTop = Reflect.get(overlay, "hintTop").bind(
+      overlay,
+    ) as () => string;
 
-      launchAtomBombForMe?.();
-      expect(received).toHaveLength(1);
-      expect(received[0].unit).toBe(UnitType.MissileSilo);
-      expect(received[0].tile).toBe(42);
-
-      silos = [silo];
-      vi.advanceTimersByTime(500);
-      expect(received).toHaveLength(2);
-      expect(received[1].unit).toBe(UnitType.AtomBomb);
-      expect(received[1].tile).toBe(88);
-      expect(localStorage.getItem(STEP_KEY)).toBe("14");
-      overlay.stop();
-    } finally {
-      vi.useRealTimers();
-    }
+    expect(hintTop()).toBe(`${window.innerHeight - 264}px`);
+    overlay.stop();
   });
 
   test("win lesson finishes only when the local player wins", () => {
@@ -428,9 +257,6 @@ describe("TutorialOverlay deterministic progression", () => {
     } as never;
     Reflect.set(overlay, "rect", new DOMRect(50, 50, 100, 100));
 
-    const isValidMapActionAt = Reflect.get(overlay, "isValidMapActionAt").bind(
-      overlay,
-    ) as (x: number, y: number) => boolean;
     const canInteractAt = Reflect.get(overlay, "canInteractAt").bind(
       overlay,
     ) as (x: number, y: number, event: Event) => boolean;
@@ -440,50 +266,40 @@ describe("TutorialOverlay deterministic progression", () => {
     const canvas = document.createElement("canvas");
     const mapTap = { composedPath: () => [canvas] } as unknown as Event;
     expect(findMapTarget()).not.toBeNull();
-    expect(isValidMapActionAt(100, 100)).toBe(true);
     expect(canInteractAt(100, 100, mapTap)).toBe(true);
     // The spotlight is a suggestion. A valid empty tile elsewhere must also
     // work, so small screen/canvas coordinate differences cannot deadlock spawn.
     expect(canInteractAt(500, 500, mapTap)).toBe(true);
 
     isLand = false;
-    expect(isValidMapActionAt(100, 100)).toBe(false);
-    expect(canInteractAt(100, 100, mapTap)).toBe(false);
+    expect(findMapTarget()).toBeNull();
+    expect(canInteractAt(100, 100, mapTap)).toBe(true);
     isLand = true;
     hasOwner = true;
-    expect(isValidMapActionAt(100, 100)).toBe(false);
+    expect(findMapTarget()).toBeNull();
     overlay.stop();
   });
 
-  test("map actions are limited to valid adjacent tutorial targets", () => {
+  test("spawn step keeps its highlight but removes the auto-pick button", async () => {
+    const { overlay } = createOverlay(1);
+    Reflect.set(overlay, "rect", new DOMRect(100, 100, 76, 76));
+    document.body.append(overlay);
+    await overlay.updateComplete;
+
+    expect(overlay.shadowRoot?.querySelector(".spotlight")).not.toBeNull();
+    expect(overlay.shadowRoot?.querySelector(".zoom-assist")).toBeNull();
+    overlay.remove();
+    overlay.stop();
+  });
+
+  test("expand step has no assist button because the radial Attack action is required", async () => {
     const { overlay } = createOverlay(2);
-    const player = { smallID: () => 1 };
-    const game = {
-      myPlayer: () => player,
-      isValidCoord: () => true,
-      ref: () => 42,
-      ownerID: () => 0,
-      isShore: () => false,
-    };
-    overlay.game = game as unknown as GameView;
-    overlay.transformHandler = {
-      screenToWorldCoordinates: () => ({ x: 0, y: 0 }),
-    } as never;
+    Reflect.set(overlay, "rect", new DOMRect(100, 100, 76, 76));
+    document.body.append(overlay);
+    await overlay.updateComplete;
 
-    Reflect.set(overlay, "adjacentUnownedLandTiles", new Set([42]));
-    const isValidMapActionAt = Reflect.get(overlay, "isValidMapActionAt").bind(
-      overlay,
-    ) as (x: number, y: number) => boolean;
-    expect(isValidMapActionAt(100, 100)).toBe(true);
-
-    Reflect.set(overlay, "adjacentUnownedLandTiles", new Set());
-    expect(isValidMapActionAt(100, 100)).toBe(false);
-
-    Reflect.set(overlay, "stepIndex", 3);
-    Reflect.set(overlay, "adjacentEnemyTiles", new Set([42]));
-    expect(isValidMapActionAt(100, 100)).toBe(true);
-    Reflect.set(overlay, "adjacentEnemyTiles", new Set());
-    expect(isValidMapActionAt(100, 100)).toBe(false);
+    expect(overlay.shadowRoot?.querySelector(".zoom-assist")).toBeNull();
+    overlay.remove();
     overlay.stop();
   });
 
@@ -516,9 +332,13 @@ describe("TutorialOverlay deterministic progression", () => {
     overlay.tick();
     expect(localStorage.getItem(STEP_KEY)).toBe("2");
 
-    eventBus.emit(new SendAttackIntentEvent(2 as never, 100));
+    eventBus.emit(new SendAttackIntentEvent(null, 100));
     Reflect.set(overlay, "expandActionAt", 0);
-    Reflect.set(overlay, "adjacentEnemyTiles", new Set([42]));
+    overlay.tick();
+    expect(localStorage.getItem(STEP_KEY)).toBe("2");
+
+    Reflect.set(overlay, "adjacentEnemyTiles", new Set([99]));
+    Reflect.set(overlay, "nextNeighborScanAt", 0);
     overlay.tick();
     expect(localStorage.getItem(STEP_KEY)).toBe("3");
 

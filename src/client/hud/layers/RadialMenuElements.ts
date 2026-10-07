@@ -442,8 +442,7 @@ function createMenuElements(
         unitTypes.has(item.unitType) &&
         (filterType === "attack"
           ? BuildableAttacks.has(item.unitType)
-          : !BuildableAttacks.has(item.unitType)) &&
-        (requiredUnit === undefined || item.unitType === requiredUnit),
+          : !BuildableAttacks.has(item.unitType)),
     )
     .map((item: BuildItemDisplay) => {
       return {
@@ -452,6 +451,7 @@ function createMenuElements(
           ? item.key.replace("unit_type.", "")
           : item.unitType.toString(),
         disabled: (p: MenuElementParams) =>
+          (requiredUnit !== undefined && item.unitType !== requiredUnit) ||
           !p.buildMenu.canBuildOrUpgrade(item),
         color: (p: MenuElementParams) =>
           p.buildMenu.canBuildOrUpgrade(item)
@@ -844,6 +844,29 @@ export const rootMenuElement: MenuElement = {
         return [infoMenuElement, buildMenuElement];
       }
       if (step === 2 || step === 3 || step === 10 || step === 16) {
+        if (step === 2) {
+          // Keep the full radial menu visible during the first action lessons
+          // so mobile players can learn its layout. The center action is the
+          // only interactive control; disabled items use the menu's existing
+          // low-opacity treatment.
+          return menuItems
+            .filter((item): item is MenuElement => item !== null)
+            .map((item) => ({ ...item, disabled: () => true }));
+        }
+        if (step === 3) {
+          // The player must be able to enter the Attack submenu after
+          // selecting the adjacent country. Keep the other radial choices
+          // visible for orientation, but make them inert during this lesson.
+          const attackItems = [
+            infoMenuElement,
+            boatMenuElement,
+            allyRequestElement,
+            attackMenuElement,
+          ];
+          return attackItems.map((item) =>
+            item.id === Slot.Attack ? item : { ...item, disabled: () => true },
+          );
+        }
         return [infoMenuElement];
       }
       if (step === 9) {

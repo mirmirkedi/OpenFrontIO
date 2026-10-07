@@ -16,7 +16,6 @@ import {
   PauseGameIntentEvent,
   SendAllianceRequestIntentEvent,
   SendAttackIntentEvent,
-  SendSpawnIntentEvent,
   SendWinnerEvent,
 } from "../../Transport";
 import type { UIState } from "../../UIState";
@@ -31,8 +30,6 @@ const STEP_KEY = "openfront.tutorial.step";
 const TUTORIAL_ZOOM_SCALE = 4.0;
 const TUTORIAL_ATTACK_RATIO = 0.15;
 const TARGET_REFRESH_INTERVAL_MS = 300;
-const EXPAND_ASSIST_INTERVAL_MS = 2_500;
-const EXPAND_ASSIST_MAX_ATTEMPTS = 8;
 
 type TutorialStep = {
   id: string;
@@ -256,27 +253,9 @@ export class TutorialOverlay extends LitElement implements Controller {
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
-    .skip:hover,
-    .zoom-assist:hover {
+    .skip:hover {
       color: white;
       border-color: rgba(128, 220, 255, 0.55);
-    }
-    .zoom-assist {
-      position: fixed;
-      right: max(12px, env(safe-area-inset-right));
-      bottom: max(68px, calc(env(safe-area-inset-bottom) + 68px));
-      pointer-events: auto;
-      padding: 7px 10px;
-      border: 1px solid rgba(128, 220, 255, 0.42);
-      border-radius: 8px;
-      background: rgba(5, 25, 41, 0.92);
-      color: #aeeaff;
-      font:
-        700 10px/1 Inter,
-        system-ui,
-        sans-serif;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
     }
     @keyframes tutorial-hand {
       0%,
@@ -297,7 +276,6 @@ export class TutorialOverlay extends LitElement implements Controller {
   @state() private rect: DOMRect | null = null;
   private active = false;
   private refreshTimer: number | undefined;
-  private zoomAnimationFrame: number | undefined;
   private lockedZoomScale: number | null = null;
   private zoomCenterWorld: { x: number; y: number } | null = null;
   private tutorialGestureScale: number | null = null;
@@ -310,10 +288,6 @@ export class TutorialOverlay extends LitElement implements Controller {
   private borderTilesRequest: Promise<void> | null = null;
   private nextBorderTilesRefreshAt = Number.NEGATIVE_INFINITY;
   private expandActionAt = Number.POSITIVE_INFINITY;
-  private expandAssistInterval: number | undefined;
-  private expandAssistAttempts = 0;
-  private rocketAssistInterval: number | undefined;
-  private rocketAssistAttempts = 0;
   private nextNeighborScanAt = Number.NEGATIVE_INFINITY;
 
   private readonly guardPointerDown = (event: PointerEvent) => {
@@ -334,11 +308,16 @@ export class TutorialOverlay extends LitElement implements Controller {
       return;
     }
     if (!this.active) return;
-    if (this.current.mapTarget && this.isCanvasEvent(event)) {
-      this.mapActionMenuAllowed = this.isValidMapActionAt(
-        event.clientX,
-        event.clientY,
-      );
+    if (
+      this.current.mapTarget &&
+      this.current.id !== "spawn" &&
+      this.pointInRect(event.clientX, event.clientY) &&
+      !this.isControlEvent(event)
+    ) {
+      // The game validates the tile when it receives the tap. Here we only
+      // ensure the tap is on the visible tutorial target; a duplicate
+      // screen-to-world check can reject mobile coordinates after scaling.
+      this.mapActionMenuAllowed = true;
     }
     if (this.canInteractAt(event.clientX, event.clientY, event)) {
       // Once a gesture starts on an allowed target, let it finish outside the
@@ -507,257 +486,6 @@ export class TutorialOverlay extends LitElement implements Controller {
     );
   }
 
-  private zoomForMe = () => {
-    if (!this.active || this.current.id !== "zoom") return;
-    if (this.zoomAnimationFrame !== undefined) {
-      cancelAnimationFrame(this.zoomAnimationFrame);
-    }
-    const startScale = this.transformHandler.scale;
-    if (startScale >= TUTORIAL_ZOOM_SCALE) {
-      this.eventBus.emit(
-        new ZoomEvent(window.innerWidth / 2, window.innerHeight / 2, 0),
-      );
-      return;
-    }
-    this.captureZoomCenter();
-    const startedAt = performance.now();
-    const duration = 260;
-    const animate = () => {
-      if (!this.active || this.current.id !== "zoom") {
-        this.zoomAnimationFrame = undefined;
-        return;
-      }
-      const progress = Math.min(1, (performance.now() - startedAt) / duration);
-      const eased = 1 - (1 - progress) ** 3;
-      const desiredScale =
-        startScale + (TUTORIAL_ZOOM_SCALE - startScale) * eased;
-      const scale = this.transformHandler.scale;
-      const delta = ZOOM_DELTA_DIVISOR * (scale / desiredScale - 1);
-      this.eventBus.emit(
-        new ZoomEvent(window.innerWidth / 2, window.innerHeight / 2, delta),
-      );
-      if (progress < 1 && this.current.id === "zoom") {
-        this.zoomAnimationFrame = requestAnimationFrame(animate);
-      } else {
-        this.zoomAnimationFrame = undefined;
-      }
-    };
-    this.zoomAnimationFrame = requestAnimationFrame(animate);
-  };
-
-  private chooseStartingPoint = () => {
-    if (!this.active || this.current.id !== "spawn") return;
-    const target = this.findMapTarget();
-    if (!target) return;
-    const cell = this.transformHandler.screenToWorldCoordinates(
-      target.left + target.width / 2,
-      target.top + target.height / 2,
-    );
-    if (!this.game.isValidCoord(cell.x, cell.y)) return;
-    const tile = this.game.ref(cell.x, cell.y);
-    if (!this.isOpenLand(cell.x, cell.y, tile)) return;
-    this.eventBus.emit(new SendSpawnIntentEvent(tile));
-  };
-
-  private expandForMe = () => {
-    if (!this.active || this.current.id !== "expand") return;
-    if (this.expandAssistInterval !== undefined) return;
-    this.expandAssistAttempts = 0;
-    const expandOnce = () => {
-      if (!this.active || this.current.id !== "expand") {
-        this.stopExpandAssist();
-        return;
-      }
-      if (this.expandAssistAttempts >= EXPAND_ASSIST_MAX_ATTEMPTS) {
-        this.stopExpandAssist();
-        return;
-      }
-      this.expandAssistAttempts++;
-      const player = this.game.myPlayer();
-      if (!player) {
-        this.stopExpandAssist();
-        return;
-      }
-      this.eventBus.emit(
-        new SendAttackIntentEvent(
-          null,
-          player.troops() * this.uiState.attackRatio,
-        ),
-      );
-    };
-    expandOnce();
-    this.expandAssistInterval = window.setInterval(
-      expandOnce,
-      EXPAND_ASSIST_INTERVAL_MS,
-    );
-  };
-
-  private stopExpandAssist() {
-    if (this.expandAssistInterval === undefined) return;
-    window.clearInterval(this.expandAssistInterval);
-    this.expandAssistInterval = undefined;
-  }
-
-  private attackForMe = () => {
-    if (!this.active || this.current.id !== "attack") return;
-    const player = this.game.myPlayer();
-    const target = this.findMapTarget();
-    if (!player || !target) return;
-    const cell = this.transformHandler.screenToWorldCoordinates(
-      target.left + target.width / 2,
-      target.top + target.height / 2,
-    );
-    if (!this.game.isValidCoord(cell.x, cell.y)) return;
-    const tile = this.game.ref(cell.x, cell.y);
-    if (!this.game.hasOwner(tile)) return;
-    const owner = this.game.owner(tile);
-    if (owner.smallID() === player.smallID()) return;
-    this.eventBus.emit(
-      new SendAttackIntentEvent(
-        owner.id(),
-        player.troops() * this.uiState.attackRatio,
-      ),
-    );
-  };
-
-  private buildUnitForMe = () => {
-    const unit = this.current.unit;
-    if (!this.active || !unit) return;
-    const player = this.game.myPlayer();
-    if (unit === UnitType.Port && player && !this.hasCoastalTerritory(player)) {
-      return;
-    }
-    const target = this.findMapTarget();
-    if (!player || !target) return;
-    const cell = this.transformHandler.screenToWorldCoordinates(
-      target.left + target.width / 2,
-      target.top + target.height / 2,
-    );
-    if (!this.game.isValidCoord(cell.x, cell.y)) return;
-    const tile = this.game.ref(cell.x, cell.y);
-    if (
-      this.game.ownerID(tile) !== player.smallID() ||
-      this.game.isImpassable(tile)
-    ) {
-      return;
-    }
-    this.eventBus.emit(new BuildUnitIntentEvent(unit, tile));
-  };
-
-  private portForMe = () => {
-    if (!this.active || this.current.id !== "port") return;
-    const player = this.game.myPlayer();
-    if (!player) return;
-    if (this.hasCoastalTerritory(player)) {
-      this.buildUnitForMe();
-      return;
-    }
-    if (this.expandAssistInterval !== undefined) return;
-    this.expandAssistAttempts = 0;
-    const expandUntilCoast = () => {
-      if (!this.active || this.current.id !== "port") {
-        this.stopExpandAssist();
-        return;
-      }
-      const currentPlayer = this.game.myPlayer();
-      if (!currentPlayer) {
-        this.stopExpandAssist();
-        return;
-      }
-      if (this.hasCoastalTerritory(currentPlayer)) {
-        this.stopExpandAssist();
-        this.buildUnitForMe();
-        return;
-      }
-      if (this.expandAssistAttempts >= EXPAND_ASSIST_MAX_ATTEMPTS) {
-        this.stopExpandAssist();
-        return;
-      }
-      this.expandAssistAttempts++;
-      this.eventBus.emit(
-        new SendAttackIntentEvent(
-          null,
-          currentPlayer.troops() * this.uiState.attackRatio,
-        ),
-      );
-    };
-    expandUntilCoast();
-    this.expandAssistInterval = window.setInterval(
-      expandUntilCoast,
-      EXPAND_ASSIST_INTERVAL_MS,
-    );
-  };
-
-  private requestAllianceForMe = () => {
-    if (!this.active || this.current.id !== "ally") return;
-    const player = this.game.myPlayer();
-    const target = this.findMapTarget();
-    if (!player || !target) return;
-    const cell = this.transformHandler.screenToWorldCoordinates(
-      target.left + target.width / 2,
-      target.top + target.height / 2,
-    );
-    if (!this.game.isValidCoord(cell.x, cell.y)) return;
-    const tile = this.game.ref(cell.x, cell.y);
-    if (!this.game.hasOwner(tile)) return;
-    const recipient = this.game.owner(tile);
-    if (!recipient.isPlayer() || recipient.smallID() === player.smallID())
-      return;
-    this.eventBus.emit(new SendAllianceRequestIntentEvent(player, recipient));
-  };
-
-  private launchAtomBombForMe = () => {
-    if (!this.active || this.current.id !== "rocket") return;
-    const player = this.game.myPlayer();
-    if (!player || this.rocketAssistInterval !== undefined) return;
-    let siloBuildRequested = false;
-    let cameraFocusRequested = false;
-    const launchFromSilo = () => {
-      if (!this.active || this.current.id !== "rocket") {
-        this.stopRocketAssist();
-        return false;
-      }
-      const silo = this.game.myPlayer()?.units(UnitType.MissileSilo)[0];
-      if (!silo) return false;
-      this.stopRocketAssist();
-      this.eventBus.emit(
-        new BuildUnitIntentEvent(UnitType.AtomBomb, silo.tile()),
-      );
-      return true;
-    };
-    if (launchFromSilo()) return;
-
-    this.rocketAssistAttempts = 0;
-    const prepareAndLaunch = () => {
-      if (launchFromSilo()) return;
-      if (!siloBuildRequested) {
-        const tile = this.findOwnedLandTile(player);
-        if (tile !== undefined) {
-          siloBuildRequested = true;
-          this.eventBus.emit(
-            new BuildUnitIntentEvent(UnitType.MissileSilo, tile),
-          );
-        } else if (!cameraFocusRequested) {
-          // The rocket lesson highlights a neighboring enemy. The player's
-          // own territory can be outside the current viewport, so center it
-          // once to find a valid placement for the missing silo.
-          cameraFocusRequested = true;
-          this.eventBus.emit(new GoToPlayerEvent(player, 8));
-        }
-      }
-      this.rocketAssistAttempts++;
-      if (this.rocketAssistAttempts >= 20) this.stopRocketAssist();
-    };
-    this.rocketAssistInterval = window.setInterval(prepareAndLaunch, 500);
-    prepareAndLaunch();
-  };
-
-  private stopRocketAssist() {
-    if (this.rocketAssistInterval === undefined) return;
-    window.clearInterval(this.rocketAssistInterval);
-    this.rocketAssistInterval = undefined;
-  };
-
   init() {
     const isSinglePlayer =
       this.game.config().gameConfig().gameType === GameType.Singleplayer;
@@ -909,18 +637,14 @@ export class TutorialOverlay extends LitElement implements Controller {
       performance.now() >= this.nextNeighborScanAt
     ) {
       this.nextNeighborScanAt = performance.now() + 400;
-      if (this.hasNeighboringEnemy()) this.complete("expand");
+      if (this.adjacentEnemyTiles.size > 0) this.complete("expand");
     }
   }
 
   stop() {
     this.active = false;
-    this.stopExpandAssist();
-    this.stopRocketAssist();
     if (this.refreshTimer !== undefined)
       window.clearInterval(this.refreshTimer);
-    if (this.zoomAnimationFrame !== undefined)
-      cancelAnimationFrame(this.zoomAnimationFrame);
     window.removeEventListener("pointerdown", this.guardPointerDown, true);
     window.removeEventListener("pointermove", this.guardPointerMove, true);
     window.removeEventListener("pointerup", this.guardPointerEnd, true);
@@ -939,8 +663,6 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   private complete(id: string) {
     if (!this.active || this.current.id !== id) return;
-    this.stopExpandAssist();
-    this.stopRocketAssist();
     if (id === "expand") this.zoomOutForAttackStep();
     if (this.stepIndex >= STEPS.length - 1) {
       this.finish();
@@ -1029,25 +751,21 @@ export class TutorialOverlay extends LitElement implements Controller {
       event
         .composedPath()
         .some(
-          (node) =>
-            node instanceof Element &&
-            (node.classList.contains("skip") ||
-              node.classList.contains("zoom-assist")),
+          (node) => node instanceof Element && node.classList.contains("skip"),
         )
     ) {
       return true;
     }
     if (this.current.id === "zoom") return false;
     if (this.current.id === "spawn") {
-      return this.isCanvasEvent(event) && this.isValidMapActionAt(x, y);
+      // During spawn the game input handler already validates the selected
+      // tile. Don't let a second tutorial-side coordinate transform swallow
+      // valid taps on the highlighted spot, especially on scaled touch screens.
+      return this.isCanvasEvent(event) || this.pointIsOnGameCanvas(x, y, event);
     }
     if (this.current.mapTarget) {
       if (this.isActionMenuEvent(event)) return this.mapActionMenuAllowed;
-      return (
-        this.pointInRect(x, y) &&
-        this.isCanvasEvent(event) &&
-        this.isValidMapActionAt(x, y)
-      );
+      return this.pointInRect(x, y) && !this.isControlEvent(event);
     }
     if (this.current.unit) {
       const selector = `[data-tutorial-unit="${this.current.unit}"]`;
@@ -1168,35 +886,6 @@ export class TutorialOverlay extends LitElement implements Controller {
     return best?.rect ?? null;
   }
 
-  private findOwnedLandTile(player: TutorialPlayer) {
-    const left = Math.max(150, Math.min(430, window.innerWidth * 0.34));
-    const right = Math.max(left, window.innerWidth - 150);
-    const top = Math.max(140, window.innerHeight * 0.2);
-    const bottom = Math.max(top, window.innerHeight - 180);
-    const centerX = window.innerWidth * 0.5;
-    const centerY = window.innerHeight * 0.46;
-    let best: { tile: ReturnType<GameView["ref"]>; score: number } | null =
-      null;
-
-    for (let y = top; y <= bottom; y += 24) {
-      for (let x = left; x <= right; x += 24) {
-        const cell = this.transformHandler.screenToWorldCoordinates(x, y);
-        if (!this.game.isValidCoord(cell.x, cell.y)) continue;
-        const tile = this.game.ref(cell.x, cell.y);
-        if (
-          this.game.ownerID(tile) !== player.smallID() ||
-          !this.game.isLand(tile) ||
-          this.game.isImpassable(tile)
-        ) {
-          continue;
-        }
-        const score = Math.hypot(x - centerX, y - centerY);
-        if (!best || score < best.score) best = { tile, score };
-      }
-    }
-    return best?.tile;
-  }
-
   private findAdjacentOpenLandTarget(
     player: TutorialPlayer,
     preferCoast = false,
@@ -1263,15 +952,6 @@ export class TutorialOverlay extends LitElement implements Controller {
     return best?.rect ?? null;
   }
 
-  private hasNeighboringEnemy() {
-    const player = this.game.myPlayer();
-    return Boolean(player && this.hasNeighboringEnemyTile(player));
-  }
-
-  private hasNeighboringEnemyTile(_player: TutorialPlayer) {
-    return this.adjacentEnemyTiles.size > 0;
-  }
-
   private cacheAdjacentTargets(
     player: TutorialPlayer,
     borderTiles: ReadonlySet<number>,
@@ -1299,39 +979,31 @@ export class TutorialOverlay extends LitElement implements Controller {
       .some((node) => node instanceof HTMLCanvasElement);
   }
 
-  private isValidMapActionAt(x: number, y: number) {
-    if (!this.transformHandler) return false;
-    const cell = this.transformHandler.screenToWorldCoordinates(x, y);
-    if (!this.game.isValidCoord(cell.x, cell.y)) return false;
-    const tile = this.game.ref(cell.x, cell.y);
+  private pointIsOnGameCanvas(x: number, y: number, event: Event) {
+    const hitsControl = event
+      .composedPath()
+      .some(
+        (node) =>
+          node instanceof Element &&
+          node.matches("button, input, select, textarea, [role='button']"),
+      );
+    if (hitsControl) return false;
+    const canvas = this.findElement("canvas");
+    if (!canvas) return false;
+    const rect = canvas.getBoundingClientRect();
+    return (
+      x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+    );
+  }
 
-    // Before the first spawn the human player does not exist in GameView yet.
-    // Validate the spawn tile directly, matching ClientGameRunner's spawn
-    // acceptance rules instead of requiring myPlayer() to be available.
-    if (this.current.id === "spawn") {
-      return this.isOpenLand(cell.x, cell.y, tile);
-    }
-
-    const player = this.game.myPlayer();
-    if (!player) return false;
-    switch (this.current.id) {
-      case "expand":
-        return this.adjacentUnownedLandTiles.has(tile);
-      case "attack":
-      case "ally":
-      case "rocket":
-      case "win":
-        return this.adjacentEnemyTiles.has(tile);
-      case "port":
-        return this.hasCoastalTerritory(player)
-          ? this.game.ownerID(tile) === player.smallID() &&
-              this.game.isShore(tile)
-          : this.adjacentUnownedLandTiles.has(tile);
-      default:
-        return this.current.unit === undefined
-          ? true
-          : this.game.ownerID(tile) === player.smallID();
-    }
+  private isControlEvent(event: Event) {
+    return event
+      .composedPath()
+      .some(
+        (node) =>
+          node instanceof Element &&
+          node.matches("button, input, select, textarea, [role='button']"),
+      );
   }
 
   private hasCoastalTerritory(player: TutorialPlayer) {
@@ -1442,17 +1114,21 @@ export class TutorialOverlay extends LitElement implements Controller {
   }
 
   private hintTop() {
-    if (!this.rect || !this.isMapStep()) {
-      return "max(56px, calc(env(safe-area-inset-top) + 46px))";
-    }
-
     const safeTop = Math.max(56, (window.visualViewport?.offsetTop ?? 0) + 46);
     const hintHeight = 128;
     const bottomReserve = 136;
+    if (!this.rect) {
+      return "max(56px, calc(env(safe-area-inset-top) + 46px))";
+    }
+    // Speed choices expand below the replay HUD. Keep the instructions at
+    // the bottom so the player can reach every speed option.
+    if (this.current.id === "speed") {
+      return `${Math.max(safeTop, window.innerHeight - bottomReserve - hintHeight)}px`;
+    }
     const above = this.rect.top - hintHeight;
     if (above >= safeTop) return `${above}px`;
 
-    const below = this.rect.top + 88;
+    const below = this.rect.bottom + 16;
     if (below + hintHeight <= window.innerHeight - bottomReserve) {
       return `${below}px`;
     }
@@ -1497,51 +1173,6 @@ export class TutorialOverlay extends LitElement implements Controller {
       <button class="skip" @click=${this.skip}>
         ${translateText("tutorial.skip")}
       </button>
-      ${this.current.id === "zoom"
-        ? html`<button class="zoom-assist" @click=${this.zoomForMe}>
-            ${translateText("tutorial.zoom.assist")}
-          </button>`
-        : null}
-      ${this.current.id === "spawn"
-        ? html`<button class="zoom-assist" @click=${this.chooseStartingPoint}>
-            ${translateText("tutorial.spawn.assist")}
-          </button>`
-        : null}
-      ${this.current.id === "expand"
-        ? html`<button class="zoom-assist" @click=${this.expandForMe}>
-            ${translateText("tutorial.expand.assist")}
-          </button>`
-        : null}
-      ${this.current.id === "attack"
-        ? html`<button class="zoom-assist" @click=${this.attackForMe}>
-            ${translateText("tutorial.attack.assist")}
-          </button>`
-        : null}
-      ${this.current.unit && this.current.unit !== UnitType.Port
-        ? html`<button class="zoom-assist" @click=${this.buildUnitForMe}>
-            ${translateText("tutorial.build.assist")}
-          </button>`
-        : null}
-      ${this.current.id === "ally"
-        ? html`<button class="zoom-assist" @click=${this.requestAllianceForMe}>
-            ${translateText("tutorial.ally.assist")}
-          </button>`
-        : null}
-      ${this.current.id === "port"
-        ? html`<button class="zoom-assist" @click=${this.portForMe}>
-            ${translateText(
-              this.game.myPlayer() &&
-                this.hasCoastalTerritory(this.game.myPlayer()!)
-                ? "tutorial.port.assist"
-                : "tutorial.port.coastAssist",
-            )}
-          </button>`
-        : null}
-      ${this.current.id === "rocket"
-        ? html`<button class="zoom-assist" @click=${this.launchAtomBombForMe}>
-            ${translateText("tutorial.rocket.assist")}
-          </button>`
-        : null}
     `;
   }
 }
