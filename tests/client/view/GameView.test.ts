@@ -122,6 +122,52 @@ describe("GameView.update — players", () => {
     expect(game.myPlayer()).toBe(first);
   });
 
+  it("resolves the country marker nearest to a spawn tile", () => {
+    const game = makeGameView();
+    const mapData = Reflect.get(game, "_mapData") as {
+      nations: {
+        name: string;
+        flag?: string;
+        coordinates?: [number, number];
+      }[];
+      additionalNations: {
+        name: string;
+        flag?: string;
+        coordinates?: [number, number];
+      }[];
+    };
+    mapData.nations.push(
+      { name: "Country A", flag: "aa", coordinates: [1, 1] },
+      { name: "Country B", flag: "bb", coordinates: [8, 8] },
+    );
+
+    expect(game.countryForTile(game.ref(2, 1))).toEqual({
+      name: "Country A",
+      flag: "/flags/aa.svg",
+    });
+  });
+
+  it("applies a tutorial country name and matching flag to the local player", () => {
+    const game = makeGameView({ myClientID: "c-me" });
+    game.update(
+      withPlayers(1, [
+        makePlayerUpdate({
+          id: "me",
+          smallID: 1,
+          clientID: "c-me",
+          name: "AnonPlayer",
+        }),
+      ]),
+    );
+
+    const player = game.myPlayer()!;
+    player.setTutorialCountryIdentity("Türkiye", "/flags/tr.svg");
+
+    expect(player.name()).toBe("Türkiye");
+    expect(player.displayName()).toBe("Türkiye");
+    expect(player.cosmetics.flag).toBe("/flags/tr.svg");
+  });
+
   it("local player's name is overridden with myUsername to bypass censorship", () => {
     const game = makeGameView({
       myClientID: "c-me",

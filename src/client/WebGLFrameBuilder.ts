@@ -150,6 +150,7 @@ export class WebGLFrameBuilder {
    * just first-seen — re-uploads only when the tile actually changes.
    */
   private readonly lastSpawnTile = new Map<number, number>();
+  private readonly lastIdentityRevision = new Map<number, number>();
   /** Skin atlas allocated once on first syncPlayers — player set is locked at game start. */
   private skinsInitialized = false;
   // The renderer needs to know which player is "me" so affiliation tint,
@@ -171,6 +172,7 @@ export class WebGLFrameBuilder {
     this.knownSmallIDs.clear();
     this.effectResolved.clear();
     this.lastSpawnTile.clear();
+    this.lastIdentityRevision.clear();
     this.localPlayerSmallID = 0;
     this.skinsInitialized = false;
   }
@@ -424,10 +426,21 @@ export class WebGLFrameBuilder {
       this.view.initSkinAtlas([...urls]);
     }
     const newPlayers: PlayerStatic[] = [];
+    const displayNameUpdates = new Map<string, string>();
+    const flagUrlUpdates = new Map<string, string | undefined>();
     for (const p of gameView.players()) {
       const smallID = p.smallID();
-      if (this.knownSmallIDs.has(smallID)) continue;
+      if (this.knownSmallIDs.has(smallID)) {
+        if (this.lastIdentityRevision.get(smallID) !== p.identityRevision) {
+          this.lastIdentityRevision.set(smallID, p.identityRevision);
+          displayNameUpdates.set(p.id(), p.displayName());
+          const flagRef = p.cosmetics.flag;
+          flagUrlUpdates.set(p.id(), flagRef ? assetUrl(flagRef) : undefined);
+        }
+        continue;
+      }
       this.knownSmallIDs.add(smallID);
+      this.lastIdentityRevision.set(smallID, p.identityRevision);
 
       this.writePaletteEntry(smallID, p.territoryColor(), p.borderColor());
 
@@ -436,7 +449,6 @@ export class WebGLFrameBuilder {
       // custom flag). assetUrl() passes URLs through and rewrites paths.
       const flagRef = p.cosmetics.flag;
       const flagUrl = flagRef ? assetUrl(flagRef) : undefined;
-
       // Crown cosmetic: already server-resolved to the catalog image URL.
       const crownRef = p.cosmetics.crown?.url;
       const crownUrl = crownRef ? assetUrl(crownRef) : undefined;
@@ -483,6 +495,12 @@ export class WebGLFrameBuilder {
         this.patternMeta,
         this.patternData,
       );
+    }
+    if (displayNameUpdates.size > 0) {
+      this.view.refreshNames(displayNameUpdates);
+    }
+    if (flagUrlUpdates.size > 0) {
+      this.view.refreshFlags(flagUrlUpdates);
     }
   }
 

@@ -509,10 +509,24 @@ export class PlayerPanel extends LitElement implements Controller {
   }
 
   private renderIdentityRow(other: PlayerView, my: PlayerView) {
-    const flagCode = other.cosmetics.flag;
+    const flagRef = other.cosmetics.flag;
+    const flagCode =
+      typeof flagRef === "string" && flagRef.startsWith("/flags/")
+        ? decodeURIComponent(
+            flagRef.slice("/flags/".length).replace(/\.svg$/, ""),
+          )
+        : flagRef;
     const country =
       typeof flagCode === "string"
         ? Countries.find((c) => c.code === flagCode)
+        : undefined;
+    const flagSrc =
+      typeof flagRef === "string"
+        ? assetUrl(
+            flagRef.startsWith("/flags/")
+              ? flagRef
+              : `flags/${encodeURIComponent(flagRef)}.svg`,
+          )
         : undefined;
 
     const chip =
@@ -522,10 +536,10 @@ export class PlayerPanel extends LitElement implements Controller {
 
     return html`
       <div class="flex items-center gap-2.5 flex-wrap">
-        ${country && typeof flagCode === "string"
+        ${flagSrc
           ? html`<img
-              src=${assetUrl(`flags/${encodeURIComponent(flagCode)}.svg`)}
-              alt=${country?.name ?? "Flag"}
+              src=${flagSrc}
+              alt=${country?.name ?? other.name()}
               class="h-10 w-10 rounded-full object-cover"
               @error=${(e: Event) => {
                 (e.target as HTMLImageElement).style.display = "none";

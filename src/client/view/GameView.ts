@@ -25,8 +25,8 @@ import {
 import { TerrainMapData } from "../../core/game/TerrainMapLoader";
 import { TerraNulliusImpl } from "../../core/game/TerraNulliusImpl";
 import { UnitGrid, UnitPredicate } from "../../core/game/UnitGrid";
-import { ClientID, GameID, Player, PlayerCosmetics } from "../../core/Schemas";
 import { UserSettings } from "../../core/game/UserSettings";
+import { ClientID, GameID, Player, PlayerCosmetics } from "../../core/Schemas";
 import { formatPlayerDisplayName } from "../../core/Util";
 import { WorkerClient } from "../../core/worker/WorkerClient";
 import { computeAllianceClusters } from "../render/frame/derive/AllianceClusters";
@@ -1071,6 +1071,36 @@ export class GameView implements GameMap {
 
   players(): PlayerView[] {
     return Array.from(this._players.values());
+  }
+
+  /** Resolve the nearest map country marker to a selected spawn tile. */
+  countryForTile(tile: TileRef): { name: string; flag?: string } | null {
+    const x = this.x(tile);
+    const y = this.y(tile);
+    const countries = [
+      ...this._mapData.nations,
+      ...this._mapData.additionalNations,
+    ];
+    let nearest:
+      | { name: string; flag?: string; distanceSquared: number }
+      | undefined;
+    for (const country of countries) {
+      const coordinates = country.coordinates;
+      if (!coordinates) continue;
+      const dx = x - coordinates[0];
+      const dy = y - coordinates[1];
+      const distanceSquared = dx * dx + dy * dy;
+      if (!nearest || distanceSquared < nearest.distanceSquared) {
+        nearest = { name: country.name, flag: country.flag, distanceSquared };
+      }
+    }
+    if (!nearest) return null;
+    return {
+      name: nearest.name,
+      flag: nearest.flag
+        ? `/flags/${encodeURIComponent(nearest.flag)}.svg`
+        : undefined,
+    };
   }
 
   /**

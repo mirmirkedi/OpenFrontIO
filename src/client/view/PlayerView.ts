@@ -3,7 +3,7 @@ import { base64url } from "jose";
 import { ColorPalette } from "../../core/CosmeticSchemas";
 import { PatternDecoder } from "../../core/PatternDecoder";
 import { ClientID, PlayerCosmetics } from "../../core/Schemas";
-import { createRandomName } from "../../core/Util";
+import { createRandomName, formatPlayerDisplayName } from "../../core/Util";
 import {
   BuildableUnit,
   Cell,
@@ -112,6 +112,8 @@ export class PlayerView {
   public state: PlayerState;
   /** Static header data — set once at construction, never mutated. */
   public static: PlayerStatic;
+  /** Incremented when a tutorial changes this player's displayed identity. */
+  public identityRevision = 0;
 
   // Assigned via computeColors() in the constructor; re-assignable on theme change.
   private _territoryColor!: Colord;
@@ -446,6 +448,17 @@ export class PlayerView {
       ? this.anonymousName
       : this.static.name;
   }
+
+  /** Apply a tutorial-only country identity after the player picks a spawn. */
+  setTutorialCountryIdentity(name: string, flag?: string): void {
+    this.static.name = name;
+    this.static.clanTag = null;
+    this.static.displayName = formatPlayerDisplayName(name);
+    this.anonymousName = null;
+    this.cosmetics = { ...this.cosmetics, flag };
+    this.identityRevision++;
+  }
+
   displayName(): string {
     return this.anonymousName !== null && userSettings.anonymousNames()
       ? this.anonymousName

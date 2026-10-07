@@ -920,6 +920,10 @@ export class GPURenderer {
     this.namePass.refreshNames(displayNames);
   }
 
+  refreshFlags(flagUrls: Map<string, string | undefined>): void {
+    this.namePass.refreshFlags(flagUrls);
+  }
+
   updateRelations(data: Uint8Array, size: number): void {
     this.borderPass.updateRelations(data, size);
     this.affiliationPalette.updateRelations(data, size);

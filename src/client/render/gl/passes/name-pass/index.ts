@@ -290,6 +290,19 @@ export class NamePass {
     }
   }
 
+  /** Replace cached player flags after a tutorial assigns a country identity. */
+  refreshFlags(flagUrls: Map<string, string | undefined>): void {
+    for (const [id, flagUrl] of flagUrls) {
+      const player = this.playerByID.get(id);
+      if (player === undefined) continue;
+      player.flag = flagUrl;
+      const slot = this.slots.get(id);
+      if (slot === undefined || slot.flagUrl === flagUrl) continue;
+      slot.flagUrl = flagUrl;
+      this.resolveSlotFlag(slot);
+    }
+  }
+
   /**
    * Request the texture layer for a slot's flag (called once at slot creation).
    * If the image is already loaded the layer index is set immediately; otherwise
@@ -400,10 +413,7 @@ export class NamePass {
             slot.flagUrl = p.flag;
             this.resolveSlotFlag(slot);
           }
-          nextSlotIndex = Math.max(
-            nextSlotIndex,
-            slot.index + 1,
-          );
+          nextSlotIndex = Math.max(nextSlotIndex, slot.index + 1);
         }
       }
     }

@@ -3,7 +3,6 @@ import { customElement, property, state } from "lit/decorators.js";
 import { assetUrl } from "../../../core/AssetUrls";
 import { EventBus } from "../../../core/EventBus";
 import { Cell, GameType, Structures, UnitType } from "../../../core/game/Game";
-import { activateTutorialForGame } from "../../TutorialProgress";
 import type { Controller } from "../../Controller";
 import {
   AttackRatioEvent,
@@ -21,6 +20,7 @@ import {
   SendAllianceRequestIntentEvent,
   SendAttackIntentEvent,
 } from "../../Transport";
+import { activateTutorialForGame } from "../../TutorialProgress";
 import type { UIState } from "../../UIState";
 import { translateText } from "../../Utils";
 import type { GameView } from "../../view";
@@ -320,6 +320,7 @@ export class TutorialOverlay extends LitElement implements Controller {
   private refreshTimer: number | undefined;
   private lockedZoomScale: number | null = null;
   private zoomCenterWorld: { x: number; y: number } | null = null;
+  private warshipCameraRestorePosition: { x: number; y: number } | null = null;
   private attackNeighborFocusRequested = false;
   private tutorialGestureScale: number | null = null;
   private tutorialAllowedPointers = new Set<number>();
@@ -340,6 +341,7 @@ export class TutorialOverlay extends LitElement implements Controller {
   private mapFocusTile: ReturnType<GameView["ref"]> | null = null;
   private mapTargetStepIndex = -1;
   private mapTargetOwnerID: number | null = null;
+  private tutorialCountryIdentityApplied = false;
   private mapActionPointer: {
     id: number;
     x: number;
@@ -782,7 +784,24 @@ export class TutorialOverlay extends LitElement implements Controller {
   tick() {
     if (!this.active || !this.game.myPlayer()) return;
     const player = this.game.myPlayer()!;
-    if (this.current.id === "spawn" && player.hasSpawned()) {
+    if (
+      !this.tutorialCountryIdentityApplied &&
+      player.state?.spawnTile !== undefined
+    ) {
+      const country = this.game.countryForTile(player.state!.spawnTile!);
+      if (country) {
+        player.setTutorialCountryIdentity(country.name, country.flag);
+        this.tutorialCountryIdentityApplied = true;
+      }
+    }
+    if (
+      this.current.id === "win" &&
+      player.isAlive() &&
+      this.game.players().filter((candidate) => candidate.isAlive()).length ===
+        1
+    ) {
+      this.finish();
+    } else if (this.current.id === "spawn" && player.hasSpawned()) {
       this.complete("spawn");
     } else if (
       this.current.id === "expand" &&
@@ -825,6 +844,8 @@ export class TutorialOverlay extends LitElement implements Controller {
   private complete(id: string) {
     if (!this.active || this.current.id !== id) return;
     if (id === "expand") this.zoomOutForAttackStep();
+    if (id === "port") this.shiftCameraForWarshipStep();
+    if (id === "warship") this.restoreWarshipCamera();
     if (this.stepIndex >= STEPS.length - 1) {
       this.finish();
       return;
@@ -860,6 +881,7 @@ export class TutorialOverlay extends LitElement implements Controller {
   }
 
   private finish() {
+    this.restoreWarshipCamera();
     this.eventBus.emit(new CloseLeaderboardEvent());
     this.stop();
     localStorage.removeItem(ACTIVE_KEY);
@@ -870,11 +892,39 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   private skip() {
     if (!window.confirm(translateText("tutorial.skip.confirm"))) return;
+    this.restoreWarshipCamera();
     this.stop();
     localStorage.removeItem(ACTIVE_KEY);
     localStorage.setItem(SKIPPED_KEY, "true");
     localStorage.removeItem(STEP_KEY);
     this.requestUpdate();
+  }
+
+  private shiftCameraForWarshipStep() {
+    if (this.warshipCameraRestorePosition) return;
+    const viewportWidth = this.transformHandler.width?.() ?? window.innerWidth;
+    const scale = this.transformHandler.scale;
+    if (!Number.isFinite(scale) || scale <= 0) return;
+    const center = this.transformHandler.screenToWorldCoordinatesFloat(
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+    );
+    this.warshipCameraRestorePosition = center;
+    // Shifting the camera center left moves the unchanged water target right
+    // on screen, away from the hard-to-tap edge.
+    this.eventBus.emit(
+      new GoToPositionEvent(
+        center.x - (viewportWidth * 0.06) / scale,
+        center.y,
+      ),
+    );
+  }
+
+  private restoreWarshipCamera() {
+    const position = this.warshipCameraRestorePosition;
+    if (!position) return;
+    this.warshipCameraRestorePosition = null;
+    this.eventBus.emit(new GoToPositionEvent(position.x, position.y));
   }
 
   private pointInRect(x: number, y: number) {
@@ -1057,9 +1107,12 @@ export class TutorialOverlay extends LitElement implements Controller {
     const bottom = Math.max(top, window.innerHeight - 180);
     const targetX = window.innerWidth * 0.5;
     const targetY = window.innerHeight * 0.46;
-    let best:
-      | { rect: DOMRect; score: number; tile: number; clearance: number }
-      | null = null;
+    let best: {
+      rect: DOMRect;
+      score: number;
+      tile: number;
+      clearance: number;
+    } | null = null;
     const ownedUnits =
       player && (wantsOwnedLand || this.current.id === "expand")
         ? this.unitsOwnedBy(player)
@@ -1107,7 +1160,11 @@ export class TutorialOverlay extends LitElement implements Controller {
         if (
           player &&
           wantsOwnedLand &&
-          !this.isValidStructureBuildTile(tile, buildStructures, structureMinDistance)
+          !this.isValidStructureBuildTile(
+            tile,
+            buildStructures,
+            structureMinDistance,
+          )
         ) {
           continue;
         }
@@ -1199,8 +1256,14 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (this.current.unit === UnitType.Warship) {
       const portExists = player
         ?.units(UnitType.Port)
-        .some((port) => port.isActive() && port.tile() === targetTile);
-      if (!portExists || !this.game.isOcean(focusTile)) return null;
+        .some((port) => port.isActive());
+      if (
+        !portExists ||
+        !this.game.isOcean(targetTile) ||
+        !this.game.isOcean(focusTile)
+      ) {
+        return null;
+      }
       return this.rectAtPoint(point.x, point.y);
     }
 
@@ -1400,9 +1463,13 @@ export class TutorialOverlay extends LitElement implements Controller {
   }
 
   private findOwnedOceanCoastTarget(player: TutorialPlayer): DOMRect | null {
+    const sideMargin = Math.max(
+      MAP_SPOTLIGHT_RADIUS + 24,
+      Math.min(430, window.innerWidth * 0.12),
+    );
     const inView = (point: { x: number; y: number }) =>
-      point.x >= 80 &&
-      point.x <= window.innerWidth - 80 &&
+      point.x >= sideMargin &&
+      point.x <= window.innerWidth - sideMargin &&
       point.y >= 100 &&
       point.y <= window.innerHeight - 140;
     const ownedUnits = this.unitsOwnedBy(player);
@@ -1442,16 +1509,24 @@ export class TutorialOverlay extends LitElement implements Controller {
       ) {
         continue;
       }
-      const inlandNeighbors = this.game
-        .neighbors(coastTile)
-        .filter(
-          (tile) =>
-            this.isLandOwnedBy(tile, player.smallID()) &&
-            !this.game.isOceanShore(tile),
-        );
-      const focusCandidates = inlandNeighbors.length
-        ? inlandNeighbors
-        : [coastTile];
+      const focusCandidates: number[] = [];
+      const visitedLand = new Set<number>([coastTile]);
+      let frontier = [coastTile];
+      for (let depth = 1; depth <= 8; depth++) {
+        const next: number[] = [];
+        for (const tile of frontier) {
+          for (const neighbor of this.game.neighbors(tile)) {
+            if (visitedLand.has(neighbor)) continue;
+            visitedLand.add(neighbor);
+            if (!this.isLandOwnedBy(neighbor, player.smallID())) continue;
+            focusCandidates.push(neighbor);
+            next.push(neighbor);
+          }
+        }
+        if (next.length === 0) break;
+        frontier = next;
+      }
+      if (focusCandidates.length === 0) focusCandidates.push(coastTile);
       for (const focusTile of focusCandidates) {
         const point = this.transformHandler.worldToScreenCoordinates(
           new Cell(this.game.x(focusTile) + 0.5, this.game.y(focusTile) + 0.5),
@@ -1523,7 +1598,9 @@ export class TutorialOverlay extends LitElement implements Controller {
     const portTile = port.tile();
     const visited = new Set<number>([portTile]);
     let frontier = [portTile];
-    const centerX = window.innerWidth * 0.5;
+    // The Port is often near the left coast. Bias the launch target slightly
+    // right so its spotlight stays comfortably tappable on narrow screens.
+    const centerX = window.innerWidth * 0.56;
     const centerY = window.innerHeight * 0.46;
     for (let depth = 1; depth <= 5; depth++) {
       const next: number[] = [];
@@ -1536,8 +1613,8 @@ export class TutorialOverlay extends LitElement implements Controller {
         for (const neighbor of this.game.neighbors(tile)) {
           if (visited.has(neighbor)) continue;
           visited.add(neighbor);
-          next.push(neighbor);
           if (!this.game.isOcean(neighbor)) continue;
+          next.push(neighbor);
           const point = this.transformHandler.worldToScreenCoordinates(
             new Cell(this.game.x(neighbor) + 0.5, this.game.y(neighbor) + 0.5),
           );
@@ -1558,7 +1635,9 @@ export class TutorialOverlay extends LitElement implements Controller {
       if (candidates.length > 0) {
         candidates.sort((a, b) => a.score - b.score);
         const target = candidates[0];
-        this.rememberMapTarget(portTile, target.tile, player.smallID());
+        // Buildables are queried against the clicked tile. Use connected
+        // ocean so Warship is buildable; the Port is only the launch anchor.
+        this.rememberMapTarget(target.tile);
         return this.rectAtPoint(target.point.x, target.point.y);
       }
       frontier = next;

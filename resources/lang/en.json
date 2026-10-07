@@ -1952,7 +1952,7 @@
       },
       "warship": {
         "title": "Launch a Warship",
-        "hint": "Tap your Port, open Attack, then choose Warship."
+        "hint": "Tap the highlighted water by your Port, open Attack, then choose Warship."
       },
       "silo": {
         "title": "Build a Missile Silo",
