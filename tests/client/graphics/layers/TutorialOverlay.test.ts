@@ -514,7 +514,11 @@ describe("TutorialOverlay deterministic progression", () => {
     window.dispatchEvent(blocked);
     expect(blocked.defaultPrevented).toBe(true);
 
+    Reflect.set(overlay, "lockedZoomScale", 2);
+    Reflect.set(overlay, "zoomCenterWorld", { x: 10, y: 20 });
     continueButton?.click();
+    expect(Reflect.get(overlay, "lockedZoomScale")).toBeNull();
+    expect(Reflect.get(overlay, "zoomCenterWorld")).toBeNull();
     expect(localStorage.getItem(ACTIVE_KEY)).toBeNull();
     expect(localStorage.getItem(COMPLETED_KEY)).toBe("true");
     expect(localStorage.getItem(STEP_KEY)).toBeNull();
@@ -526,6 +530,22 @@ describe("TutorialOverlay deterministic progression", () => {
     window.dispatchEvent(allowed);
     expect(allowed.defaultPrevented).toBe(false);
     overlay.stop();
+  });
+
+  test("skip clears tutorial restrictions and its temporary zoom lock", () => {
+    const { overlay } = createOverlay(3);
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    Reflect.set(overlay, "lockedZoomScale", 1.5);
+    Reflect.set(overlay, "zoomCenterWorld", { x: 5, y: 6 });
+
+    Reflect.get(overlay, "skip").call(overlay);
+
+    expect(Reflect.get(overlay, "lockedZoomScale")).toBeNull();
+    expect(Reflect.get(overlay, "zoomCenterWorld")).toBeNull();
+    expect(localStorage.getItem(ACTIVE_KEY)).toBeNull();
+    expect(localStorage.getItem(STEP_KEY)).toBeNull();
+    expect(localStorage.getItem("openfront.tutorial.skipped")).toBe("true");
+    vi.restoreAllMocks();
   });
 
   test("migrates old 17-step and intermediate 16-step saves", () => {

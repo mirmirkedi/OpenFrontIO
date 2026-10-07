@@ -620,6 +620,7 @@ export class TutorialOverlay extends LitElement implements Controller {
     this.eventBus.emit(new ShowReplayPanelEvent(false, isSinglePlayer));
 
     this.eventBus.on(ZoomEvent, (event) => {
+      if (!this.active) return;
       if (this.current.id === "zoom" && this.zoomCenterWorld) {
         const canvasCenter = this.transformHandler.screenToCanvasCoordinates(
           window.innerWidth / 2,
@@ -719,6 +720,11 @@ export class TutorialOverlay extends LitElement implements Controller {
   stop() {
     this.active = false;
     this.spawnPointer = null;
+    this.lockedZoomScale = null;
+    this.zoomCenterWorld = null;
+    this.tutorialGestureScale = null;
+    this.tutorialAllowedPointers.clear();
+    this.mapActionMenuAllowed = false;
     if (this.refreshTimer !== undefined)
       window.clearInterval(this.refreshTimer);
     window.removeEventListener("pointerdown", this.guardPointerDown, true);

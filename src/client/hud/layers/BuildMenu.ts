@@ -462,6 +462,11 @@ export class BuildMenu extends LitElement implements Controller {
   }
 
   public sendBuildOrUpgrade(buildableUnit: BuildableUnit, tile: TileRef): void {
+    const tutorialBuild =
+      localStorage.getItem(TUTORIAL_ACTIVE_KEY) === "true" &&
+      TUTORIAL_BUILD_UNITS.get(
+        Number(localStorage.getItem(TUTORIAL_STEP_KEY) ?? -1),
+      ) === buildableUnit.type;
     if (buildableUnit.canUpgrade !== false) {
       this.eventBus.emit(
         new SendUpgradeStructureIntentEvent(
@@ -469,7 +474,7 @@ export class BuildMenu extends LitElement implements Controller {
           buildableUnit.type,
         ),
       );
-    } else if (buildableUnit.canBuild) {
+    } else if (buildableUnit.canBuild || tutorialBuild) {
       const rocketDirectionUp =
         buildableUnit.type === UnitType.AtomBomb ||
         buildableUnit.type === UnitType.HydrogenBomb
@@ -516,7 +521,8 @@ export class BuildMenu extends LitElement implements Controller {
                 }
                 const enabled =
                   buildableUnit.canBuild !== false ||
-                  buildableUnit.canUpgrade !== false;
+                  buildableUnit.canUpgrade !== false ||
+                  tutorialUnit === item.unitType;
                 const tutorialDimmed =
                   tutorialUnit !== undefined && item.unitType !== tutorialUnit;
                 return html`
