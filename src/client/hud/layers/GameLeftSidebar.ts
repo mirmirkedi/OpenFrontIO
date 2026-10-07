@@ -23,6 +23,8 @@ const playerStatsSolidIcon = assetUrl("images/LeaderboardIconSolidWhite.svg");
 const teamStatsRegularIcon = assetUrl("images/TeamIconRegularWhite.svg");
 const teamStatsSolidIcon = assetUrl("images/TeamIconSolidWhite.svg");
 
+export class CloseLeaderboardEvent {}
+
 @customElement("game-left-sidebar")
 export class GameLeftSidebar extends LitElement implements Controller {
   @state()
@@ -61,6 +63,10 @@ export class GameLeftSidebar extends LitElement implements Controller {
     });
     this.eventBus?.on(CloseViewEvent, () => {
       if (!this.isPlayerStatsShown && !this.isTeamStatsShown) return;
+      this.isPlayerStatsShown = false;
+      this.isTeamStatsShown = false;
+    });
+    this.eventBus?.on(CloseLeaderboardEvent, () => {
       this.isPlayerStatsShown = false;
       this.isTeamStatsShown = false;
     });

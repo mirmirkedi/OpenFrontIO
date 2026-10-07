@@ -1,4 +1,7 @@
-import { GameLeftSidebar } from "../src/client/hud/layers/GameLeftSidebar";
+import {
+  CloseLeaderboardEvent,
+  GameLeftSidebar,
+} from "../src/client/hud/layers/GameLeftSidebar";
 import type { PlayerStats } from "../src/client/hud/layers/PlayerStats";
 import type { TeamStats } from "../src/client/hud/layers/TeamStats";
 import type { GameView, PlayerView } from "../src/client/view";
@@ -80,6 +83,52 @@ describe("GameLeftSidebar", () => {
     await playerStats.updateComplete;
     expect(playerStats.querySelector(".stats-table-row")).not.toBeNull();
 
+    sidebar.remove();
+  });
+
+
+  it("closes an open leaderboard when the tutorial advances", async () => {
+    const player = {
+      id: () => "player-1",
+      name: () => "Player 1",
+      displayName: () => "Player 1",
+      clanTag: () => null,
+      numTilesOwned: () => 10,
+      gold: () => 100n,
+      isAlive: () => true,
+      isOnSameTeam: () => false,
+      team: () => null,
+    } as unknown as PlayerView;
+    const game = {
+      config: () => ({
+        gameConfig: () => ({ gameMode: GameMode.FFA }),
+        maxTroops: () => 1_000,
+      }),
+      gameID: () => "test-game",
+      inSpawnPhase: () => false,
+      myPlayer: () => player,
+      numLandTiles: () => 100,
+      numTilesWithFallout: () => 0,
+      playerViews: () => [player],
+    } as unknown as GameView;
+    const eventBus = new EventBus();
+    const sidebar = new GameLeftSidebar();
+    sidebar.game = game;
+    sidebar.eventBus = eventBus;
+    document.body.append(sidebar);
+    sidebar.init();
+    await sidebar.updateComplete;
+
+    (sidebar.querySelector('[data-tutorial-target="leaderboard"]') as HTMLElement).click();
+    await sidebar.updateComplete;
+    const playerStats = sidebar.querySelector("player-stats") as PlayerStats;
+    await playerStats.updateComplete;
+    expect(playerStats.visible).toBe(true);
+
+    eventBus.emit(new CloseLeaderboardEvent());
+    await sidebar.updateComplete;
+    await playerStats.updateComplete;
+    expect(playerStats.visible).toBe(false);
     sidebar.remove();
   });
 

@@ -168,7 +168,7 @@ describe("GameRightSidebar end timer warnings", () => {
     document.body.innerHTML = "";
   });
 
-  it("unlocks speed and pause controls only on their tutorial steps", async () => {
+  it("keeps speed and pause controls locked until tutorial completion", async () => {
     localStorage.setItem("openfront.tutorial.active", "true");
     localStorage.setItem("openfront.tutorial.step", "3");
     const { sidebar } = createSidebar({}, GameType.Singleplayer);
@@ -186,13 +186,13 @@ describe("GameRightSidebar end timer warnings", () => {
     localStorage.setItem("openfront.tutorial.step", "4");
     sidebar.tick();
     await sidebar.updateComplete;
-    expect(speedButton?.disabled).toBe(false);
+    expect(speedButton?.disabled).toBe(true);
     expect(pauseButton?.disabled).toBe(true);
 
-    localStorage.setItem("openfront.tutorial.step", "5");
+    localStorage.removeItem("openfront.tutorial.active");
     sidebar.tick();
     await sidebar.updateComplete;
-    expect(speedButton?.disabled).toBe(true);
+    expect(speedButton?.disabled).toBe(false);
     expect(pauseButton?.disabled).toBe(false);
   });
 

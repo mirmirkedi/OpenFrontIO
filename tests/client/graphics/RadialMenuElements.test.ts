@@ -24,13 +24,12 @@ vi.mock("../../../src/client/hud/layers/BuildMenu", async () => {
   >("../../../src/core/game/Game");
   return {
     TUTORIAL_BUILD_UNITS: new Map([
-      [6, UnitType.City],
-      [7, UnitType.Factory],
-      [8, UnitType.DefensePost],
-      [10, UnitType.Port],
-      [11, UnitType.Warship],
-      [12, UnitType.MissileSilo],
-      [14, UnitType.SAMLauncher],
+      [4, UnitType.City],
+      [5, UnitType.Factory],
+      [6, UnitType.DefensePost],
+      [8, UnitType.Port],
+      [10, UnitType.MissileSilo],
+      [12, UnitType.SAMLauncher],
     ]),
     flattenedBuildTable: [
       {
@@ -304,7 +303,7 @@ describe("RadialMenuElements", () => {
 
     it("keeps other build choices visible but disabled during the City lesson", () => {
       localStorage.setItem("openfront.tutorial.active", "true");
-      localStorage.setItem("openfront.tutorial.step", "6");
+      localStorage.setItem("openfront.tutorial.step", "4");
       try {
         const subMenu = buildMenuElement.subMenu!(mockParams);
         const city = subMenu.find((item) => item.id === "build_City");
@@ -313,6 +312,23 @@ describe("RadialMenuElements", () => {
         expect(subMenu.map((item) => item.id)).toContain("build_Factory");
         expect(city?.disabled(mockParams)).toBe(false);
         expect(factory?.disabled(mockParams)).toBe(true);
+      } finally {
+        localStorage.removeItem("openfront.tutorial.active");
+        localStorage.removeItem("openfront.tutorial.step");
+      }
+    });
+
+    it("shows the Warship choice in Attack during its tutorial step", () => {
+      localStorage.setItem("openfront.tutorial.active", "true");
+      localStorage.setItem("openfront.tutorial.step", "9");
+      try {
+        const root = rootMenuElement.subMenu!(mockParams);
+        const attack = root.find((item) => item.id === "attack");
+        const subMenu = attack?.subMenu?.(mockParams) ?? [];
+        const warship = subMenu.find((item) => item.id === "attack_Warship");
+        expect(attack).toBeDefined();
+        expect(warship).toBeDefined();
+        expect(warship?.disabled(mockParams)).toBe(false);
       } finally {
         localStorage.removeItem("openfront.tutorial.active");
         localStorage.removeItem("openfront.tutorial.step");

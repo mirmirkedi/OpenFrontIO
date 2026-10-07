@@ -564,7 +564,10 @@ export class InputHandler {
       )
         deltaX -= this.PAN_SPEED;
 
-      if (deltaX || deltaY) {
+      if (
+        (deltaX || deltaY) &&
+        localStorage.getItem("openfront.tutorial.active") !== "true"
+      ) {
         this.eventBus.emit(new DragEvent(deltaX, deltaY));
       }
 
@@ -914,6 +917,12 @@ export class InputHandler {
           this.suppressNextTap = false;
           event.preventDefault();
           return;
+        }
+        // Spawn selection is handled by ClientGameRunner through MouseUpEvent.
+        // Touches normally emit only TouchEvent, so mirror a tap into the
+        // existing spawn path while the game is waiting for a spawn tile.
+        if (this.gameView.inSpawnPhase()) {
+          this.eventBus.emit(new MouseUpEvent(event.clientX, event.clientY));
         }
         this.eventBus.emit(new TouchEvent(event.x, event.y));
         event.preventDefault();

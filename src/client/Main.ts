@@ -354,9 +354,11 @@ class Client {
     document.addEventListener("join-lobby", this.handleJoinLobby.bind(this));
     document.addEventListener("replay-tutorial", () => {
       const singlePlayer = document.querySelector("single-player-modal") as {
-        open?: (args?: Record<string, unknown>) => void;
+        startTutorialWithDefaults?: () => Promise<void>;
       } | null;
-      singlePlayer?.open?.({ tutorial: true });
+      void singlePlayer?.startTutorialWithDefaults?.().catch((error) => {
+        console.error("Failed to start tutorial directly", error);
+      });
     });
     document.addEventListener(
       "resume-local-game",

@@ -1,5 +1,8 @@
 import {
+  DragEvent,
   InputHandler,
+  MouseUpEvent,
+  TouchEvent,
   ZOOM_DELTA_DIVISOR,
   ZoomEvent,
 } from "../../src/client/InputHandler";
@@ -55,8 +58,32 @@ function setup() {
   const handler = new InputHandler(gameView, {} as UIState, canvas, eventBus);
   handler.initialize();
 
-  return { canvas, handler, zooms };
+  return { canvas, eventBus, handler, zooms };
 }
+
+describe("InputHandler tutorial keyboard movement", () => {
+  it("does not pan with a held movement key until the tutorial ends", () => {
+    const { canvas, eventBus, handler } = setup();
+    const drags: DragEvent[] = [];
+    eventBus.on(DragEvent, (event) => drags.push(event));
+    Reflect.get(handler, "activeKeys").add("ArrowUp");
+    const moveKeys = Reflect.get(handler, "moveKeys") as () => void;
+
+    try {
+      localStorage.setItem("openfront.tutorial.active", "true");
+      moveKeys();
+      expect(drags).toHaveLength(0);
+
+      localStorage.removeItem("openfront.tutorial.active");
+      moveKeys();
+      expect(drags).toHaveLength(1);
+    } finally {
+      localStorage.removeItem("openfront.tutorial.active");
+      handler.destroy();
+      canvas.remove();
+    }
+  });
+});
 
 describe("InputHandler Safari trackpad pinch", () => {
   let ctx: ReturnType<typeof setup>;
@@ -186,5 +213,103 @@ describe("InputHandler Safari trackpad pinch", () => {
       const event = dispatchGesture(ctx.canvas, type, { scale: 1.2 });
       expect(event.defaultPrevented).toBe(true);
     }
+  });
+});
+
+describe("InputHandler touch spawn selection", () => {
+  afterEach(() => {
+    localStorage.removeItem("openfront.tutorial.active");
+    localStorage.removeItem("openfront.tutorial.step");
+  });
+
+  it("routes a mobile tap through the normal spawn selection event", () => {
+    localStorage.setItem("openfront.tutorial.active", "true");
+    localStorage.setItem("openfront.tutorial.step", "1");
+    const canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    const eventBus = new EventBus();
+    const mouseUps: MouseUpEvent[] = [];
+    const touches: TouchEvent[] = [];
+    eventBus.on(MouseUpEvent, (event) => mouseUps.push(event));
+    eventBus.on(TouchEvent, (event) => touches.push(event));
+    const gameView = { inSpawnPhase: () => true } as unknown as GameView;
+    const handler = new InputHandler(gameView, {} as UIState, canvas, eventBus);
+    handler.initialize();
+
+    const pointerDown = new Event("pointerdown", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.assign(pointerDown, {
+      pointerId: 7,
+      pointerType: "touch",
+      button: 0,
+      clientX: 232,
+      clientY: 387,
+    });
+    canvas.dispatchEvent(pointerDown);
+
+    const pointerUp = new Event("pointerup", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.assign(pointerUp, {
+      pointerId: 7,
+      pointerType: "touch",
+      button: 0,
+      clientX: 232,
+      clientY: 387,
+      x: 232,
+      y: 387,
+    });
+    window.dispatchEvent(pointerUp);
+
+    expect(mouseUps).toHaveLength(1);
+    expect(mouseUps[0]).toMatchObject({ x: 232, y: 387 });
+    expect(touches).toHaveLength(1);
+    handler.destroy();
+    canvas.remove();
+  });
+
+  it("does not turn normal gameplay touches into map clicks", () => {
+    const canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    const eventBus = new EventBus();
+    const mouseUps: MouseUpEvent[] = [];
+    eventBus.on(MouseUpEvent, (event) => mouseUps.push(event));
+    const gameView = { inSpawnPhase: () => false } as unknown as GameView;
+    const handler = new InputHandler(gameView, {} as UIState, canvas, eventBus);
+    handler.initialize();
+
+    const pointerDown = new Event("pointerdown", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.assign(pointerDown, {
+      pointerId: 8,
+      pointerType: "touch",
+      button: 0,
+      clientX: 120,
+      clientY: 120,
+    });
+    canvas.dispatchEvent(pointerDown);
+    const pointerUp = new Event("pointerup", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.assign(pointerUp, {
+      pointerId: 8,
+      pointerType: "touch",
+      button: 0,
+      clientX: 120,
+      clientY: 120,
+      x: 120,
+      y: 120,
+    });
+    window.dispatchEvent(pointerUp);
+
+    expect(mouseUps).toHaveLength(0);
+    handler.destroy();
+    canvas.remove();
   });
 });

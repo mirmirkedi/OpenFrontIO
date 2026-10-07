@@ -143,7 +143,9 @@ function tutorialStep() {
 
 function tutorialExpectedUnit(): UnitType | undefined {
   const step = tutorialStep();
-  return step === 13 ? UnitType.AtomBomb : TUTORIAL_BUILD_UNITS.get(step);
+  if (step === 9) return UnitType.Warship;
+  if (step === 11) return UnitType.AtomBomb;
+  return TUTORIAL_BUILD_UNITS.get(step);
 }
 
 function isFriendlyTarget(params: MenuElementParams): boolean {
@@ -418,6 +420,9 @@ function getAllEnabledUnits(
 
   if (myPlayer) {
     Structures.types.forEach(addIfEnabled);
+    // Warships are otherwise classified as attack units and omitted from
+    // own-territory radial menus. The tutorial builds one from the Port tile.
+    if (tutorialStep() === 9) addIfEnabled(UnitType.Warship);
   } else {
     BuildableAttacks.types.forEach(addIfEnabled);
   }
@@ -746,8 +751,7 @@ export const centerButtonElement: CenterButtonElement = {
     const step = tutorialStep();
     if (
       step !== -1 &&
-      ![1, 2, 3, 16].includes(step) &&
-      !(step === 10 && !params.game.hasOwner(params.tile))
+      ![1, 2, 3, 14].includes(step)
     ) {
       return true;
     }
@@ -841,9 +845,11 @@ export const rootMenuElement: MenuElement = {
     if (tutorialStep() !== -1) {
       const step = tutorialStep();
       if (isOwnTerritory && tutorialExpectedUnit() !== undefined) {
-        return [infoMenuElement, buildMenuElement];
+        return step === 9
+          ? [infoMenuElement, attackMenuElement]
+          : [infoMenuElement, buildMenuElement];
       }
-      if (step === 2 || step === 3 || step === 10 || step === 16) {
+      if (step === 2 || step === 3 || step === 14) {
         if (step === 2) {
           // Keep the full radial menu visible during the first action lessons
           // so mobile players can learn its layout. The center action is the
@@ -869,10 +875,10 @@ export const rootMenuElement: MenuElement = {
         }
         return [infoMenuElement];
       }
-      if (step === 9) {
+      if (step === 7) {
         return [infoMenuElement, allyRequestElement];
       }
-      if (step === 13) {
+      if (step === 11) {
         return [infoMenuElement, attackMenuElement];
       }
     }

@@ -12,7 +12,7 @@ const STEP_KEY = "openfront.tutorial.step";
 describe("BuildMenu tutorial choices", () => {
   beforeEach(() => {
     localStorage.setItem(ACTIVE_KEY, "true");
-    localStorage.setItem(STEP_KEY, "6");
+    localStorage.setItem(STEP_KEY, "4");
   });
 
   afterEach(() => {

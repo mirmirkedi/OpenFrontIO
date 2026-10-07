@@ -128,13 +128,12 @@ const TUTORIAL_ACTIVE_KEY = "openfront.tutorial.active";
 const TUTORIAL_STEP_KEY = "openfront.tutorial.step";
 // Keep the build menu closed until the scripted tutorial reaches a build step.
 export const TUTORIAL_BUILD_UNITS = new Map<number, UnitType>([
-  [6, UnitType.City],
-  [7, UnitType.Factory],
-  [8, UnitType.DefensePost],
-  [10, UnitType.Port],
-  [11, UnitType.Warship],
-  [12, UnitType.MissileSilo],
-  [14, UnitType.SAMLauncher],
+  [4, UnitType.City],
+  [5, UnitType.Factory],
+  [6, UnitType.DefensePost],
+  [8, UnitType.Port],
+  [10, UnitType.MissileSilo],
+  [12, UnitType.SAMLauncher],
 ]);
 const TUTORIAL_BUILD_STEPS = new Set(TUTORIAL_BUILD_UNITS.keys());
 

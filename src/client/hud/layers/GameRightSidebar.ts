@@ -245,13 +245,6 @@ export class GameRightSidebar extends LitElement implements Controller {
     this.eventBus.emit(new PauseGameIntentEvent(this.isPaused));
   }
 
-  private isTutorialControlUnlocked(step: number) {
-    return (
-      localStorage.getItem(TUTORIAL_ACTIVE_KEY) !== "true" ||
-      localStorage.getItem(TUTORIAL_STEP_KEY) === String(step)
-    );
-  }
-
   private getTutorialControlState() {
     return `${localStorage.getItem(TUTORIAL_ACTIVE_KEY)}:${localStorage.getItem(TUTORIAL_STEP_KEY)}`;
   }
@@ -429,8 +422,10 @@ export class GameRightSidebar extends LitElement implements Controller {
     const showPauseButton =
       isReplayOrSingleplayer ||
       (this.isLobbyCreator && !this.game.config().listed);
-    const replayUnlocked = this.isTutorialControlUnlocked(4);
-    const pauseUnlocked = this.isTutorialControlUnlocked(5);
+    // Speed and pause controls stay locked until the player confirms the final
+    // tutorial step, so they cannot open panels or interrupt the lesson.
+    const replayUnlocked = localStorage.getItem(TUTORIAL_ACTIVE_KEY) !== "true";
+    const pauseUnlocked = localStorage.getItem(TUTORIAL_ACTIVE_KEY) !== "true";
     // The host of a private lobby can start a fresh lobby at any time, without
     // waiting to die or for the game to end.
     const showNewLobbyButton = this.isLobbyCreator && this.isPrivateLobby;

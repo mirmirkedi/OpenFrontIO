@@ -1904,6 +1904,7 @@
     "controls.pause": "Pause game",
     "controls.resume": "Resume game",
     "skip": "Skip tutorial",
+    "continue": "Continue playing",
     "step": {
       "zoom": {
         "title": "Zoom in",
@@ -1911,7 +1912,7 @@
       },
       "spawn": {
         "title": "Choose your starting point",
-        "hint": "Tap the highlighted spot or another clear patch of land to choose where to start."
+        "hint": "Tap the highlighted spot to choose your starting point."
       },
       "expand": {
         "title": "Expand your territory",
@@ -1950,8 +1951,8 @@
         "hint": "Tap the highlighted land on the ocean coast, open Build, then choose Port."
       },
       "warship": {
-        "title": "Build a Warship",
-        "hint": "Tap the highlighted land, open Build, then choose Warship."
+        "title": "Launch a Warship",
+        "hint": "Tap your Port, open Attack, then choose Warship."
       },
       "silo": {
         "title": "Build a Missile Silo",
@@ -1971,7 +1972,7 @@
       },
       "win": {
         "title": "Win the match",
-        "hint": "Attack the highlighted neighboring country. Keep expanding until you win."
+        "hint": "Keep expanding to win the match. When you’re ready, continue to unlock all controls."
       }
     },
     "step.pause.resume": "The game is paused. Tap Resume to continue the tutorial.",

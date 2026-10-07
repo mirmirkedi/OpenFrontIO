@@ -130,6 +130,7 @@ export class SinglePlayerModal extends BaseModal {
   protected routerName = "single-player";
   private tutorialRequested = false;
   private firstGameStartPromise: Promise<void> | null = null;
+  private tutorialStartPromise: Promise<void> | null = null;
 
   @state() private selectedMap: GameMapType = DEFAULT_OPTIONS.selectedMap;
   @state() private selectedDifficulty: Difficulty =
@@ -637,6 +638,24 @@ export class SinglePlayerModal extends BaseModal {
     } finally {
       this.firstGameStartPromise = null;
     }
+  }
+
+  /** Start the Help-page tutorial directly, without showing battle setup. */
+  public async startTutorialWithDefaults(): Promise<void> {
+    if (this.tutorialStartPromise) return this.tutorialStartPromise;
+
+    this.tutorialRequested = true;
+    this.tutorialStartPromise = (async () => {
+      try {
+        await this.loadNationCount();
+        await this.startGame();
+      } finally {
+        this.tutorialRequested = false;
+        this.tutorialStartPromise = null;
+      }
+    })();
+
+    return this.tutorialStartPromise;
   }
 
   private handleSelectRandomMap() {

@@ -2110,6 +2110,7 @@
     "controls.pause": "Oyunu duraklat",
     "controls.resume": "Oyuna devam et",
     "skip": "Eğitimi geç",
+    "continue": "Oyuna devam et",
     "step": {
       "zoom": {
         "title": "Haritayı yakınlaştır",
@@ -2117,7 +2118,7 @@
       },
       "spawn": {
         "title": "Başlangıç noktanı seç",
-        "hint": "Başlangıç yerini seçmek için parlayan noktaya veya geniş ve boş bir araziye dokun."
+        "hint": "Başlangıç noktanı seçmek için yalnızca parlayan noktaya dokun."
       },
       "expand": {
         "title": "Topraklarını genişlet",
@@ -2156,8 +2157,8 @@
         "hint": "Parlayan deniz kıyısındaki araziye dokun, İnşa menüsünü aç ve Liman seç."
       },
       "warship": {
-        "title": "Savaş gemisi kur",
-        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve Savaş Gemisi seç."
+        "title": "Savaş gemisi gönder",
+        "hint": "Limanına dokun, Saldırı menüsünü aç ve Savaş Gemisi seç."
       },
       "silo": {
         "title": "Füze silosu kur",
@@ -2177,7 +2178,7 @@
       },
       "win": {
         "title": "Maçı kazan",
-        "hint": "Parlayan komşu ülkeye saldır. Kazanana kadar topraklarını genişlet."
+        "hint": "Kazanmak için topraklarını genişlet. Hazır olduğunda devam ederek tüm kontrolleri aç."
       }
     },
     "step.pause.resume": "Oyun duraklatıldı. Eğitime devam etmek için Devam et düğmesine bas.",

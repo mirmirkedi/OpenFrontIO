@@ -5,7 +5,7 @@ import { Cell, GameType, UnitType } from "../../../core/game/Game";
 import type { Controller } from "../../Controller";
 import {
   AttackRatioEvent,
-  ReplaySpeedChangeEvent,
+  MouseUpEvent,
   ZOOM_DELTA_DIVISOR,
   ZoomEvent,
 } from "../../InputHandler";
@@ -13,20 +13,21 @@ import type { TransformHandler } from "../../TransformHandler";
 import { GoToPlayerEvent, GoToPositionEvent } from "../../TransformHandler";
 import {
   BuildUnitIntentEvent,
-  PauseGameIntentEvent,
   SendAllianceRequestIntentEvent,
   SendAttackIntentEvent,
-  SendWinnerEvent,
 } from "../../Transport";
 import type { UIState } from "../../UIState";
 import { translateText } from "../../Utils";
 import type { GameView } from "../../view";
+import { CloseLeaderboardEvent } from "./GameLeftSidebar";
 import { ShowReplayPanelEvent } from "./ReplayPanel";
 
 const ACTIVE_KEY = "openfront.tutorial.active";
 const COMPLETED_KEY = "openfront.tutorial.completed";
 const SKIPPED_KEY = "openfront.tutorial.skipped";
 const STEP_KEY = "openfront.tutorial.step";
+const SPEED_STEP_REMOVED_KEY = "openfront.tutorial.speed-step-removed";
+const STEP_INDEX_VERSION_KEY = "openfront.tutorial.step-index-version";
 const TUTORIAL_ZOOM_SCALE = 4.0;
 const TUTORIAL_ATTACK_RATIO = 0.15;
 const TARGET_REFRESH_INTERVAL_MS = 300;
@@ -67,18 +68,6 @@ const STEPS: TutorialStep[] = [
     title: "tutorial.step.attack.title",
     hint: "tutorial.step.attack.hint",
     mapTarget: true,
-  },
-  {
-    id: "speed",
-    title: "tutorial.step.speed.title",
-    hint: "tutorial.step.speed.hint",
-    target: "replay",
-  },
-  {
-    id: "pause",
-    title: "tutorial.step.pause.title",
-    hint: "tutorial.step.pause.hint",
-    target: "pause",
   },
   {
     id: "city",
@@ -257,6 +246,27 @@ export class TutorialOverlay extends LitElement implements Controller {
       color: white;
       border-color: rgba(128, 220, 255, 0.55);
     }
+    .continue {
+      pointer-events: auto;
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(128, 220, 255, 0.55);
+      border-radius: 8px;
+      background: rgba(8, 48, 72, 0.96);
+      color: #b9edff;
+      font:
+        700 11px/1 Inter,
+        system-ui,
+        sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .continue:hover {
+      color: white;
+      border-color: rgba(128, 220, 255, 0.85);
+      background: rgba(11, 65, 95, 0.98);
+    }
     @keyframes tutorial-hand {
       0%,
       100% {
@@ -280,12 +290,19 @@ export class TutorialOverlay extends LitElement implements Controller {
   private zoomCenterWorld: { x: number; y: number } | null = null;
   private attackNeighborFocusRequested = false;
   private tutorialGestureScale: number | null = null;
-  private pauseStepPaused = false;
   private tutorialAllowedPointers = new Set<number>();
+  private spawnPointer: {
+    id: number;
+    x: number;
+    y: number;
+    targetX: number;
+    targetY: number;
+  } | null = null;
   private enemyBorderTiles: ReadonlySet<number> = new Set();
   private adjacentEnemyTiles: ReadonlySet<number> = new Set();
   private adjacentUnownedLandTiles: ReadonlySet<number> = new Set();
   private invalidPortTargets = new Set<number>();
+  private spawnTargetTile: ReturnType<GameView["ref"]> | null = null;
   private portTargetTile: ReturnType<GameView["ref"]> | null = null;
   private portTargetRequest: Promise<void> | null = null;
   private portFocusRequested = false;
@@ -296,6 +313,36 @@ export class TutorialOverlay extends LitElement implements Controller {
   private nextNeighborScanAt = Number.NEGATIVE_INFINITY;
 
   private readonly guardPointerDown = (event: PointerEvent) => {
+    if (this.active && this.current.id === "spawn") {
+      if (
+        event
+          .composedPath()
+          .some(
+            (node) =>
+              node instanceof Element && node.classList.contains("skip"),
+          )
+      ) {
+        return;
+      }
+      if (
+        event.button === 0 &&
+        this.spawnPointer === null &&
+        this.canInteractAt(event.clientX, event.clientY, event)
+      ) {
+        this.spawnPointer = {
+          id: event.pointerId,
+          x: event.clientX,
+          y: event.clientY,
+          targetX: this.rect!.left + this.rect!.width / 2,
+          targetY: this.rect!.top + this.rect!.height / 2,
+        };
+      }
+      // The highlighted circle covers many map tiles. Route a completed tap
+      // through the game's spawn validation using the selected tile below.
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     // Let map touches reach InputHandler so it can recognize pinch gestures.
     // A touch on a HUD control must not activate that control during the lesson.
     if (
@@ -335,6 +382,32 @@ export class TutorialOverlay extends LitElement implements Controller {
   };
 
   private readonly guardPointerEnd = (event: PointerEvent) => {
+    if (this.active && this.current.id === "spawn") {
+      if (
+        event
+          .composedPath()
+          .some(
+            (node) =>
+              node instanceof Element && node.classList.contains("skip"),
+          )
+      ) {
+        return;
+      }
+      const start = this.spawnPointer;
+      this.spawnPointer = null;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (
+        event.type === "pointerup" &&
+        start?.id === event.pointerId &&
+        this.pointInSpotlight(event.clientX, event.clientY) &&
+        Math.hypot(event.clientX - start.x, event.clientY - start.y) < 12 &&
+        this.spawnTargetTile !== null
+      ) {
+        this.eventBus.emit(new MouseUpEvent(start.targetX, start.targetY));
+      }
+      return;
+    }
     this.tutorialAllowedPointers.delete(event.pointerId);
   };
 
@@ -362,6 +435,22 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   private readonly guardKeyDown = (event: KeyboardEvent) => {
     if (!this.active) return;
+    if (
+      [
+        "KeyW",
+        "KeyA",
+        "KeyS",
+        "KeyD",
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+      ].includes(event.code)
+    ) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     if (event.code === "Enter" || event.code === "Space") {
       if (
         this.current.id === "leaderboard" &&
@@ -430,18 +519,13 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (
       this.active &&
       this.current.id !== "zoom" &&
-      event.pointerType === "touch" &&
-      this.tutorialAllowedPointers.size > 1
+      this.tutorialAllowedPointers.has(event.pointerId)
     ) {
       event.preventDefault();
       event.stopImmediatePropagation();
       return;
     }
-    if (
-      !this.active ||
-      this.tutorialAllowedPointers.has(event.pointerId) ||
-      this.canInteractAt(event.clientX, event.clientY, event)
-    )
+    if (!this.active || this.canInteractAt(event.clientX, event.clientY, event))
       return;
     event.preventDefault();
     event.stopImmediatePropagation();
@@ -501,6 +585,21 @@ export class TutorialOverlay extends LitElement implements Controller {
       0,
       Math.min(STEPS.length - 1, Number(localStorage.getItem(STEP_KEY) ?? 0)),
     );
+    if (localStorage.getItem(STEP_INDEX_VERSION_KEY) !== "2") {
+      const savedStep = Number(localStorage.getItem(STEP_KEY) ?? 0);
+      const previousReleaseRemovedSpeed =
+        localStorage.getItem(SPEED_STEP_REMOVED_KEY) === "true";
+      if (previousReleaseRemovedSpeed) {
+        // The previous 16-step flow still included Pause/Resume.
+        if (savedStep >= 5) this.stepIndex = savedStep - 1;
+      } else if (savedStep >= 4) {
+        // Migrate directly from the original 17-step flow to this 15-step one.
+        this.stepIndex = savedStep >= 6 ? savedStep - 2 : 4;
+      }
+      this.stepIndex = Math.max(0, Math.min(STEPS.length - 1, this.stepIndex));
+      localStorage.setItem(STEP_KEY, String(this.stepIndex));
+      localStorage.setItem(STEP_INDEX_VERSION_KEY, "2");
+    }
     this.refreshTimer = window.setInterval(
       () => this.refreshTarget(),
       TARGET_REFRESH_INTERVAL_MS,
@@ -518,6 +617,7 @@ export class TutorialOverlay extends LitElement implements Controller {
     window.addEventListener("gesturechange", this.guardGesture, true);
     window.addEventListener("gesturestart", this.guardGesture, true);
     window.addEventListener("gestureend", this.guardGesture, true);
+    this.eventBus.emit(new ShowReplayPanelEvent(false, isSinglePlayer));
 
     this.eventBus.on(ZoomEvent, (event) => {
       if (this.current.id === "zoom" && this.zoomCenterWorld) {
@@ -578,36 +678,6 @@ export class TutorialOverlay extends LitElement implements Controller {
     this.eventBus.on(SendAllianceRequestIntentEvent, () =>
       this.complete("ally"),
     );
-    this.eventBus.on(PauseGameIntentEvent, (event) => {
-      if (this.current.id !== "pause") return;
-      if (event.paused) {
-        this.pauseStepPaused = true;
-        this.requestUpdate();
-      } else if (this.pauseStepPaused) {
-        this.complete("pause");
-      }
-    });
-    this.eventBus.on(ReplaySpeedChangeEvent, () => {
-      if (this.current.id !== "speed") return;
-      this.complete("speed");
-      this.eventBus.emit(
-        new ShowReplayPanelEvent(
-          false,
-          this.game.config().gameConfig().gameType === GameType.Singleplayer,
-        ),
-      );
-    });
-    this.eventBus.on(SendWinnerEvent, (event) => {
-      const player = this.game.myPlayer();
-      const winner = event.winner;
-      if (
-        player &&
-        ((winner?.[0] === "player" && winner[1] === player.clientID()) ||
-          (winner?.[0] === "team" && winner[1] === player.team()))
-      ) {
-        this.finish();
-      }
-    });
     this.eventBus.on(BuildUnitIntentEvent, (event) => {
       if (this.current.unit === event.unit) this.complete(this.current.id);
       if (
@@ -648,6 +718,7 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   stop() {
     this.active = false;
+    this.spawnPointer = null;
     if (this.refreshTimer !== undefined)
       window.clearInterval(this.refreshTimer);
     window.removeEventListener("pointerdown", this.guardPointerDown, true);
@@ -676,10 +747,16 @@ export class TutorialOverlay extends LitElement implements Controller {
     this.stepIndex += 1;
     this.attackNeighborFocusRequested = false;
     this.portFocusRequested = false;
+    this.spawnTargetTile = null;
+    this.spawnPointer = null;
     this.mapActionMenuAllowed = false;
-    this.pauseStepPaused = false;
     this.tutorialAllowedPointers.clear();
     localStorage.setItem(STEP_KEY, String(this.stepIndex));
+    if (id === "leaderboard") {
+      // The click opens the panel after this capture-phase handler advances the
+      // tutorial, so close it once the click has finished bubbling.
+      queueMicrotask(() => this.eventBus.emit(new CloseLeaderboardEvent()));
+    }
     this.rect = null;
     this.requestUpdate();
   }
@@ -718,11 +795,23 @@ export class TutorialOverlay extends LitElement implements Controller {
     );
   }
 
+  private pointInSpotlight(x: number, y: number) {
+    if (!this.rect) return false;
+    const radius = Math.min(this.rect.width, this.rect.height) / 2;
+    return (
+      Math.hypot(
+        x - (this.rect.left + this.rect.width / 2),
+        y - (this.rect.top + this.rect.height / 2),
+      ) <= radius
+    );
+  }
+
   private currentTargetSelector() {
-    if (this.current.id === "speed") {
-      const speedSelector = '[data-tutorial-target="replay-speed"]';
-      if (this.isVisibleElement(speedSelector)) return speedSelector;
-      return '[data-tutorial-target="replay"]';
+    if (
+      this.current.unit === UnitType.Warship &&
+      this.isVisibleElement('[data-id="attack_Warship"]')
+    ) {
+      return '[data-id="attack_Warship"]';
     }
     if (this.current.target)
       return `[data-tutorial-target="${this.current.target}"]`;
@@ -758,17 +847,24 @@ export class TutorialOverlay extends LitElement implements Controller {
       event
         .composedPath()
         .some(
-          (node) => node instanceof Element && node.classList.contains("skip"),
+          (node) =>
+            node instanceof Element &&
+            (node.classList.contains("skip") ||
+              node.classList.contains("continue")),
         )
     ) {
       return true;
     }
     if (this.current.id === "zoom") return false;
     if (this.current.id === "spawn") {
-      // During spawn the game input handler already validates the selected
-      // tile. Don't let a second tutorial-side coordinate transform swallow
-      // valid taps on the highlighted spot, especially on scaled touch screens.
-      return this.isCanvasEvent(event) || this.pointIsOnGameCanvas(x, y, event);
+      const eventIsMap =
+        this.isCanvasEvent(event) || this.pointIsOnGameCanvas(x, y, event);
+      return (
+        eventIsMap &&
+        !this.isControlEvent(event) &&
+        this.pointInSpotlight(x, y) &&
+        this.spawnTargetTile !== null
+      );
     }
     if (this.current.mapTarget) {
       if (this.isActionMenuEvent(event)) return this.mapActionMenuAllowed;
@@ -809,6 +905,7 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (this.current.mapTarget) {
       const mapTarget = this.findMapTarget();
       if (mapTarget) return mapTarget;
+      if (this.current.id === "spawn") return null;
     }
 
     // Enemy-target lessons must never silently point at the map center: at
@@ -868,7 +965,7 @@ export class TutorialOverlay extends LitElement implements Controller {
     const bottom = Math.max(top, window.innerHeight - 180);
     const targetX = window.innerWidth * 0.5;
     const targetY = window.innerHeight * 0.46;
-    let best: { rect: DOMRect; score: number } | null = null;
+    let best: { rect: DOMRect; score: number; tile: number } | null = null;
 
     const mapStep = 24;
     for (let y = top; y <= bottom; y += mapStep) {
@@ -901,9 +998,13 @@ export class TutorialOverlay extends LitElement implements Controller {
           best = {
             rect: new DOMRect(x - 38, y - 38, 76, 76),
             score,
+            tile,
           };
         }
       }
+    }
+    if (this.current.id === "spawn") {
+      this.spawnTargetTile = best?.tile ?? null;
     }
     return best?.rect ?? null;
   }
@@ -1004,7 +1105,7 @@ export class TutorialOverlay extends LitElement implements Controller {
     const bottom = Math.max(top, window.innerHeight - 180);
     const centerX = window.innerWidth * 0.5;
     const centerY = window.innerHeight * 0.46;
-    let best: { rect: DOMRect; score: number } | null = null;
+    let best: { rect: DOMRect; score: number; tile: number } | null = null;
 
     for (const tile of this.adjacentUnownedLandTiles) {
       const x = this.game.x(tile);
@@ -1025,7 +1126,11 @@ export class TutorialOverlay extends LitElement implements Controller {
       const score =
         coastPriority + Math.hypot(point.x - centerX, point.y - centerY);
       if (!best || score < best.score) {
-        best = { rect: new DOMRect(point.x - 38, point.y - 38, 76, 76), score };
+        best = {
+          rect: new DOMRect(point.x - 38, point.y - 38, 76, 76),
+          score,
+          tile,
+        };
       }
     }
     return best?.rect ?? null;
@@ -1038,7 +1143,7 @@ export class TutorialOverlay extends LitElement implements Controller {
     const bottom = Math.max(top, window.innerHeight - 140);
     const centerX = window.innerWidth * 0.5;
     const centerY = window.innerHeight * 0.46;
-    let best: { rect: DOMRect; score: number } | null = null;
+    let best: { rect: DOMRect; score: number; tile: number } | null = null;
 
     let focusTile: number | null = null;
     for (const tile of this.adjacentEnemyTiles) {
@@ -1057,7 +1162,11 @@ export class TutorialOverlay extends LitElement implements Controller {
       }
       const score = Math.hypot(point.x - centerX, point.y - centerY);
       if (!best || score < best.score) {
-        best = { rect: new DOMRect(point.x - 38, point.y - 38, 76, 76), score };
+        best = {
+          rect: new DOMRect(point.x - 38, point.y - 38, 76, 76),
+          score,
+          tile,
+        };
       }
     }
     if (best) return best.rect;
@@ -1294,9 +1403,6 @@ export class TutorialOverlay extends LitElement implements Controller {
   }
 
   private currentHintKey() {
-    if (this.current.id === "pause" && this.pauseStepPaused) {
-      return "tutorial.step.pause.resume";
-    }
     if (
       this.current.id === "port" &&
       this.game.myPlayer() &&
@@ -1313,11 +1419,6 @@ export class TutorialOverlay extends LitElement implements Controller {
     const bottomReserve = 136;
     if (!this.rect) {
       return "max(56px, calc(env(safe-area-inset-top) + 46px))";
-    }
-    // Speed choices expand below the replay HUD. Keep the instructions at
-    // the bottom so the player can reach every speed option.
-    if (this.current.id === "speed") {
-      return `${Math.max(safeTop, window.innerHeight - bottomReserve - hintHeight)}px`;
     }
     const above = this.rect.top - hintHeight;
     if (above >= safeTop) return `${above}px`;
@@ -1351,10 +1452,9 @@ export class TutorialOverlay extends LitElement implements Controller {
             >${translateText(this.current.title)}</strong
           >
           <span class="step-copy">${translateText(this.currentHintKey())}</span>
+          ${this.renderContinueButton()}
         </div>
-        <button class="skip" @click=${this.skip}>
-          ${translateText("tutorial.skip")}
-        </button>
+        ${this.renderSkipButton()}
       `;
     }
     const isMapStep = this.isMapStep();
@@ -1388,10 +1488,23 @@ export class TutorialOverlay extends LitElement implements Controller {
         >
         <strong class="step-title">${translateText(this.current.title)}</strong>
         <span class="step-copy">${translateText(this.currentHintKey())}</span>
+        ${this.renderContinueButton()}
       </div>
-      <button class="skip" @click=${this.skip}>
-        ${translateText("tutorial.skip")}
-      </button>
+      ${this.renderSkipButton()}
     `;
+  }
+
+  private renderContinueButton() {
+    if (this.current.id !== "win") return html``;
+    return html`<button class="continue" @click=${() => this.finish()}>
+      ${translateText("tutorial.continue")}
+    </button>`;
+  }
+
+  private renderSkipButton() {
+    if (this.current.id === "win") return html``;
+    return html`<button class="skip" @click=${this.skip}>
+      ${translateText("tutorial.skip")}
+    </button>`;
   }
 }
