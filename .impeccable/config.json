@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "src/client/UserProfileModal.ts"
+        ],
+        "createdAt": "2026-10-08T07:53:32.614Z",
+        "reason": "Codex review: the finding targets text-slate-950, a near-black selected-button label with readable contrast on sky-500; it is not gray text."
+      }
+    ]
+  }
+}

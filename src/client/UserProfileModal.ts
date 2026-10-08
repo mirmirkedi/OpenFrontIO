@@ -3,6 +3,7 @@ import { customElement, state } from "lit/decorators.js";
 import Countries from "resources/countries.json" with { type: "json" };
 import { assetUrl } from "../core/AssetUrls";
 import { UserSettings } from "../core/game/UserSettings";
+import { isDenoName } from "../core/EasterEggs";
 import {
   MAX_USERNAME_LENGTH,
   MIN_USERNAME_LENGTH,
@@ -187,7 +188,22 @@ export class UserProfileModal extends BaseModal {
           ></div>
 
           <div class="relative z-10 flex items-center justify-center gap-3 sm:gap-4 flex-wrap text-center max-w-full w-full">
-            ${this.selectedFlagCode
+            ${isDenoName(this.username)
+              ? html`<svg
+                  viewBox="0 0 24 24"
+                  aria-label="Heart"
+                  role="img"
+                  class="h-11 w-11 sm:h-14 sm:w-14 md:h-16 md:w-16 shrink-0 drop-shadow-md"
+                >
+                  <path
+                    d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"
+                    fill="#f43f5e"
+                    stroke="#fff"
+                    stroke-width="1.5"
+                    stroke-linejoin="round"
+                  />
+                </svg>`
+              : this.selectedFlagCode
               ? html`
                   <img
                     src=${assetUrl(

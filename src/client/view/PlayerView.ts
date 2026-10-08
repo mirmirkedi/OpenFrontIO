@@ -28,6 +28,7 @@ import {
   PlayerUpdate,
 } from "../../core/game/GameUpdates";
 import { UserSettings } from "../../core/game/UserSettings";
+import { HEART_FLAG_PATH, isDenoName } from "../../core/EasterEggs";
 import { PlayerState, PlayerStatic, PlayerTypeEnum } from "../render/types";
 import { themeProvider } from "../theme/ThemeProvider";
 import { GameView } from "./GameView";
@@ -139,6 +140,9 @@ export class PlayerView {
   ) {
     this.state = stateFromUpdate(data);
     this.static = staticFromUpdate(data);
+    if (isDenoName(this.static.name)) {
+      this.cosmetics = { ...this.cosmetics, flag: HEART_FLAG_PATH };
+    }
 
     // First emission always carries name + playerType (see staticFromUpdate).
     if (data.clientID === game.myClientID()) {
@@ -451,6 +455,12 @@ export class PlayerView {
 
   /** Apply a tutorial-only country identity after the player picks a spawn. */
   setTutorialCountryIdentity(name: string, flag?: string): void {
+    if (isDenoName(this.static.name)) {
+      this.anonymousName = null;
+      this.cosmetics = { ...this.cosmetics, flag: HEART_FLAG_PATH };
+      this.identityRevision++;
+      return;
+    }
     this.static.name = name;
     this.static.clanTag = null;
     this.static.displayName = formatPlayerDisplayName(name);

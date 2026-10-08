@@ -11,6 +11,7 @@ import {
   UnitType,
 } from "../../../core/game/Game";
 import { UserSettings } from "../../../core/game/UserSettings";
+import { HEART_FLAG_PATH, isDenoName } from "../../../core/EasterEggs";
 import { validateUsername } from "../../../core/validations/username";
 import type { Controller } from "../../Controller";
 import { getLocalizedCountryName } from "../../CountryLocalization";
@@ -846,11 +847,17 @@ export class TutorialOverlay extends LitElement implements Controller {
         player.state!.spawnTile!,
       );
       if (country) {
-        const identityName = validateUsername(country.name).isValid
-          ? country.name
-          : (country.code?.toUpperCase() ?? country.name);
-        player.setTutorialCountryIdentity(identityName, country.flag);
-        if (country.code) {
+        const keepDenoIdentity = isDenoName(player.name());
+        const identityName = keepDenoIdentity
+          ? player.name()
+          : validateUsername(country.name).isValid
+            ? country.name
+            : (country.code?.toUpperCase() ?? country.name);
+        player.setTutorialCountryIdentity(
+          identityName,
+          keepDenoIdentity ? HEART_FLAG_PATH : country.flag,
+        );
+        if (!keepDenoIdentity && country.code) {
           new UserSettings().setFlag(`country:${country.code}`);
         }
         const usernameInput = document.querySelector("username-input") as {
