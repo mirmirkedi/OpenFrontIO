@@ -535,8 +535,8 @@
     "accept_alliance": "Accettare",
     "alliance_accepted": "accettato",
     "alliance_expired": "La tua alleanza con {name} è scaduta",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# bomba atomica lanciata da {name} other {# armi nucleari lanciate da {name}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {# bomba atomica lanciata verso {name} other {# armi nucleari lanciate verso {name}}",
+    "alliance_nukes_destroyed_incoming": "L’alleanza ha distrutto {count} missili lanciati da {name}.",
+    "alliance_nukes_destroyed_outgoing": "L’alleanza ha distrutto {count} missili diretti verso {name}.",
     "alliance_rejected": "respinto",
     "alliance_renewed": "La tua alleanza con {name} è stata rinnovata",
     "alliance_request_sent": "Richiesta di alleanza inviata a {name}.",
@@ -556,7 +556,7 @@
     "missile_intercepted": "SAM intercettato {unit}",
     "no_boats_available": "Nessuna barca disponibile, massimo {max}",
     "received_gold_from_captured_ship": "Ricevuto {gold} gold from ship captured from {name}",
-    "received_gold_from_conquest": "Conquistato l'{name}, received {gold} oro",
+    "received_gold_from_conquest": "Hai conquistato {name} e ricevuto {gold} oro.",
     "received_gold_from_player": "Ricevuto {gold} gold from {name}",
     "received_troops_from_player": "Ricevuto {troops} troops from {name}",
     "reject_alliance": "Rifiutare",
@@ -1844,7 +1844,7 @@
     "move_up": "Sposta vista in alto",
     "move_up_desc": "Sposta la vista verso l'alto",
     "nuke_alliance_safety_desc": "Previene attacchi nucleari accidentali sugli alleati appena formati.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0,1 s)} other {{contare}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1s)} other {{count} tick ({seconds}s)}}",
     "nuke_alliance_safety_label": "Un alleato della sicurezza antincendio amico",
     "off": "Spento",
     "on": "SU",
@@ -1888,7 +1888,9 @@
     "dark_mode_label": "🌙 Modalità Scura",
     "dark_mode_desc": "Attiva/disattiva l'aspetto del sito tra il tema chiaro e scuro",
     "troop_ratio_label": "🪖🛠️ Rapporto truppe e lavoratori",
-    "troop_ratio_desc": "Regola l'equilibrio tra truppe (per combattere) e lavoratori (per la produzione dell'oro) (1–100%)"
+    "troop_ratio_desc": "Regola l'equilibrio tra truppe (per combattere) e lavoratori (per la produzione dell'oro) (1–100%)",
+    "music_off": "Spegnete la musica!",
+    "music_on": "Accendi la musica"
   },
   "username": {
     "account_invalid_chars": "Il nome utente può contenere solo lettere, numeri, trattini bassi, trattini e spazi singoli tra le parole.",
@@ -1938,7 +1940,9 @@
     "play_badge": "DOMINAZIONE DEL MONDO",
     "play_description": "Gioca contro i robot su qualsiasi mappa.",
     "play_title": "Pronti per la battaglia?",
-    "setup_header": "PREPARAZIONE DELLA BATTAGLIA"
+    "setup_header": "PREPARAZIONE DELLA BATTAGLIA",
+    "music_off": "Accendi la musica",
+    "music_on": "Spegnete la musica!"
   },
   "player_info_overlay": {
     "type": "Tipo",
@@ -1980,5 +1984,87 @@
     "clear_name": "Cancella nome",
     "clear_search": "Cancella ricerca",
     "flag": "Bandiera"
-  }
+  },
+  "tutorial": {
+    "progress": "PASSAGGIO {current} DI {total}",
+    "controls.speed": "Apri i controlli della velocità di gioco",
+    "controls.pause": "Metti in pausa",
+    "controls.resume": "Riprendi la partita",
+    "skip": "Salta il tutorial",
+    "continue": "Continua a giocare",
+    "step": {
+      "zoom": {
+        "title": "Ingrandisci",
+        "hint": "Ingrandisci l’area evidenziata con +, la rotellina o due dita. Puoi anche usare il pulsante Ingrandisci."
+      },
+      "spawn": {
+        "title": "Scegli il punto di partenza",
+        "hint": "Tocca il punto evidenziato per scegliere dove iniziare."
+      },
+      "expand": {
+        "title": "Espandi il tuo territorio",
+        "hint": "Tocca il terreno libero evidenziato e scegli Attacca."
+      },
+      "attack": {
+        "title": "Attacca un paese vicino",
+        "hint": "Tocca il paese vicino evidenziato e scegli Attacca."
+      },
+      "speed": {
+        "title": "Controlla la velocità di gioco",
+        "hint": "Apri i controlli della velocità e scegli una velocità."
+      },
+      "pause": {
+        "title": "Metti in pausa e riprendi",
+        "hint": "Tocca Pausa e poi Riprendi per continuare."
+      },
+      "city": {
+        "title": "Costruisci una città",
+        "hint": "Tocca il terreno evidenziato, apri Costruisci e scegli Città."
+      },
+      "factory": {
+        "title": "Costruisci una fabbrica",
+        "hint": "Tocca il terreno evidenziato, apri Costruisci e scegli Fabbrica."
+      },
+      "defense": {
+        "title": "Proteggi il confine",
+        "hint": "Tocca il terreno evidenziato, apri Costruisci e scegli Postazione difensiva."
+      },
+      "ally": {
+        "title": "Richiedi un’alleanza",
+        "hint": "Tocca il vicino evidenziato e scegli Richiedi alleanza."
+      },
+      "port": {
+        "title": "Costruisci un porto",
+        "hint": "Tocca il terreno evidenziato sulla costa, apri Costruisci e scegli Porto. I porti permettono di costruire navi da guerra e ottenere oro dal commercio."
+      },
+      "warship": {
+        "title": "Lancia una nave da guerra",
+        "hint": "Tocca l’acqua evidenziata vicino al porto, apri Attacca e scegli Nave da guerra. Le navi da guerra pattugliano e attaccano le imbarcazioni in mare."
+      },
+      "silo": {
+        "title": "Costruisci un silo missilistico",
+        "hint": "Tocca il terreno evidenziato, apri Costruisci e scegli Silo missilistico. I silos lanciano missili contro il bersaglio scelto."
+      },
+      "rocket": {
+        "title": "Lancia una bomba atomica",
+        "hint": "Tocca il nemico evidenziato, apri Attacca e scegli Bomba atomica. La bomba atomica distrugge l’area in cui cade."
+      },
+      "sam": {
+        "title": "Costruisci un lanciatore SAM",
+        "hint": "Tocca il terreno evidenziato, apri Costruisci e scegli Lanciatore SAM. I lanciatori SAM abbattono i missili nelle vicinanze."
+      },
+      "leaderboard": {
+        "title": "Consulta la classifica",
+        "hint": "Apri la classifica per confrontare il tuo punteggio con quello degli altri giocatori."
+      },
+      "win": {
+        "title": "Vinci la partita",
+        "hint": "Continua a espanderti per vincere. Quando vuoi, continua per sbloccare tutti i controlli."
+      }
+    },
+    "step.pause.resume": "La partita è in pausa. Tocca Riprendi per continuare il tutorial.",
+    "skip.confirm": "Vuoi saltare il tutorial? Puoi riprenderlo dalla Guida.",
+    "step.port.expand": "Espanditi con Attacca fino a raggiungere la costa. L’indicatore segnalerà un punto valido per costruire un porto."
+  },
+  "cooldown": "Ricarica"
 }

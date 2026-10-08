@@ -533,8 +533,8 @@
     "accept_alliance": "Prijať",
     "alliance_accepted": "prijaté",
     "alliance_expired": "Tvoje spojenectvo s {name} vypršala",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# nuke vypustený {name} other {# jadrových zbraní vypustených spoločnosťou {name}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {# jadrová bomba vypustená smerom k {name} other {# jadrových zbraní vypustených smerom k {name}}",
+    "alliance_nukes_destroyed_incoming": "Aliancia zničila {count} rakiet, ktoré vypustil hráč {name}.",
+    "alliance_nukes_destroyed_outgoing": "Aliancia zničila {count} rakiet vypustených na hráča {name}.",
     "alliance_rejected": "odmietnuté",
     "alliance_renewed": "Tvoje spojenectvo s {name} bola obnovená",
     "alliance_request_sent": "Žiadosť o alianciu bola odoslaná na adresu {name}.",
@@ -1890,7 +1890,7 @@
     "move_up": "Pohnúť pohľad hore",
     "move_up_desc": "Pohnúť pohľad smerom hore",
     "nuke_alliance_safety_desc": "Zabraňuje náhodným jadrovým útokom na novovytvorených spojencov.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 začiarknutie (0,1 s)} other {{počítať}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tik (0.1s)} other {{count} tik ({seconds}s)}}",
     "nuke_alliance_safety_label": "Spojenecká protipožiarna bezpečnosť",
     "off": "Vypnúť",
     "on": "Zapnúť",
@@ -1949,7 +1949,9 @@
     "right_click_opens_menu": "Pravé ťuknutie otvorí ponuku",
     "troop_ratio_desc": "Upraví pomer medzi vojskami (na boj) a robotníkmi (na tvorbu zlata) (1 až 100%)",
     "terrain_enabled": "Viditeľnosť povrchu zapnutá",
-    "terrain_disabled": "Viditeľnosť povrchu vypnutá"
+    "terrain_disabled": "Viditeľnosť povrchu vypnutá",
+    "music_off": "Vypnúť hudbu",
+    "music_on": "Zapnúť hudbu"
   },
   "username": {
     "account_invalid_chars": "Používateľské meno môže obsahovať iba písmená, čísla, podčiarkovníky, spojovníky a jednotlivé medzery medzi slovami.",
@@ -2000,7 +2002,9 @@
     "play_badge": "SVETOVÁ DOMINÁCIA",
     "play_description": "Hrajte proti robotom na akejkoľvek mape.",
     "play_title": "Pripravený na boj?",
-    "setup_header": "BOJOVÉ NASTAVENIE"
+    "setup_header": "BOJOVÉ NASTAVENIE",
+    "music_off": "Zapnúť hudbu",
+    "music_on": "Vypnúť hudbu"
   },
   "player_info_overlay": {
     "type": "Typ",
@@ -2038,5 +2042,111 @@
     "redirecting": "Práve si presmerovaná/ý...",
     "not_authorized": "Nemáš oprávnenie na prístup k tejto stránke.",
     "contact_admin": "Ak si myslíš, že túto správu vidíš omylom, prosím kontaktuj administrátora webstránky."
-  }
+  },
+  "user_profile": {
+    "title": "Profil hráča",
+    "preview_heading": "TAKTICKÁ IDENTITA",
+    "player_name": "Meno hráča",
+    "name_placeholder": "Zadaj používateľské meno...",
+    "random_name": "Náhodné meno",
+    "characters": "{current}/{max}",
+    "flag_heading": "ŠTÁTNA VLAJKA",
+    "search_flags": "Hľadať krajinu alebo kód...",
+    "no_flag": "Bez vlajky",
+    "all_continents": "Všetky",
+    "continent_europe": "Európa",
+    "continent_asia": "Ázia",
+    "continent_americas": "Amerika",
+    "continent_africa": "Afrika",
+    "continent_oceania": "Oceánia",
+    "save": "Uložiť profil",
+    "saved": "Profil bol úspešne uložený!",
+    "no_flags_found": "Hľadaniu nezodpovedajú žiadne vlajky.",
+    "default_username": "Hráč",
+    "clear_name": "Vymazať meno",
+    "clear_search": "Vymazať hľadanie",
+    "flag": "Vlajka"
+  },
+  "tutorial": {
+    "progress": "KROK {current} Z {total}",
+    "controls.speed": "Otvor nastavenia rýchlosti hry",
+    "controls.pause": "Pozastaviť hru",
+    "controls.resume": "Pokračovať v hre",
+    "skip": "Preskočiť tutoriál",
+    "continue": "Pokračovať v hraní",
+    "step": {
+      "zoom": {
+        "title": "Priblížiť",
+        "hint": "Priblíž zvýraznenú oblasť tlačidlom +, kolieskom alebo dvoma prstami. Môžeš použiť aj tlačidlo priblíženia."
+      },
+      "spawn": {
+        "title": "Vyber miesto štartu",
+        "hint": "Ťukni na zvýraznené miesto a vyber si začiatok."
+      },
+      "expand": {
+        "title": "Rozšír svoje územie",
+        "hint": "Ťukni na zvýraznenú voľnú zem a vyber Útok."
+      },
+      "attack": {
+        "title": "Zaútoč na suseda",
+        "hint": "Ťukni na zvýraznenú susednú krajinu a vyber Útok."
+      },
+      "speed": {
+        "title": "Ovládaj rýchlosť hry",
+        "hint": "Otvor nastavenia rýchlosti a vyber tempo."
+      },
+      "pause": {
+        "title": "Pozastavenie a pokračovanie",
+        "hint": "Ťukni na Pozastaviť a potom na Pokračovať."
+      },
+      "city": {
+        "title": "Postav mesto",
+        "hint": "Ťukni na zvýraznenú zem, otvor Stavbu a vyber Mesto."
+      },
+      "factory": {
+        "title": "Postav továreň",
+        "hint": "Ťukni na zvýraznenú zem, otvor Stavbu a vyber Továreň."
+      },
+      "defense": {
+        "title": "Chráň hranicu",
+        "hint": "Ťukni na zvýraznenú zem, otvor Stavbu a vyber Obranné stanovište."
+      },
+      "ally": {
+        "title": "Požiadaj o spojenectvo",
+        "hint": "Ťukni na zvýrazneného suseda a vyber Požiadať o spojenectvo."
+      },
+      "port": {
+        "title": "Postav prístav",
+        "hint": "Ťukni na zvýraznenú zem pri pobreží, otvor Stavbu a vyber Prístav. Prístavy umožňujú stavať vojnové lode a posielať obchodné lode, ktoré zarábajú zlato."
+      },
+      "warship": {
+        "title": "Vypusti vojnovú loď",
+        "hint": "Ťukni na zvýraznenú vodu pri prístave, otvor Útok a vyber Vojnovú loď. Lode hliadkujú, zajímajú obchodné lode a ničia nepriateľské plavidlá."
+      },
+      "silo": {
+        "title": "Postav raketové silo",
+        "hint": "Ťukni na zvýraznenú zem, otvor Stavbu a vyber Raketové silo. Silo umožňuje odpáliť rakety na zvolený cieľ."
+      },
+      "rocket": {
+        "title": "Vypáľ atómovú bombu",
+        "hint": "Ťukni na zvýrazneného nepriateľa, otvor Útok a vyber Atómovú bombu. Zničí územie, budovy a lode v mieste dopadu."
+      },
+      "sam": {
+        "title": "Postav odpaľovacie zariadenie SAM",
+        "hint": "Ťukni na zvýraznenú zem, otvor Stavbu a vyber Odpaľovacie zariadenie SAM. V dosahu zostreľuje prilietajúce rakety."
+      },
+      "leaderboard": {
+        "title": "Pozri si rebríček",
+        "hint": "Otvor rebríček a porovnaj svoje skóre so skóre ostatných hráčov."
+      },
+      "win": {
+        "title": "Vyhraj zápas",
+        "hint": "Rozširuj svoje územie, aby si vyhral. Keď budeš pripravený, pokračuj a odomkni všetky ovládacie prvky."
+      }
+    },
+    "step.pause.resume": "Hra je pozastavená. Ťukni na Pokračovať a pokračuj v tutoriáli.",
+    "skip.confirm": "Preskočiť tutoriál? Znovu si ho môžeš zahrať v Pomoci.",
+    "step.port.expand": "Rozširuj sa pomocou Útoku, kým nedosiahneš pobrežie. Značka ukáže vhodné miesto na prístav."
+  },
+  "cooldown": "Čas obnovy"
 }

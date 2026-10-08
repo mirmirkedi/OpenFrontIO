@@ -84,7 +84,7 @@
     "username_error_failed": "사용자 이름을 변경할 수 없습니다. 나중에 다시 시도해 주세요.",
     "username_error_profane": "해당 사용자 이름은 허용되지 않습니다.",
     "username_error_taken": "해당 사용자 이름은 이미 사용 중입니다. 다른 사용자 이름을 입력해 보세요.",
-    "username_grace_warning": "{date}의 '{name}'에 대한 독점권을 잃게 됩니다. 유지하려면 다시 구독하세요.",
+    "username_grace_warning": "{date}에 “{name}”의 독점 사용 권리를 잃게 됩니다. 유지하려면 다시 구독하세요.",
     "username_locked_until": "{date}까지 잠김",
     "username_new_label": "새 이름",
     "username_not_set": "프로필과 모든 게임에서 식별자로 사용되는 사용자 이름을 요청하세요.",
@@ -752,7 +752,7 @@
     "preset_custom": "관습",
     "preset_default": "기본",
     "preset_default_desc": "표준 OpenFront 모양",
-    "preset_delete_confirm": "사전 설정 '{name}'을(를) 삭제하시겠습니까?",
+    "preset_delete_confirm": "프리셋 “{name}”을(를) 삭제하시겠습니까?",
     "preset_migrated_name": "내 설정",
     "preset_name_placeholder": "프리셋 이름",
     "preset_night": "밤",
@@ -1884,7 +1884,7 @@
     "move_up": "위로 카메라 이동",
     "move_up_desc": "카메라를 위로 이동",
     "nuke_alliance_safety_desc": "새로 형성된 동맹국에 대한 우발적인 핵 공격을 방지합니다.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1틱(0.1초)} other {{세다}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 틱 (0.1초)} other {{count} 틱 ({seconds}초)}}",
     "nuke_alliance_safety_label": "동맹국 화재 안전",
     "off": "끔",
     "on": "ㅋ",
@@ -1928,7 +1928,9 @@
     "dark_mode_label": "다크 모드",
     "dark_mode_desc": "밝은 테마/어두운 테마로 전환합니다.",
     "structure_sprites_label": "건물 스프라이트",
-    "structure_sprites_desc": "건물 스프라이트 켜기/끄기"
+    "structure_sprites_desc": "건물 스프라이트 켜기/끄기",
+    "music_off": "음악 끄기",
+    "music_on": "음악 켜기"
   },
   "username": {
     "account_invalid_chars": "사용자 이름에는 문자, 숫자, 밑줄, 하이픈 및 단어 사이에 단일 공백만 포함할 수 있습니다.",
@@ -1979,7 +1981,9 @@
     "play_badge": "세계 지배",
     "play_description": "어느 지도에서나 봇과 대결할 수 있습니다.",
     "play_title": "전투 준비가 되셨나요?",
-    "setup_header": "전투 설정"
+    "setup_header": "전투 설정",
+    "music_off": "음악 켜기",
+    "music_on": "음악 끄기"
   },
   "flag_input": {
     "title": "깃발 선택",
@@ -2015,5 +2019,87 @@
     "clear_name": "이름 지우기",
     "clear_search": "검색 지우기",
     "flag": "깃발"
-  }
+  },
+  "tutorial": {
+    "progress": "{current}/{total}단계",
+    "controls.speed": "게임 속도 조절 열기",
+    "controls.pause": "게임 일시 정지",
+    "controls.resume": "게임 계속하기",
+    "skip": "튜토리얼 건너뛰기",
+    "continue": "계속 플레이",
+    "step": {
+      "zoom": {
+        "title": "확대",
+        "hint": "+, 스크롤 또는 두 손가락으로 강조된 영역을 확대하세요. 확대 버튼을 사용할 수도 있습니다."
+      },
+      "spawn": {
+        "title": "시작 지점 선택",
+        "hint": "강조된 지점을 눌러 시작 위치를 선택하세요."
+      },
+      "expand": {
+        "title": "영토 확장",
+        "hint": "강조된 빈 땅을 누른 다음 공격을 선택하세요."
+      },
+      "attack": {
+        "title": "이웃 국가 공격",
+        "hint": "강조된 이웃 국가를 누른 다음 공격을 선택하세요."
+      },
+      "speed": {
+        "title": "게임 속도 조절",
+        "hint": "속도 조절을 열고 속도를 선택하세요."
+      },
+      "pause": {
+        "title": "일시 정지 및 재개",
+        "hint": "일시 정지를 누른 다음 계속하려면 재개를 누르세요."
+      },
+      "city": {
+        "title": "도시 건설",
+        "hint": "강조된 땅을 누르고 건설을 연 다음 도시를 선택하세요."
+      },
+      "factory": {
+        "title": "공장 건설",
+        "hint": "강조된 땅을 누르고 건설을 연 다음 공장을 선택하세요."
+      },
+      "defense": {
+        "title": "국경 방어",
+        "hint": "강조된 땅을 누르고 건설을 연 다음 방어 초소를 선택하세요."
+      },
+      "ally": {
+        "title": "동맹 요청",
+        "hint": "강조된 이웃 국가를 누른 다음 동맹 요청을 선택하세요."
+      },
+      "port": {
+        "title": "항구 건설",
+        "hint": "해안의 강조된 땅을 누르고 건설을 연 다음 항구를 선택하세요. 항구에서는 군함을 건조하고 무역으로 금을 얻을 수 있습니다."
+      },
+      "warship": {
+        "title": "군함 출항",
+        "hint": "항구 옆의 강조된 바다를 누르고 공격을 연 다음 군함을 선택하세요. 군함은 바다를 순찰하며 선박을 공격합니다."
+      },
+      "silo": {
+        "title": "미사일 격납고 건설",
+        "hint": "강조된 땅을 누르고 건설을 연 다음 미사일 격납고를 선택하세요. 미사일 격납고에서는 선택한 목표로 미사일을 발사합니다."
+      },
+      "rocket": {
+        "title": "원자폭탄 발사",
+        "hint": "강조된 적을 누르고 공격을 연 다음 원자폭탄을 선택하세요. 원자폭탄은 떨어진 지역을 파괴합니다."
+      },
+      "sam": {
+        "title": "SAM 발사대 건설",
+        "hint": "강조된 땅을 누르고 건설을 연 다음 SAM 발사대를 선택하세요. SAM 발사대는 주변의 미사일을 요격합니다."
+      },
+      "leaderboard": {
+        "title": "순위표 확인",
+        "hint": "순위표를 열어 다른 플레이어와 점수를 비교하세요."
+      },
+      "win": {
+        "title": "전투에서 승리",
+        "hint": "계속 영토를 확장해 승리하세요. 준비되면 계속하여 모든 조작을 잠금 해제하세요."
+      }
+    },
+    "step.pause.resume": "게임이 일시 정지되었습니다. 재개를 눌러 튜토리얼을 계속하세요.",
+    "skip.confirm": "튜토리얼을 건너뛸까요? 도움말에서 다시 플레이할 수 있습니다.",
+    "step.port.expand": "공격을 선택해 해안에 도달할 때까지 확장하세요. 표시가 항구를 건설할 수 있는 위치를 알려줍니다."
+  },
+  "cooldown": "재사용 대기시간"
 }

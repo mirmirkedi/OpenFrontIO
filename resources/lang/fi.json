@@ -534,8 +534,8 @@
     "accept_alliance": "Hyväksy",
     "alliance_accepted": "hyväksyi",
     "alliance_expired": "Liittosi pelaajan {name} kanssa vanhentui",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# ydinase laukaisi {name} other {# ydinase laukaisi {name}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {# ydinase laukaistiin kohti {name} other {# ydinase laukaistu kohti {name}}",
+    "alliance_nukes_destroyed_incoming": "Liitto tuhosi {name}n laukaisemat {count} ohjusta.",
+    "alliance_nukes_destroyed_outgoing": "Liitto tuhosi {name}a kohti laukaistut {count} ohjusta.",
     "alliance_rejected": "hylkäsi",
     "alliance_renewed": "Liittosi pelaajan {name} kanssa sai jatkoa",
     "alliance_request_sent": "Liittoutumispyyntö lähetetty osoitteeseen {name}.",
@@ -1895,7 +1895,7 @@
     "move_up": "Siirrä kameraa ylös",
     "move_up_desc": "Siirrä kameraa ylöspäin",
     "nuke_alliance_safety_desc": "Estää tahattomat ydiniskut vasta muodostettuja liittolaisia ​​vastaan.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 rasti (0,1 s)} other {{laskea}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tik (0.1s)} other {{count} tik ({seconds}s)}}",
     "nuke_alliance_safety_label": "Liittoystävällinen paloturvallisuus",
     "off": "Pois",
     "on": "Päällä",
@@ -1954,7 +1954,9 @@
     "right_click_opens_menu": "Hiiren oikea nappi avaa valikon",
     "troop_ratio_desc": "Säädä joukkojen (sotia varten) ja työntekijöiden (tekevät kultaa) määrää (1 - 100%)",
     "terrain_enabled": "Maastonäkymä käytössä",
-    "terrain_disabled": "Maastonäkymä pois käytöstä"
+    "terrain_disabled": "Maastonäkymä pois käytöstä",
+    "music_off": "Poista musiikki käytöstä",
+    "music_on": "Ota musiikki käyttöön"
   },
   "username": {
     "account_invalid_chars": "Käyttäjätunnus voi sisältää vain kirjaimia, numeroita, alaviivoja, yhdysmerkkejä ja yksittäisiä välilyöntejä sanojen välissä.",
@@ -2005,7 +2007,9 @@
     "play_badge": "MAAILMANHALLITUS",
     "play_description": "Pelaa botteja vastaan ​​millä tahansa kartalla.",
     "play_title": "Valmiina taisteluun?",
-    "setup_header": "TAISTELUASETUKSET"
+    "setup_header": "TAISTELUASETUKSET",
+    "music_off": "Ota musiikki käyttöön",
+    "music_on": "Poista musiikki käytöstä"
   },
   "player_info_overlay": {
     "type": "Tyyppi",
@@ -2048,5 +2052,111 @@
     "redirecting": "Sinut uudelleenohjataan...",
     "not_authorized": "Sinulla ei ole oikeutta käyttää tätä verkkosivustoa.",
     "contact_admin": "Jos uskot näkeväsi tämän viestin virheenä, ota yhteyttä sivuston ylläpitoon."
-  }
+  },
+  "user_profile": {
+    "title": "Pelaajan profiili",
+    "preview_heading": "TAKTINEN IDENTITEETTI",
+    "player_name": "Pelaajan nimi",
+    "name_placeholder": "Anna käyttäjänimi...",
+    "random_name": "Arvo nimi",
+    "characters": "{current}/{max}",
+    "flag_heading": "KANSALLISLIPPU",
+    "search_flags": "Hae maata tai koodia...",
+    "no_flag": "Ei lippua",
+    "all_continents": "Kaikki",
+    "continent_europe": "Eurooppa",
+    "continent_asia": "Aasia",
+    "continent_americas": "Amerikka",
+    "continent_africa": "Afrikka",
+    "continent_oceania": "Oseania",
+    "save": "Tallenna profiili",
+    "saved": "Profiili tallennettu!",
+    "no_flags_found": "Hakuasi vastaavia lippuja ei löytynyt.",
+    "default_username": "Pelaaja",
+    "clear_name": "Tyhjennä nimi",
+    "clear_search": "Tyhjennä haku",
+    "flag": "Lippu"
+  },
+  "tutorial": {
+    "progress": "VAIHE {current}/{total}",
+    "controls.speed": "Avaa pelinopeuden säätimet",
+    "controls.pause": "Keskeytä peli",
+    "controls.resume": "Jatka peliä",
+    "skip": "Ohita opastus",
+    "continue": "Jatka pelaamista",
+    "step": {
+      "zoom": {
+        "title": "Lähennä",
+        "hint": "Lähennä korostettua aluetta +-painikkeella, vierityspyörällä tai kahdella sormella. Voit käyttää myös lähennyspainiketta."
+      },
+      "spawn": {
+        "title": "Valitse aloituspaikka",
+        "hint": "Valitse aloituspaikka napauttamalla korostettua kohtaa."
+      },
+      "expand": {
+        "title": "Laajenna aluettasi",
+        "hint": "Napauta korostettua vapaata maata ja valitse Hyökkää."
+      },
+      "attack": {
+        "title": "Hyökkää naapurimaahan",
+        "hint": "Napauta korostettua naapurimaata ja valitse Hyökkää."
+      },
+      "speed": {
+        "title": "Säädä pelin nopeutta",
+        "hint": "Avaa nopeudensäätimet ja valitse nopeus."
+      },
+      "pause": {
+        "title": "Keskeytä ja jatka",
+        "hint": "Napauta Keskeytä ja jatka sitten napauttamalla Jatka."
+      },
+      "city": {
+        "title": "Rakenna kaupunki",
+        "hint": "Napauta korostettua maata, avaa Rakentaminen ja valitse Kaupunki."
+      },
+      "factory": {
+        "title": "Rakenna tehdas",
+        "hint": "Napauta korostettua maata, avaa Rakentaminen ja valitse Tehdas."
+      },
+      "defense": {
+        "title": "Suojaa rajaa",
+        "hint": "Napauta korostettua maata, avaa Rakentaminen ja valitse Puolustusasema."
+      },
+      "ally": {
+        "title": "Pyydä liittoumaa",
+        "hint": "Napauta korostettua naapuria ja valitse Pyydä liittoumaa."
+      },
+      "port": {
+        "title": "Rakenna satama",
+        "hint": "Napauta rannikon korostettua maata, avaa Rakentaminen ja valitse Satama. Satamissa voi rakentaa sotalaivoja ja lähettää kultaa tuovia kauppalaivoja."
+      },
+      "warship": {
+        "title": "Lähetä sotalaiva matkaan",
+        "hint": "Napauta sataman lähellä olevaa korostettua vettä, avaa Hyökkää ja valitse Sotalaiva. Sotalaivat partioivat, kaappaavat kauppalaivoja ja tuhoavat vihollisaluksia."
+      },
+      "silo": {
+        "title": "Rakenna ohjussiilo",
+        "hint": "Napauta korostettua maata, avaa Rakentaminen ja valitse Ohjussiilo. Siiloista voi laukaista ohjuksia valittuun kohteeseen."
+      },
+      "rocket": {
+        "title": "Laukaise atomipommi",
+        "hint": "Napauta korostettua vihollista, avaa Hyökkää ja valitse Atomipommi. Pommi tuhoaa osumakohdan maaston, rakennukset ja alukset."
+      },
+      "sam": {
+        "title": "Rakenna SAM-ohjuksen laukaisin",
+        "hint": "Napauta korostettua maata, avaa Rakentaminen ja valitse SAM-ohjuksen laukaisin. Se torjuu kantamalleen saapuvat ohjukset."
+      },
+      "leaderboard": {
+        "title": "Katso tulostaulukkoa",
+        "hint": "Avaa tulostaulukko ja vertaa pisteitäsi muiden pelaajien pisteisiin."
+      },
+      "win": {
+        "title": "Voita ottelu",
+        "hint": "Laajenna aluettasi voittaaksesi. Kun olet valmis, jatka avataksesi kaikki ohjaimet."
+      }
+    },
+    "step.pause.resume": "Peli on keskeytetty. Jatka opastusta napauttamalla Jatka.",
+    "skip.confirm": "Ohitetaanko opastus? Voit pelata sen uudelleen Ohje-valikosta.",
+    "step.port.expand": "Laajenna Hyökkää-toiminnolla, kunnes saavutat rannikon. Merkki osoittaa sopivan satamapaikan."
+  },
+  "cooldown": "Latausaika"
 }

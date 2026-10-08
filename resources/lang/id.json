@@ -1874,7 +1874,7 @@
     "move_up": "Pindahkan kamera ke atas",
     "move_up_desc": "Memindahkan kamera ke atas",
     "nuke_alliance_safety_desc": "Mencegah serangan nuklir yang tidak disengaja terhadap sekutu yang baru terbentuk.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1s)} other {{count}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1dtk)} other {{count} tick ({seconds}dtk)}}",
     "nuke_alliance_safety_label": "Keamanan kebakaran ramah sekutu",
     "off": "Mati",
     "on": "Hidup",
@@ -1918,7 +1918,9 @@
     "dark_mode_label": "Mode Gelap",
     "dark_mode_desc": "Beralih tampilan situs antara tema terang dan gelap",
     "structure_sprites_label": "Sprite Bangunan",
-    "structure_sprites_desc": "Alihkan tampilan sprite bangunan"
+    "structure_sprites_desc": "Alihkan tampilan sprite bangunan",
+    "music_off": "Nonaktifkan musik",
+    "music_on": "Aktifkan musik"
   },
   "username": {
     "account_invalid_chars": "Nama pengguna hanya boleh berisi huruf, angka, garis bawah, tanda hubung, dan spasi tunggal antar kata.",
@@ -1969,7 +1971,9 @@
     "play_badge": "DOMINASI DUNIA",
     "play_description": "Bermain melawan bot di peta mana pun.",
     "play_title": "Siap berperang?",
-    "setup_header": "PENYIAPAN PERTEMPURAN"
+    "setup_header": "PENYIAPAN PERTEMPURAN",
+    "music_off": "Aktifkan musik",
+    "music_on": "Nonaktifkan musik"
   },
   "flag_input": {
     "title": "Pilih Bendera",
@@ -1981,5 +1985,111 @@
     "description": "(ALPHA)",
     "login_required": "Masuk untuk bermain peringkat!",
     "must_login": "Anda harus masuk untuk bermain di pertandingan 1v1 Ranked."
-  }
+  },
+  "user_profile": {
+    "title": "Simpan Profil Pemutar",
+    "preview_heading": "IDENTITAS TAKTIS",
+    "player_name": "Nama Pemain",
+    "name_placeholder": "Nama Pengguna:",
+    "random_name": "Acak",
+    "characters": "{current}/{max}",
+    "flag_heading": "- National / Flag",
+    "search_flags": "Cari negara atau kode...",
+    "no_flag": "Tidak Ada Bendera",
+    "all_continents": "Semua",
+    "continent_europe": "Eropa",
+    "continent_asia": "Asia",
+    "continent_americas": "Amerika",
+    "continent_africa": "Afrika",
+    "continent_oceania": "Oseania",
+    "save": "Simpan profil",
+    "saved": "Profil berhasil disimpan",
+    "no_flags_found": "Tidak ada bendera yang cocok dengan pencarian Anda.",
+    "default_username": "Pemain",
+    "clear_name": "Hapus nama",
+    "clear_search": "Bersihkan pencarian",
+    "flag": "Bendera"
+  },
+  "tutorial": {
+    "progress": "LANGKAH {current} DARI {total}",
+    "controls.speed": "Buka kontrol kecepatan permainan",
+    "controls.pause": "Istirahatkan permainan",
+    "controls.resume": "Lanjutkan permainan",
+    "skip": "Lewati tutorial",
+    "continue": "Lanjutkan bermain",
+    "step": {
+      "zoom": {
+        "title": "Perbesar",
+        "hint": "Perbesar ke area yang disorot dengan +, gulir, atau dua jari. Atau gunakan tombol Zoom In."
+      },
+      "spawn": {
+        "title": "Pilih titik awal Anda",
+        "hint": "Ketuk titik yang disorot untuk memilih titik awal Anda."
+      },
+      "expand": {
+        "title": "Perluas wilayah Anda",
+        "hint": "Ketuk lahan terbuka yang disorot, lalu pilih Serang."
+      },
+      "attack": {
+        "title": "Menyerang tetangga",
+        "hint": "Ketuk negara tetangga yang disorot, lalu pilih Serang."
+      },
+      "speed": {
+        "title": "Kontrol kecepatan permainan",
+        "hint": "Buka kontrol kecepatan, lalu pilih kecepatan."
+      },
+      "pause": {
+        "title": "Jeda dan lanjutkan",
+        "hint": "Ketuk Jeda, lalu ketuk Lanjutkan untuk melanjutkan."
+      },
+      "city": {
+        "title": "Bangun Kota",
+        "hint": "Ketuk tanah yang disorot, buka Bangun, lalu pilih Kota."
+      },
+      "factory": {
+        "title": "Bangun Pabrik",
+        "hint": "Ketuk tanah yang disorot, buka Bangun, lalu pilih Pabrik."
+      },
+      "defense": {
+        "title": "Lindungi perbatasan Anda",
+        "hint": "Ketuk tanah yang disorot, buka Bangun, lalu pilih Pos Pertahanan."
+      },
+      "ally": {
+        "title": "Minta aliansi",
+        "hint": "Ketuk tetangga yang disorot, lalu pilih Minta Aliansi."
+      },
+      "port": {
+        "title": "Bangun Pelabuhan",
+        "hint": "Ketuk daratan yang disorot di pantai laut, buka Build, lalu pilih Port. Pelabuhan memungkinkanmu membuat kapal perang dan mendapat emas dari perdagangan."
+      },
+      "warship": {
+        "title": "Luncurkan Kapal Perang",
+        "hint": "Ketuk air yang disorot oleh Port milikmu, buka Attack, lalu pilih Warship. Kapal perang berpatroli dan menyerang kapal di laut."
+      },
+      "silo": {
+        "title": "Bangun Silo Rudal",
+        "hint": "Ketuk tanah yang disorot, buka Build, lalu pilih Missile Silo. Silo meluncurkan rudal ke target yang kamu pilih."
+      },
+      "rocket": {
+        "title": "Luncurkan Bom Atom",
+        "hint": "Ketuk musuh yang disorot, buka Serangan, lalu pilih Bom Atom. Bom atom menghancurkan area tempatnya jatuh."
+      },
+      "sam": {
+        "title": "Buat Peluncur SAM",
+        "hint": "Ketuk tanah yang disorot, buka Build, lalu pilih SAM Launcher. Peluncur SAM menembak jatuh rudal di dekatnya."
+      },
+      "leaderboard": {
+        "title": "Periksa papan peringkat",
+        "hint": "Buka papan peringkat untuk membandingkan skor Anda dengan pemain lain."
+      },
+      "win": {
+        "title": "Menangkan pertandingan",
+        "hint": "Terus berkembang untuk memenangkan pertandingan. Saat Anda siap, lanjutkan untuk membuka semua kontrol."
+      }
+    },
+    "step.pause.resume": "Permainan dijeda. Ketuk Lanjutkan untuk melanjutkan tutorial.",
+    "skip.confirm": "Lewati tutorialnya? Kamu bisa memainkannya lagi dari Bantuan.",
+    "step.port.expand": "Perluas dengan Attack sampai kamu mencapai pantai laut. Penanda akan menunjuk ke lokasi Port yang valid."
+  },
+  "cooldown": "Waktu jeda"
 }

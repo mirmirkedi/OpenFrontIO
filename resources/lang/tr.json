@@ -531,8 +531,8 @@
     "accept_alliance": "Kabul et",
     "alliance_accepted": "kabul edildi",
     "alliance_expired": "{name} ile ittifakının süresi doldu",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# nükleer bombası {name tarafından fırlatıldı} other {{name tarafından fırlatılan # nükleer bomba}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {# nükleer bombası {name'e doğru fırlatıldı} other {{name'e doğru # nükleer bomba fırlatıldı}}",
+    "alliance_nukes_destroyed_incoming": "İttifak, {name} tarafından fırlatılan {count} füzeyi imha etti.",
+    "alliance_nukes_destroyed_outgoing": "İttifak, {name} hedefine fırlatılan {count} füzeyi imha etti.",
     "alliance_rejected": "reddedildi",
     "alliance_renewed": "{name} ile ittifakın yenilendi",
     "alliance_request_sent": "İttifak isteği {name} adresine gönderildi.",
@@ -1910,7 +1910,7 @@
     "move_up": "Kamerayı Yukarı Taşı",
     "move_up_desc": "Kamerayı yukarı hareket ettir",
     "nuke_alliance_safety_desc": "Yeni oluşturulan müttefiklere kazara yapılan nükleer saldırıları önler.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 onay işareti (0,1 saniye)} other {{saymak}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tık (0.1sn)} other {{count} tık ({seconds}sn)}}",
     "nuke_alliance_safety_label": "Müttefik dostu yangın güvenliği",
     "off": "Kapalı",
     "on": "Açık",
@@ -2008,7 +2008,9 @@
     "play_badge": "DÜNYA HAKİMİYETİ",
     "play_description": "İstediğin haritada botlara karşı oyna.",
     "play_title": "Savaşa hazır mısın?",
-    "setup_header": "SAVAŞ AYARLARI"
+    "setup_header": "SAVAŞ AYARLARI",
+    "music_off": "Müziği aç",
+    "music_on": "Kapat şu müziği."
   },
   "stats_modal": {
     "title": "İstatistikler",
@@ -2154,23 +2156,23 @@
       },
       "port": {
         "title": "Liman kur",
-        "hint": "Parlayan deniz kıyısındaki araziye dokun, İnşa menüsünü aç ve Liman seç."
+        "hint": "Parlayan deniz kıyısındaki araziye dokun, İnşa menüsünü aç ve Liman seç. Limanlarda savaş gemisi üretebilir ve ticaretten altın kazanabilirsin."
       },
       "warship": {
         "title": "Savaş gemisi gönder",
-        "hint": "Limanının yanındaki vurgulu suya dokun, Saldırı menüsünü aç ve Savaş Gemisi seç."
+        "hint": "Limanının yanındaki vurgulu suya dokun, Saldırı menüsünü aç ve Savaş Gemisi seç. Savaş gemileri denizde devriye gezer ve gemilere saldırır."
       },
       "silo": {
         "title": "Füze silosu kur",
-        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve Füze Silosu seç."
+        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve Füze Silosu seç. Füze siloları seçtiğin hedefe füze fırlatır."
       },
       "rocket": {
         "title": "Atom bombası fırlat",
-        "hint": "Parlayan düşmana dokun, Saldırı menüsünü aç ve Atom Bombası seç."
+        "hint": "Parlayan düşmana dokun, Saldırı menüsünü aç ve Atom Bombası seç. Atom bombası düştüğü bölgeyi yok eder."
       },
       "sam": {
         "title": "SAM fırlatıcısı kur",
-        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve SAM Fırlatıcısı seç."
+        "hint": "Parlayan arazine dokun, İnşa menüsünü aç ve SAM Fırlatıcısı seç. SAM rampaları yakındaki füzeleri düşürür."
       },
       "leaderboard": {
         "title": "Skor tablosuna bak",
@@ -2184,5 +2186,6 @@
     "step.pause.resume": "Oyun duraklatıldı. Eğitime devam etmek için Devam et düğmesine bas.",
     "skip.confirm": "Eğitimi geçmek istiyor musun? Yardım menüsünden yeniden oynayabilirsin.",
     "step.port.expand": "Saldır seçeneğiyle deniz kıyısına ulaşana kadar genişle. İşaretçi, Liman kurabileceğin yeri gösterecek."
-  }
+  },
+  "cooldown": "Bekleme süresi"
 }

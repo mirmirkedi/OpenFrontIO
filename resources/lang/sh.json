@@ -529,8 +529,8 @@
     "accept_alliance": "Prihvatiti",
     "alliance_accepted": "prihvaćeno",
     "alliance_expired": "Vaše savezništvo s {name} je isteklo",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# nuke lansirao {name} other {# nuklearne bombe koje je lansirao {name}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {Nuklearna bomba # lansirana prema {name} other {# nuklearke lansirane prema {name}}",
+    "alliance_nukes_destroyed_incoming": "Savez je uništio {count} projektila koje je lansirao {name}.",
+    "alliance_nukes_destroyed_outgoing": "Savez je uništio {count} projektila lansiranih prema {name}.",
     "alliance_rejected": "odbijena",
     "alliance_renewed": "Vaš savez s {name} je obnovljen",
     "alliance_request_sent": "Zahtjev za savez poslan na {name}.",
@@ -1829,7 +1829,7 @@
     "move_up": "Pomeri kameru na nagore",
     "move_up_desc": "Pomera kameru nagore",
     "nuke_alliance_safety_desc": "Sprječava slučajne nuklearne napade na novoosnovane saveznike.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 tik (0,1 s)} other {{računati}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tik (0.1s)} other {{count} tik ({seconds}s)}}",
     "nuke_alliance_safety_label": "Ally prijateljski - protupožarna sigurnost",
     "off": "Isključeno",
     "on": "Na",
@@ -1873,7 +1873,9 @@
     "dark_mode_label": "Tamni mod",
     "dark_mode_desc": "Promeni izgled stranice sa svetlog na tamni mod",
     "troop_ratio_label": "Razmjer vojnika i radnika",
-    "troop_ratio_desc": "Prilagođava odnos između vojnika (za borbu) i radnika (za proizvodnju zlata) (1-100%)"
+    "troop_ratio_desc": "Prilagođava odnos između vojnika (za borbu) i radnika (za proizvodnju zlata) (1-100%)",
+    "music_off": "Isključi muziku",
+    "music_on": "Uključi muziku"
   },
   "username": {
     "account_invalid_chars": "Korisničko ime može sadržavati samo slova, brojeve, podvlake, crtice i jednostruke razmake između riječi.",
@@ -1923,6 +1925,114 @@
     "play_badge": "SVJETSKA DOMINACIJA",
     "play_description": "Igrajte protiv robota na bilo kojoj karti.",
     "play_title": "Spremni za bitku?",
-    "setup_header": "POSTAVKA BITKE"
-  }
+    "setup_header": "POSTAVKA BITKE",
+    "music_off": "Uključi muziku",
+    "music_on": "Isključi muziku"
+  },
+  "user_profile": {
+    "title": "Profil igrača",
+    "preview_heading": "TAKTIČKI IDENTITET",
+    "player_name": "Ime igrača",
+    "name_placeholder": "Unesite korisničko ime...",
+    "random_name": "Nasumično ime",
+    "characters": "{current}/{max}",
+    "flag_heading": "NACIONALNA ZASTAVA",
+    "search_flags": "Pretraži državu ili kod...",
+    "no_flag": "Bez zastave",
+    "all_continents": "Sve",
+    "continent_europe": "Evropa",
+    "continent_asia": "Azija",
+    "continent_americas": "Amerike",
+    "continent_africa": "Afrika",
+    "continent_oceania": "Okeanija",
+    "save": "Sačuvaj profil",
+    "saved": "Profil je uspešno sačuvan!",
+    "no_flags_found": "Nema zastava koje odgovaraju pretrazi.",
+    "default_username": "Igrač",
+    "clear_name": "Obriši ime",
+    "clear_search": "Obriši pretragu",
+    "flag": "Zastava"
+  },
+  "tutorial": {
+    "progress": "KORAK {current} OD {total}",
+    "controls.speed": "Otvori kontrole brzine igre",
+    "controls.pause": "Pauziraj igru",
+    "controls.resume": "Nastavi igru",
+    "skip": "Preskoči vodič",
+    "continue": "Nastavi igrati",
+    "step": {
+      "zoom": {
+        "title": "Uvećaj",
+        "hint": "Uvećaj označeno područje pomoću +, točkića ili dva prsta. Možeš koristiti i dugme za uvećanje."
+      },
+      "spawn": {
+        "title": "Izaberi početnu tačku",
+        "hint": "Dodirni označeno mesto da izabereš početnu tačku."
+      },
+      "expand": {
+        "title": "Proširi svoju teritoriju",
+        "hint": "Dodirni označenu slobodnu zemlju, pa izaberi Napad."
+      },
+      "attack": {
+        "title": "Napadni suseda",
+        "hint": "Dodirni označenu susednu državu, pa izaberi Napad."
+      },
+      "speed": {
+        "title": "Kontroliši brzinu igre",
+        "hint": "Otvori kontrole brzine i izaberi brzinu."
+      },
+      "pause": {
+        "title": "Pauziraj i nastavi",
+        "hint": "Dodirni Pauza, pa Nastavi da nastaviš igru."
+      },
+      "city": {
+        "title": "Izgradi grad",
+        "hint": "Dodirni označenu zemlju, otvori Izgradnju i izaberi Grad."
+      },
+      "factory": {
+        "title": "Izgradi fabriku",
+        "hint": "Dodirni označenu zemlju, otvori Izgradnju i izaberi Fabrika."
+      },
+      "defense": {
+        "title": "Zaštiti granicu",
+        "hint": "Dodirni označenu zemlju, otvori Izgradnju i izaberi Odbrambeni položaj."
+      },
+      "ally": {
+        "title": "Zatraži savez",
+        "hint": "Dodirni označenog suseda, pa izaberi Zatraži savez."
+      },
+      "port": {
+        "title": "Izgradi luku",
+        "hint": "Dodirni označenu zemlju na obali, otvori Izgradnju i izaberi Luku. Luke omogućavaju gradnju ratnih brodova i šalju trgovačke brodove koji donose zlato."
+      },
+      "warship": {
+        "title": "Pošalji ratni brod",
+        "hint": "Dodirni označenu vodu pored luke, otvori Napad i izaberi Ratni brod. Brodovi patroliraju, zarobljavaju trgovačke brodove i uništavaju neprijateljska plovila."
+      },
+      "silo": {
+        "title": "Izgradi raketni silos",
+        "hint": "Dodirni označenu zemlju, otvori Izgradnju i izaberi Raketni silos. Silosi ispaljuju rakete na izabranu metu."
+      },
+      "rocket": {
+        "title": "Lansiraj atomsku bombu",
+        "hint": "Dodirni označenog neprijatelja, otvori Napad i izaberi Atomsku bombu. Bomba uništava teritoriju, zgrade i brodove na mestu udara."
+      },
+      "sam": {
+        "title": "Izgradi SAM lanser",
+        "hint": "Dodirni označenu zemlju, otvori Izgradnju i izaberi SAM lanser. U svom dometu obara nadolazeće rakete."
+      },
+      "leaderboard": {
+        "title": "Pogledaj rang-listu",
+        "hint": "Otvori rang-listu i uporedi svoj rezultat s rezultatima drugih igrača."
+      },
+      "win": {
+        "title": "Pobedi u meču",
+        "hint": "Nastavi da širiš teritoriju kako bi pobedio. Kada budeš spreman, nastavi da otključaš sve kontrole."
+      }
+    },
+    "step.pause.resume": "Igra je pauzirana. Dodirni Nastavi da nastaviš vodič.",
+    "skip.confirm": "Preskočiti vodič? Možeš ga ponovo pokrenuti iz pomoći.",
+    "step.port.expand": "Širi se napadom dok ne stigneš do obale. Oznaka će pokazati ispravno mesto za luku."
+  },
+  "cooldown": "Vreme čekanja"
 }

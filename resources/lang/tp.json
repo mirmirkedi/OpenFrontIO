@@ -1833,7 +1833,7 @@
     "move_up": "o lukin sewi",
     "move_up_desc": "o lukin sewi",
     "nuke_alliance_safety_desc": "Prevents accidental nuke strikes lon newly formed jan pona mute.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1s)} other {{count} ticks ({seconds}s)}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tenpo (0.1s)} other {{count} tenpo ({seconds}s)}}",
     "nuke_alliance_safety_label": "jan pona friendly - fire safety",
     "off": "ala",
     "on": "lon",
@@ -1877,7 +1877,9 @@
     "dark_mode_label": "🌙 sitelen pimeja",
     "dark_mode_desc": "o ante e kule sitelen tawa walo tawa pimeja",
     "troop_ratio_label": "🪖🛠️ kulupu utala en kulupu pali",
-    "troop_ratio_desc": "o ante e suli pi kulupu utala (tawa utala) e suli pi kulupu pali (tawa mani) (kipisi wan tawa wan ale)"
+    "troop_ratio_desc": "o ante e suli pi kulupu utala (tawa utala) e suli pi kulupu pali (tawa mani) (kipisi wan tawa wan ale)",
+    "music_off": "o weka e kalama musi",
+    "music_on": "o pana e kalama musi"
   },
   "username": {
     "account_invalid_chars": "Username can only contain letters, numbers, underscores, hyphens, and single spaces between words.",
@@ -1927,6 +1929,114 @@
     "play_badge": "lawa ma ale",
     "play_description": "o musi against bots lon any map.",
     "play_title": "sina ken ala ken utala?",
-    "setup_header": "pali utala"
-  }
+    "setup_header": "pali utala",
+    "music_off": "o pana e kalama musi",
+    "music_on": "o weka e kalama musi"
+  },
+  "user_profile": {
+    "title": "lipu pi jan musi",
+    "preview_heading": "NASIN PI UTALA",
+    "player_name": "nimi pi jan musi",
+    "name_placeholder": "o pana e nimi sina...",
+    "random_name": "nimi nasa",
+    "characters": "{current}/{max}",
+    "flag_heading": "LIPU MA",
+    "search_flags": "o alasa e ma anu nimi...",
+    "no_flag": "ala",
+    "all_continents": "ale",
+    "continent_europe": "ma Elopa",
+    "continent_asia": "ma Asija",
+    "continent_americas": "ma Amelika",
+    "continent_africa": "ma Apika",
+    "continent_oceania": "ma Osejanija",
+    "save": "o awen e lipu",
+    "saved": "lipu li awen pona!",
+    "no_flags_found": "lipu ma la, ala li sama wile sina.",
+    "default_username": "jan musi",
+    "clear_name": "o weka e nimi",
+    "clear_search": "o weka e alasa",
+    "flag": "lipu ma"
+  },
+  "tutorial": {
+    "progress": "nasin {current}/{total}",
+    "controls.speed": "o open e ilo tenpo musi",
+    "controls.pause": "o awen e musi",
+    "controls.resume": "o musi sin",
+    "skip": "o weka e sona musi",
+    "continue": "o musi sin",
+    "step": {
+      "zoom": {
+        "title": "o suli e sitelen",
+        "hint": "o suli e ma pi sitelen pona kepeken + anu ilo tawa anu luka tu. sina ken kepeken ilo suli kin."
+      },
+      "spawn": {
+        "title": "o kama sona e ma open",
+        "hint": "o pilin e ma sitelen pona tawa open."
+      },
+      "expand": {
+        "title": "o suli e ma sina",
+        "hint": "o pilin e ma weka sitelen pona. o utala."
+      },
+      "attack": {
+        "title": "o utala e ma poka",
+        "hint": "o pilin e ma poka sitelen pona. o utala."
+      },
+      "speed": {
+        "title": "o lawa e tenpo musi",
+        "hint": "o open e ilo tenpo. o kama jo e tenpo."
+      },
+      "pause": {
+        "title": "o awen e musi la, o musi sin",
+        "hint": "o pilin e awen. o pilin e musi sin tawa musi."
+      },
+      "city": {
+        "title": "o pali e ma tomo",
+        "hint": "o pilin e ma sitelen pona. o open e pali. o pali e ma tomo."
+      },
+      "factory": {
+        "title": "o pali e tomo pali",
+        "hint": "o pilin e ma sitelen pona. o open e pali. o pali e tomo pali."
+      },
+      "defense": {
+        "title": "o awen e poka ma",
+        "hint": "o pilin e ma sitelen pona. o open e pali. o pali e tomo awen."
+      },
+      "ally": {
+        "title": "o wile jo e poka pona",
+        "hint": "o pilin e jan ma poka sitelen pona. o wile e poka pona."
+      },
+      "port": {
+        "title": "o pali e tomo telo",
+        "hint": "o pilin e ma telo poka sitelen pona. o open e pali. o pali e tomo telo. tomo telo la sina ken pali e tomo tawa telo utala. tomo telo li pana e tomo tawa esun tawa kama jo e mani."
+      },
+      "warship": {
+        "title": "o pana e tomo tawa telo utala",
+        "hint": "o pilin e telo sitelen pona poka tomo telo. o open e utala. o pana e tomo tawa telo utala. ona li lukin e telo, li kama jo e tomo esun, li pakala e tomo tawa telo pi jan utala."
+      },
+      "silo": {
+        "title": "o pali e tomo poki pi ilo utala",
+        "hint": "o pilin e ma sitelen pona. o open e pali. o pali e tomo poki pi ilo utala. ona li pana e ilo utala tawa ma sina wile."
+      },
+      "rocket": {
+        "title": "o pana e ilo utala suli",
+        "hint": "o pilin e jan utala sitelen pona. o open e utala. o pana e ilo utala suli. ona li pakala e ma, tomo, tomo tawa telo lon ma ona li kama."
+      },
+      "sam": {
+        "title": "o pali e ilo pi pakala ilo utala",
+        "hint": "o pilin e ma sitelen pona. o open e pali. o pali e ilo pi pakala ilo utala. ona li pakala e ilo utala pi kama lon poka ona."
+      },
+      "leaderboard": {
+        "title": "o lukin e lipu pi nanpa",
+        "hint": "o open e lipu nanpa tawa lukin e nanpa sina en nanpa jan ante."
+      },
+      "win": {
+        "title": "o kama pona lon musi",
+        "hint": "o suli e ma sina tawa kama pona. sina wile la, o pali sin tawa open e ilo ale."
+      }
+    },
+    "step.pause.resume": "musi li awen. o pilin e musi sin tawa musi pi sona.",
+    "skip.confirm": "o weka e sona musi anu seme? sina ken musi sin lon lipu pi sona.",
+    "step.port.expand": "o utala tawa ma telo. sitelen li pana e ma pona tawa tomo telo."
+  },
+  "cooldown": "tenpo awen"
 }

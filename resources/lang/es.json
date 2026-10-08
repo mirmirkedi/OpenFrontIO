@@ -535,8 +535,8 @@
     "accept_alliance": "Aceptar",
     "alliance_accepted": "aceptado",
     "alliance_expired": "Tu alianza con {name} expiró",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# bomba nuclear lanzada por {nombre} other {# armas nucleares lanzadas por {nombre}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {# bomba nuclear lanzada hacia {nombre} other {# armas nucleares lanzadas hacia {nombre}}",
+    "alliance_nukes_destroyed_incoming": "La alianza destruyó {count} misiles lanzados por {name}.",
+    "alliance_nukes_destroyed_outgoing": "La alianza destruyó {count} misiles dirigidos a {name}.",
     "alliance_rejected": "rechazado",
     "alliance_renewed": "Tu alianza con {name} ha sido renovada",
     "alliance_request_sent": "Solicitud de alianza enviada a {name}.",
@@ -1844,7 +1844,7 @@
     "move_up": "Mover cámara arriba",
     "move_up_desc": "Mueve la cámara hacia arriba",
     "nuke_alliance_safety_desc": "Previene ataques nucleares accidentales contra aliados recién formados.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 tic (0,1 s)} other {{contar}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tic (0.1s)} other {{count} tic ({seconds}s)}}",
     "nuke_alliance_safety_label": "Seguridad contra incendios amiga de los aliados",
     "off": "Apagado",
     "on": "En",
@@ -1888,7 +1888,9 @@
     "dark_mode_label": "🌙 Modo oscuro",
     "dark_mode_desc": "Cambiar la apariencia del sitio entre el tema claro y oscuro",
     "troop_ratio_label": "🪖🛠️ Ratio de tropas y trabajadores",
-    "troop_ratio_desc": "Ajusta el equilibrio entre tropas (para el combate) y trabajadores (para la producción de oro) (1–100%)"
+    "troop_ratio_desc": "Ajusta el equilibrio entre tropas (para el combate) y trabajadores (para la producción de oro) (1–100%)",
+    "music_off": "Debe apagarse la música",
+    "music_on": "Música activada"
   },
   "username": {
     "account_invalid_chars": "El nombre de usuario solo puede contener letras, números, guiones bajos, guiones y espacios simples entre palabras.",
@@ -1938,7 +1940,9 @@
     "play_badge": "DOMINACIÓN MUNDIAL",
     "play_description": "Juega contra bots en cualquier mapa.",
     "play_title": "¿Listo para la batalla?",
-    "setup_header": "CONFIGURACIÓN DE BATALLA"
+    "setup_header": "CONFIGURACIÓN DE BATALLA",
+    "music_off": "Música activada",
+    "music_on": "Debe apagarse la música"
   },
   "player_info_overlay": {
     "type": "Tipo",
@@ -1980,5 +1984,87 @@
     "clear_name": "Borrar nombre",
     "clear_search": "Borrar búsqueda",
     "flag": "Bandera"
-  }
+  },
+  "tutorial": {
+    "progress": "PASO {current} DE {total}",
+    "controls.speed": "Abrir los controles de velocidad del juego",
+    "controls.pause": "Pausar el juego",
+    "controls.resume": "Reanudar el juego",
+    "skip": "Saltar tutorial",
+    "continue": "Seguir jugando",
+    "step": {
+      "zoom": {
+        "title": "Acercar",
+        "hint": "Acércate a la zona resaltada con +, la rueda o dos dedos. También puedes usar el botón de acercar."
+      },
+      "spawn": {
+        "title": "Elige dónde empezar",
+        "hint": "Toca el lugar resaltado para elegir dónde empezar."
+      },
+      "expand": {
+        "title": "Expande tu territorio",
+        "hint": "Toca el terreno libre resaltado y elige Atacar."
+      },
+      "attack": {
+        "title": "Ataca a un país vecino",
+        "hint": "Toca el país vecino resaltado y elige Atacar."
+      },
+      "speed": {
+        "title": "Controla la velocidad del juego",
+        "hint": "Abre los controles de velocidad y elige una."
+      },
+      "pause": {
+        "title": "Pausar y reanudar",
+        "hint": "Toca Pausar y luego Reanudar para continuar."
+      },
+      "city": {
+        "title": "Construir una ciudad",
+        "hint": "Toca el terreno resaltado, abre Construir y elige Ciudad."
+      },
+      "factory": {
+        "title": "Construir una fábrica",
+        "hint": "Toca el terreno resaltado, abre Construir y elige Fábrica."
+      },
+      "defense": {
+        "title": "Protege tu frontera",
+        "hint": "Toca el terreno resaltado, abre Construir y elige Puesto defensivo."
+      },
+      "ally": {
+        "title": "Solicitar una alianza",
+        "hint": "Toca al vecino resaltado y elige Solicitar alianza."
+      },
+      "port": {
+        "title": "Construir un puerto",
+        "hint": "Toca el terreno resaltado junto a la costa, abre Construir y elige Puerto. Los puertos permiten construir buques de guerra y ganar oro con el comercio."
+      },
+      "warship": {
+        "title": "Lanzar un buque de guerra",
+        "hint": "Toca el agua resaltada junto a tu puerto, abre Atacar y elige Buque de guerra. Los buques patrullan y atacan barcos en el mar."
+      },
+      "silo": {
+        "title": "Construir un silo de misiles",
+        "hint": "Toca el terreno resaltado, abre Construir y elige Silo de misiles. Los silos lanzan misiles al objetivo que elijas."
+      },
+      "rocket": {
+        "title": "Lanzar una bomba atómica",
+        "hint": "Toca al enemigo resaltado, abre Atacar y elige Bomba atómica. La bomba atómica destruye la zona donde cae."
+      },
+      "sam": {
+        "title": "Construir un lanzador SAM",
+        "hint": "Toca el terreno resaltado, abre Construir y elige Lanzador SAM. Los lanzadores SAM derriban misiles cercanos."
+      },
+      "leaderboard": {
+        "title": "Ver la clasificación",
+        "hint": "Abre la clasificación para comparar tu puntuación con la de otros jugadores."
+      },
+      "win": {
+        "title": "Gana la partida",
+        "hint": "Sigue expandiéndote para ganar. Cuando quieras, continúa para desbloquear todos los controles."
+      }
+    },
+    "step.pause.resume": "El juego está en pausa. Toca Reanudar para continuar el tutorial.",
+    "skip.confirm": "¿Saltar el tutorial? Puedes volver a jugarlo desde Ayuda.",
+    "step.port.expand": "Expándete con Atacar hasta llegar a la costa. El marcador señalará una ubicación válida para construir un puerto."
+  },
+  "cooldown": "Enfriamiento"
 }

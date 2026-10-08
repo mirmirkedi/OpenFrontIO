@@ -1872,7 +1872,7 @@
     "move_up": "Flyt Kamera Op",
     "move_up_desc": "Flyt kameraet opad",
     "nuke_alliance_safety_desc": "Forhindrer utilsigtede atomangreb på nydannede allierede.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 flueben (0,1s)} other {{tælle}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1s)} other {{count} tick ({seconds}s)}}",
     "nuke_alliance_safety_label": "Allieret venlig-brandsikkerhed",
     "off": "Fra",
     "on": "Til",
@@ -1914,7 +1914,9 @@
     "zoom_out": "Zoom Ud",
     "zoom_out_desc": "Zoom ud af kortet",
     "colorblind_desc": "Brug farveblind-venlige territorium- og grænsefarver",
-    "colorblind_label": "Farveblind-tilstand"
+    "colorblind_label": "Farveblind-tilstand",
+    "music_off": "Slå musik fra",
+    "music_on": "Slå musik til"
   },
   "username": {
     "account_invalid_chars": "Brugernavn kan kun indeholde bogstaver, tal, understregninger, bindestreger og enkelte mellemrum mellem ord.",
@@ -1965,7 +1967,9 @@
     "play_badge": "VERDENSDOMINATION",
     "play_description": "Spil mod bots på ethvert kort.",
     "play_title": "Klar til kamp?",
-    "setup_header": "KAMPOPSÆTNING"
+    "setup_header": "KAMPOPSÆTNING",
+    "music_off": "Slå musik til",
+    "music_on": "Slå musik fra"
   },
   "flag_input": {
     "button_title": "Vælg et flag!",
@@ -1977,5 +1981,111 @@
     "login_required": "Log ind for at spille rangeret!",
     "must_login": "Du skal være logget ind for at spille rangeret matchmaking.",
     "play_ranked": "1v1 Rangeret Matchmaking"
-  }
+  },
+  "user_profile": {
+    "title": "Spillerprofil",
+    "preview_heading": "TAKTISK IDENTITET",
+    "player_name": "Spillernavn",
+    "name_placeholder": "Indtast brugernavn...",
+    "random_name": "Tilfældigt navn",
+    "characters": "{current}/{max}",
+    "flag_heading": "NATIONALFLAG",
+    "search_flags": "Søg efter land eller kode...",
+    "no_flag": "Intet flag",
+    "all_continents": "Alle",
+    "continent_europe": "Europa",
+    "continent_asia": "Asien",
+    "continent_americas": "Amerika",
+    "continent_africa": "Afrika",
+    "continent_oceania": "Oceanien",
+    "save": "Gem profil",
+    "saved": "Profilen blev gemt!",
+    "no_flags_found": "Ingen flag matcher din søgning.",
+    "default_username": "Spiller",
+    "clear_name": "Ryd navn",
+    "clear_search": "Ryd søgning",
+    "flag": "Flag"
+  },
+  "tutorial": {
+    "progress": "TRIN {current} AF {total}",
+    "controls.speed": "Åbn indstillinger for spilhastighed",
+    "controls.pause": "Sæt spillet på pause",
+    "controls.resume": "Fortsæt spillet",
+    "skip": "Spring vejledningen over",
+    "continue": "Fortsæt med at spille",
+    "step": {
+      "zoom": {
+        "title": "Zoom ind",
+        "hint": "Zoom ind på det fremhævede område med +, rullehjulet eller to fingre. Du kan også bruge knappen Zoom ind."
+      },
+      "spawn": {
+        "title": "Vælg dit startpunkt",
+        "hint": "Tryk på det fremhævede sted for at vælge dit startpunkt."
+      },
+      "expand": {
+        "title": "Udvid dit territorium",
+        "hint": "Tryk på det fremhævede frie land, og vælg Angrib."
+      },
+      "attack": {
+        "title": "Angrib en nabo",
+        "hint": "Tryk på det fremhævede naboland, og vælg Angrib."
+      },
+      "speed": {
+        "title": "Styr spillets hastighed",
+        "hint": "Åbn hastighedsindstillingerne, og vælg en hastighed."
+      },
+      "pause": {
+        "title": "Sæt på pause og fortsæt",
+        "hint": "Tryk på Pause og derefter Fortsæt for at spille videre."
+      },
+      "city": {
+        "title": "Byg en by",
+        "hint": "Tryk på det fremhævede land, åbn Byg, og vælg By."
+      },
+      "factory": {
+        "title": "Byg en fabrik",
+        "hint": "Tryk på det fremhævede land, åbn Byg, og vælg Fabrik."
+      },
+      "defense": {
+        "title": "Beskyt din grænse",
+        "hint": "Tryk på det fremhævede land, åbn Byg, og vælg Forsvarspost."
+      },
+      "ally": {
+        "title": "Anmod om en alliance",
+        "hint": "Tryk på den fremhævede nabo, og vælg Anmod om alliance."
+      },
+      "port": {
+        "title": "Byg en havn",
+        "hint": "Tryk på det fremhævede land ved kysten, åbn Byg, og vælg Havn. Havne giver adgang til krigsskibe og handelsskibe, der tjener guld."
+      },
+      "warship": {
+        "title": "Send et krigsskib af sted",
+        "hint": "Tryk på det fremhævede vand ved din havn, åbn Angrib, og vælg Krigsskib. Skibe patruljerer, kaprer handelsskibe og ødelægger fjendtlige fartøjer."
+      },
+      "silo": {
+        "title": "Byg en missilsilo",
+        "hint": "Tryk på det fremhævede land, åbn Byg, og vælg Missilsilo. Siloer affyrer missiler mod et valgt mål."
+      },
+      "rocket": {
+        "title": "Affyr en atombombe",
+        "hint": "Tryk på den fremhævede fjende, åbn Angrib, og vælg Atombombe. Bomber ødelægger land, bygninger og skibe, hvor de rammer."
+      },
+      "sam": {
+        "title": "Byg en SAM-affyringsrampe",
+        "hint": "Tryk på det fremhævede land, åbn Byg, og vælg SAM-affyringsrampe. Den skyder indkommende missiler ned inden for rækkevidde."
+      },
+      "leaderboard": {
+        "title": "Se ranglisten",
+        "hint": "Åbn ranglisten for at sammenligne din score med andre spilleres."
+      },
+      "win": {
+        "title": "Vind kampen",
+        "hint": "Bliv ved med at udvide for at vinde. Fortsæt, når du er klar, for at låse op for alle kontroller."
+      }
+    },
+    "step.pause.resume": "Spillet er sat på pause. Tryk på Fortsæt for at fortsætte vejledningen.",
+    "skip.confirm": "Spring vejledningen over? Du kan spille den igen under Hjælp.",
+    "step.port.expand": "Udvid med Angrib, indtil du når kysten. Markøren viser et gyldigt sted at bygge en havn."
+  },
+  "cooldown": "Nedkøling"
 }

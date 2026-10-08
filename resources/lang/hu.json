@@ -1851,7 +1851,7 @@
     "move_up": "Kamera mozgatása fel",
     "move_up_desc": "Kamera mozgatása felfelé",
     "nuke_alliance_safety_desc": "Megakadályozza az újonnan alakult szövetségesekre irányuló véletlen nukleáris csapásokat.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 pipa (0,1 s)} other {{számít}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1mp)} other {{count} tick ({seconds}mp)}}",
     "nuke_alliance_safety_label": "Szövetségbarát-tűzbiztonság",
     "off": "Ki",
     "on": "Be",
@@ -1891,7 +1891,9 @@
     "zoom_in": "Nagyítás",
     "zoom_in_desc": "Térkép nagyítása",
     "zoom_out": "Kicsinyítés",
-    "zoom_out_desc": "Térkép kicsinyítése"
+    "zoom_out_desc": "Térkép kicsinyítése",
+    "music_off": "Zene kikapcsolása",
+    "music_on": "Zene bekapcsolása"
   },
   "username": {
     "account_invalid_chars": "A felhasználónév csak betűket, számokat, alulvonásokat, kötőjeleket és a szavak között egyetlen szóközt tartalmazhat.",
@@ -1941,7 +1943,9 @@
     "play_badge": "VILÁGURALOM",
     "play_description": "Játssz botok ellen bármilyen térképen.",
     "play_title": "Harcra készen?",
-    "setup_header": "CSATA BEÁLLÍTÁS"
+    "setup_header": "CSATA BEÁLLÍTÁS",
+    "music_off": "Zene bekapcsolása",
+    "music_on": "Zene kikapcsolása"
   },
   "flag_input": {
     "button_title": "Válassz egy zászlót!",
@@ -1950,5 +1954,111 @@
   },
   "steam": {
     "link_signpost": "Rendelkezel már OpenFront-fiókkal? A fiókok összekapcsolása egy későbbi frissítéssel érkezik."
-  }
+  },
+  "user_profile": {
+    "title": "Játékosprofil",
+    "preview_heading": "TAKTIKAI IDENTITÁS",
+    "player_name": "Játékos neve",
+    "name_placeholder": "Add meg a felhasználónevet...",
+    "random_name": "Véletlenszerű név",
+    "characters": "{current}/{max}",
+    "flag_heading": "NEMZETI ZÁSZLÓ",
+    "search_flags": "Ország vagy kód keresése...",
+    "no_flag": "Nincs zászló",
+    "all_continents": "Összes",
+    "continent_europe": "Európa",
+    "continent_asia": "Ázsia",
+    "continent_americas": "Amerika",
+    "continent_africa": "Afrika",
+    "continent_oceania": "Óceánia",
+    "save": "Profil mentése",
+    "saved": "A profil sikeresen mentve!",
+    "no_flags_found": "Nincs a keresésnek megfelelő zászló.",
+    "default_username": "Játékos",
+    "clear_name": "Név törlése",
+    "clear_search": "Keresés törlése",
+    "flag": "Zászló"
+  },
+  "tutorial": {
+    "progress": "{current}. LÉPÉS / {total}",
+    "controls.speed": "Játéksebesség beállításainak megnyitása",
+    "controls.pause": "Játék szüneteltetése",
+    "controls.resume": "Játék folytatása",
+    "skip": "Oktatóanyag kihagyása",
+    "continue": "Játék folytatása",
+    "step": {
+      "zoom": {
+        "title": "Nagyítás",
+        "hint": "Nagyíts a kiemelt területre a + gombbal, a görgővel vagy két ujjal. A Nagyítás gombot is használhatod."
+      },
+      "spawn": {
+        "title": "Válaszd ki a kezdőpontot",
+        "hint": "Koppints a kiemelt helyre a kezdőpont kiválasztásához."
+      },
+      "expand": {
+        "title": "Terjeszd ki a területedet",
+        "hint": "Koppints a kiemelt szabad területre, majd válaszd a Támadás lehetőséget."
+      },
+      "attack": {
+        "title": "Támadj meg egy szomszédot",
+        "hint": "Koppints a kiemelt szomszédos országra, majd válaszd a Támadás lehetőséget."
+      },
+      "speed": {
+        "title": "Játéksebesség szabályozása",
+        "hint": "Nyisd meg a sebesség beállításait, majd válassz egy sebességet."
+      },
+      "pause": {
+        "title": "Szüneteltetés és folytatás",
+        "hint": "Koppints a Szünet gombra, majd a folytatáshoz a Folytatás gombra."
+      },
+      "city": {
+        "title": "Építs várost",
+        "hint": "Koppints a kiemelt területre, nyisd meg az Építés menüt, majd válaszd a Város lehetőséget."
+      },
+      "factory": {
+        "title": "Építs gyárat",
+        "hint": "Koppints a kiemelt területre, nyisd meg az Építés menüt, majd válaszd a Gyár lehetőséget."
+      },
+      "defense": {
+        "title": "Védd meg a határodat",
+        "hint": "Koppints a kiemelt területre, nyisd meg az Építés menüt, majd válaszd a Védelmi állomás lehetőséget."
+      },
+      "ally": {
+        "title": "Kérj szövetséget",
+        "hint": "Koppints a kiemelt szomszédra, majd válaszd a Szövetség kérése lehetőséget."
+      },
+      "port": {
+        "title": "Építs kikötőt",
+        "hint": "Koppints a parton kiemelt területre, nyisd meg az Építés menüt, majd válaszd a Kikötő lehetőséget. A kikötőben hadihajók és aranyat termelő kereskedelmi hajók építhetők."
+      },
+      "warship": {
+        "title": "Indíts hadihajót",
+        "hint": "Koppints a kikötő melletti kiemelt vízre, nyisd meg a Támadás menüt, majd válaszd a Hadihajó lehetőséget. A hajók járőröznek, kereskedelmi hajókat foglalnak el és ellenséges hajókat pusztítanak el."
+      },
+      "silo": {
+        "title": "Építs rakétasilót",
+        "hint": "Koppints a kiemelt területre, nyisd meg az Építés menüt, majd válaszd a Rakétasiló lehetőséget. A silók rakétákat indítanak a kiválasztott célpontra."
+      },
+      "rocket": {
+        "title": "Indíts atom bombát",
+        "hint": "Koppints a kiemelt ellenségre, nyisd meg a Támadás menüt, majd válaszd az Atombomba lehetőséget. A bomba becsapódáskor elpusztítja a területet, az épületeket és a hajókat."
+      },
+      "sam": {
+        "title": "Építs SAM-indítót",
+        "hint": "Koppints a kiemelt területre, nyisd meg az Építés menüt, majd válaszd a SAM-indító lehetőséget. A hatótávján belül lelövi a közeledő rakétákat."
+      },
+      "leaderboard": {
+        "title": "Nézd meg a ranglistát",
+        "hint": "Nyisd meg a ranglistát, és hasonlítsd össze a pontszámodat más játékosokéval."
+      },
+      "win": {
+        "title": "Nyerd meg a meccset",
+        "hint": "Terjeszkedj tovább a győzelemért. Ha készen állsz, folytasd az összes vezérlő feloldásához."
+      }
+    },
+    "step.pause.resume": "A játék szünetel. Koppints a Folytatás gombra az oktatóanyag folytatásához.",
+    "skip.confirm": "Kihagyod az oktatóanyagot? A Súgóban újra elindíthatod.",
+    "step.port.expand": "A Támadás paranccsal terjeszkedj, amíg eléred a partot. A jelölő megmutatja a kikötő építésére alkalmas helyet."
+  },
+  "cooldown": "Újratöltési idő"
 }

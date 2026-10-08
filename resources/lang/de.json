@@ -534,8 +534,8 @@
     "accept_alliance": "Annehmen",
     "alliance_accepted": "akzeptiert",
     "alliance_expired": "Deine Allianz mit {name} ist abgelaufen",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# Atombombe von {name} other {# Atomwaffen wurden von {name}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {# Atomrakete in Richtung {Name abgefeuert} other {# Atomwaffen wurden auf {Name}}",
+    "alliance_nukes_destroyed_incoming": "Das Bündnis zerstörte {count} von {name} abgefeuerte Raketen.",
+    "alliance_nukes_destroyed_outgoing": "Das Bündnis zerstörte {count} auf {name} abgefeuerte Raketen.",
     "alliance_rejected": "abgelehnt",
     "alliance_renewed": "Deine Allianz mit {name} wurde erneuert",
     "alliance_request_sent": "Allianzanfrage an {name} gesendet.",
@@ -1893,7 +1893,7 @@
     "move_up": "Kamera nach oben bewegen",
     "move_up_desc": "Bewegt die Kamera nach oben",
     "nuke_alliance_safety_desc": "Verhindert versehentliche Atomangriffe auf neu gebildete Verbündete.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 Tick (0,1 s)} other {{zählen}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 Tick (0.1s)} other {{count} Tick ({seconds}s)}}",
     "nuke_alliance_safety_label": "Ally Friendly-Fire-Sicherheit",
     "off": "Aus",
     "on": "An",
@@ -1938,7 +1938,9 @@
     "dark_mode_desc": "Wechseln zwischen dem dunklen und hellen Design der Website",
     "structure_sprites_label": "Struktur-Grafiken",
     "structure_sprites_desc": "Struktur-Grafiken ein-/ausschalten",
-    "troop_ratio_desc": "Stelle das Verhältnis zwischen Truppen (für den Kampf) und Arbeitern (für die Goldproduktion) ein (1–100 %)"
+    "troop_ratio_desc": "Stelle das Verhältnis zwischen Truppen (für den Kampf) und Arbeitern (für die Goldproduktion) ein (1–100 %)",
+    "music_off": "Musik aus",
+    "music_on": "Musik an"
   },
   "username": {
     "account_invalid_chars": "Der Benutzername darf nur Buchstaben, Zahlen, Unterstriche, Bindestriche und einzelne Leerzeichen zwischen Wörtern enthalten.",
@@ -1992,7 +1994,9 @@
     "play_badge": "WELTHERRSCHAFT",
     "play_description": "Spielen Sie gegen Bots auf einer beliebigen Karte.",
     "play_title": "Kampfbereit?",
-    "setup_header": "KAMPFAUFBAU"
+    "setup_header": "KAMPFAUFBAU",
+    "music_off": "Musik an",
+    "music_on": "Musik aus"
   },
   "stats_modal": {
     "title": "Statistiken",
@@ -2072,5 +2076,87 @@
     "clear_name": "Namen löschen",
     "clear_search": "Suche löschen",
     "flag": "Flagge"
-  }
+  },
+  "tutorial": {
+    "progress": "SCHRITT {current} VON {total}",
+    "controls.speed": "Spielgeschwindigkeitssteuerung öffnen",
+    "controls.pause": "Spiel pausieren",
+    "controls.resume": "Spiel fortsetzen",
+    "skip": "Tutorial überspringen",
+    "continue": "Weiterspielen",
+    "step": {
+      "zoom": {
+        "title": "Heranzoomen",
+        "hint": "Zoome mit +, dem Mausrad oder zwei Fingern auf den hervorgehobenen Bereich. Du kannst auch die Schaltfläche zum Heranzoomen verwenden."
+      },
+      "spawn": {
+        "title": "Startpunkt auswählen",
+        "hint": "Tippe auf die markierte Stelle, um deinen Startpunkt auszuwählen."
+      },
+      "expand": {
+        "title": "Gebiet erweitern",
+        "hint": "Tippe auf das markierte freie Land und wähle Angriff."
+      },
+      "attack": {
+        "title": "Einen Nachbarn angreifen",
+        "hint": "Tippe auf das markierte Nachbarland und wähle Angriff."
+      },
+      "speed": {
+        "title": "Spielgeschwindigkeit steuern",
+        "hint": "Öffne die Geschwindigkeitssteuerung und wähle ein Tempo."
+      },
+      "pause": {
+        "title": "Pausieren und fortsetzen",
+        "hint": "Tippe auf Pause und dann auf Fortsetzen, um weiterzuspielen."
+      },
+      "city": {
+        "title": "Eine Stadt bauen",
+        "hint": "Tippe auf das markierte Land, öffne Bauen und wähle Stadt."
+      },
+      "factory": {
+        "title": "Eine Fabrik bauen",
+        "hint": "Tippe auf das markierte Land, öffne Bauen und wähle Fabrik."
+      },
+      "defense": {
+        "title": "Grenze schützen",
+        "hint": "Tippe auf das markierte Land, öffne Bauen und wähle Verteidigungsposten."
+      },
+      "ally": {
+        "title": "Bündnis anfragen",
+        "hint": "Tippe auf das markierte Nachbarland und wähle Bündnis anfragen."
+      },
+      "port": {
+        "title": "Einen Hafen bauen",
+        "hint": "Tippe auf das markierte Land an der Küste, öffne Bauen und wähle Hafen. Häfen ermöglichen den Bau von Kriegsschiffen und bringen durch Handel Gold ein."
+      },
+      "warship": {
+        "title": "Ein Kriegsschiff starten",
+        "hint": "Tippe auf das markierte Wasser bei deinem Hafen, öffne Angriff und wähle Kriegsschiff. Kriegsschiffe patrouillieren und greifen Schiffe auf See an."
+      },
+      "silo": {
+        "title": "Einen Raketensilo bauen",
+        "hint": "Tippe auf das markierte Land, öffne Bauen und wähle Raketensilo. Raketensilos starten Raketen auf ein ausgewähltes Ziel."
+      },
+      "rocket": {
+        "title": "Eine Atombombe starten",
+        "hint": "Tippe auf den markierten Gegner, öffne Angriff und wähle Atombombe. Die Atombombe zerstört das Gebiet, in dem sie einschlägt."
+      },
+      "sam": {
+        "title": "Einen SAM-Abwerfer bauen",
+        "hint": "Tippe auf das markierte Land, öffne Bauen und wähle SAM-Abwerfer. SAM-Abwerfer schießen nahe Raketen ab."
+      },
+      "leaderboard": {
+        "title": "Bestenliste ansehen",
+        "hint": "Öffne die Bestenliste, um deine Punktzahl mit der anderer Spieler zu vergleichen."
+      },
+      "win": {
+        "title": "Das Spiel gewinnen",
+        "hint": "Expandiere weiter, um zu gewinnen. Wenn du bereit bist, fahre fort, um alle Steuerungen freizuschalten."
+      }
+    },
+    "step.pause.resume": "Das Spiel ist pausiert. Tippe auf Fortsetzen, um das Tutorial weiterzuspielen.",
+    "skip.confirm": "Tutorial überspringen? Du kannst es jederzeit über Hilfe erneut spielen.",
+    "step.port.expand": "Greife mit Angriff weiter an, bis du die Küste erreichst. Die Markierung zeigt einen gültigen Standort für einen Hafen an."
+  },
+  "cooldown": "Abklingzeit"
 }

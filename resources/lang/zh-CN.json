@@ -1873,7 +1873,7 @@
     "move_up": "镜头上移",
     "move_up_desc": "向上移动镜头",
     "nuke_alliance_safety_desc": "防止对新成立的盟友进行意外的核打击。",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 刻度（0.1 秒）} other {{数数}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 刻 (0.1秒)} other {{count} 刻 ({seconds}秒)}}",
     "nuke_alliance_safety_label": "盟友友好的消防安全",
     "off": "关",
     "on": "开",
@@ -1917,7 +1917,9 @@
     "dark_mode_label": "深色模式",
     "dark_mode_desc": "在浅色和深色主题之间切换网站外观",
     "structure_sprites_label": "建筑贴图",
-    "structure_sprites_desc": "切换建筑贴图"
+    "structure_sprites_desc": "切换建筑贴图",
+    "music_off": "音乐关掉&#x0D;",
+    "music_on": "開啟音樂"
   },
   "username": {
     "account_invalid_chars": "用户名只能包含字母、数字、下划线、连字符和单词之间的单个空格。",
@@ -1968,7 +1970,9 @@
     "play_badge": "统治世界",
     "play_description": "在任何地图上与机器人对战。",
     "play_title": "准备好战斗了吗？",
-    "setup_header": "战斗设置"
+    "setup_header": "战斗设置",
+    "music_off": "開啟音樂",
+    "music_on": "音乐关掉&#x0D;"
   },
   "flag_input": {
     "title": "选择旗帜",
@@ -2004,5 +2008,87 @@
     "clear_name": "清除名称",
     "clear_search": "清除搜索",
     "flag": "旗帜"
-  }
+  },
+  "tutorial": {
+    "progress": "第 {current} 步，共 {total} 步",
+    "controls.speed": "打开游戏速度控制",
+    "controls.pause": "暂停游戏",
+    "controls.resume": "继续游戏",
+    "skip": "跳过教程",
+    "continue": "继续游戏",
+    "step": {
+      "zoom": {
+        "title": "放大",
+        "hint": "使用 +、滚轮或双指缩放到高亮区域。也可以点击“放大”按钮。"
+      },
+      "spawn": {
+        "title": "选择起始位置",
+        "hint": "点击高亮位置来选择起始点。"
+      },
+      "expand": {
+        "title": "扩张领土",
+        "hint": "点击高亮的空地，然后选择“攻击”。"
+      },
+      "attack": {
+        "title": "攻击邻国",
+        "hint": "点击高亮的邻国，然后选择“攻击”。"
+      },
+      "speed": {
+        "title": "控制游戏速度",
+        "hint": "打开速度控制，然后选择一种速度。"
+      },
+      "pause": {
+        "title": "暂停与继续",
+        "hint": "点击“暂停”，再点击“继续”以继续游戏。"
+      },
+      "city": {
+        "title": "建造城市",
+        "hint": "点击高亮的土地，打开“建造”，然后选择“城市”。"
+      },
+      "factory": {
+        "title": "建造工厂",
+        "hint": "点击高亮的土地，打开“建造”，然后选择“工厂”。"
+      },
+      "defense": {
+        "title": "保卫边境",
+        "hint": "点击高亮的土地，打开“建造”，然后选择“防御哨所”。"
+      },
+      "ally": {
+        "title": "请求结盟",
+        "hint": "点击高亮的邻国，然后选择“请求结盟”。"
+      },
+      "port": {
+        "title": "建造港口",
+        "hint": "点击海岸边高亮的土地，打开“建造”，然后选择“港口”。港口可以建造战舰，并通过贸易获得金币。"
+      },
+      "warship": {
+        "title": "派出战舰",
+        "hint": "点击港口附近高亮的水域，打开“攻击”，然后选择“战舰”。战舰会在海上巡逻并攻击船只。"
+      },
+      "silo": {
+        "title": "建造导弹发射井",
+        "hint": "点击高亮的土地，打开“建造”，然后选择“导弹发射井”。导弹发射井可以向你选择的目标发射导弹。"
+      },
+      "rocket": {
+        "title": "发射原子弹",
+        "hint": "点击高亮的敌方国家，打开“攻击”，然后选择“原子弹”。原子弹会摧毁落点区域。"
+      },
+      "sam": {
+        "title": "建造防空导弹发射器",
+        "hint": "点击高亮的土地，打开“建造”，然后选择“防空导弹发射器”。SAM 发射器会击落附近的来袭导弹。"
+      },
+      "leaderboard": {
+        "title": "查看排行榜",
+        "hint": "打开排行榜，将你的分数与其他玩家进行比较。"
+      },
+      "win": {
+        "title": "赢得比赛",
+        "hint": "继续扩张以赢得比赛。准备好后，继续即可解锁所有控制功能。"
+      }
+    },
+    "step.pause.resume": "游戏已暂停。点击“继续”以继续教程。",
+    "skip.confirm": "跳过教程？你可以在“帮助”中重新开始。",
+    "step.port.expand": "使用“攻击”继续扩张，直到到达海岸。标记将指向可建造港口的位置。"
+  },
+  "cooldown": "冷却时间"
 }

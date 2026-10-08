@@ -1884,7 +1884,7 @@
     "move_up": "Mou la càmera amunt",
     "move_up_desc": "Mou la càmera cap amunt",
     "nuke_alliance_safety_desc": "Evita atacs nuclears accidentals sobre aliats recentment formats.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1s)} other {{count}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tic (0.1s)} other {{count} tic ({seconds}s)}}",
     "nuke_alliance_safety_label": "Aliat a la seguretat contra el foc",
     "off": "Desactivat",
     "on": "Activat",
@@ -1928,7 +1928,9 @@
     "dark_mode_label": "Mode Fosc",
     "dark_mode_desc": "Canvia l'aspecte de la pàgina entre el tema clar i el tema fosc",
     "structure_sprites_label": "Estructures Animades",
-    "structure_sprites_desc": "Activa/desactiva les estructures animades"
+    "structure_sprites_desc": "Activa/desactiva les estructures animades",
+    "music_off": "Desactiva la música",
+    "music_on": "Activa la música"
   },
   "username": {
     "account_invalid_chars": "El nom d'usuari només pot contenir lletres, números, guions baixos, guions i espais individuals entre paraules.",
@@ -1979,7 +1981,9 @@
     "play_badge": "DOMINACIÓ MUNDIAL",
     "play_description": "Juga contra robots a qualsevol mapa.",
     "play_title": "Preparat per a la batalla?",
-    "setup_header": "CONFIGURACIÓ DE LA BATALLA"
+    "setup_header": "CONFIGURACIÓ DE LA BATALLA",
+    "music_off": "Activa la música",
+    "music_on": "Desactiva la música"
   },
   "flag_input": {
     "title": "Tria la Bandera",
@@ -1991,5 +1995,111 @@
     "description": "(ALFA)",
     "login_required": "Inicia sessió per jugar classificat!",
     "must_login": "Has d'iniciar sessió per jugar a partides classificades."
-  }
+  },
+  "user_profile": {
+    "title": "Perfil del jugador",
+    "preview_heading": "IDENTITAT TÀCTICA",
+    "player_name": "Nom del jugador",
+    "name_placeholder": "Introdueix el nom d’usuari...",
+    "random_name": "Aleatoritza",
+    "characters": "{current}/{max}",
+    "flag_heading": "BANDERA NACIONAL",
+    "search_flags": "Cerca un país o un codi...",
+    "no_flag": "Sense bandera",
+    "all_continents": "Tots",
+    "continent_europe": "Europa",
+    "continent_asia": "Àsia",
+    "continent_americas": "Amèrica",
+    "continent_africa": "Àfrica",
+    "continent_oceania": "Oceania",
+    "save": "Desa el perfil",
+    "saved": "El perfil s’ha desat correctament!",
+    "no_flags_found": "Cap bandera coincideix amb la cerca.",
+    "default_username": "Jugador",
+    "clear_name": "Esborra el nom",
+    "clear_search": "Esborra la cerca",
+    "flag": "Bandera"
+  },
+  "tutorial": {
+    "progress": "PAS {current} DE {total}",
+    "controls.speed": "Obre els controls de velocitat del joc",
+    "controls.pause": "Posa el joc en pausa",
+    "controls.resume": "Reprèn la partida",
+    "skip": "Omet el tutorial",
+    "continue": "Continua jugant",
+    "step": {
+      "zoom": {
+        "title": "Amplia",
+        "hint": "Amplia la zona ressaltada amb +, la roda o dos dits. També pots fer servir el botó d’ampliar."
+      },
+      "spawn": {
+        "title": "Tria el punt de partida",
+        "hint": "Toca el lloc ressaltat per triar el punt de partida."
+      },
+      "expand": {
+        "title": "Amplia el teu territori",
+        "hint": "Toca el terreny lliure ressaltat i tria Atacar."
+      },
+      "attack": {
+        "title": "Ataca un país veí",
+        "hint": "Toca el país veí ressaltat i tria Atacar."
+      },
+      "speed": {
+        "title": "Controla la velocitat del joc",
+        "hint": "Obre els controls de velocitat i tria’n una."
+      },
+      "pause": {
+        "title": "Posa en pausa i reprèn",
+        "hint": "Toca Pausa i després Reprèn per continuar."
+      },
+      "city": {
+        "title": "Construeix una ciutat",
+        "hint": "Toca el terreny ressaltat, obre Construir i tria Ciutat."
+      },
+      "factory": {
+        "title": "Construeix una fàbrica",
+        "hint": "Toca el terreny ressaltat, obre Construir i tria Fàbrica."
+      },
+      "defense": {
+        "title": "Protegeix la frontera",
+        "hint": "Toca el terreny ressaltat, obre Construir i tria un Post defensiu."
+      },
+      "ally": {
+        "title": "Demana una aliança",
+        "hint": "Toca el veí ressaltat i tria Demana una aliança."
+      },
+      "port": {
+        "title": "Construeix un port",
+        "hint": "Toca el terreny ressaltat de la costa, obre Construir i tria Port. Els ports permeten construir vaixells de guerra i enviar vaixells comercials que guanyen or."
+      },
+      "warship": {
+        "title": "Fes sortir un vaixell de guerra",
+        "hint": "Toca l’aigua ressaltada al costat del port, obre Atacar i tria Vaixell de guerra. Patrullen, capturen vaixells comercials i destrueixen embarcacions enemigues."
+      },
+      "silo": {
+        "title": "Construeix un silo de míssils",
+        "hint": "Toca el terreny ressaltat, obre Construir i tria Silo de míssils. Els silos llancen míssils contra l’objectiu que triïs."
+      },
+      "rocket": {
+        "title": "Llança una bomba atòmica",
+        "hint": "Toca l’enemic ressaltat, obre Atacar i tria Bomba atòmica. Les bombes destrueixen el territori, els edificis i els vaixells on impacten."
+      },
+      "sam": {
+        "title": "Construeix un llançador SAM",
+        "hint": "Toca el terreny ressaltat, obre Construir i tria Llançador SAM. Abat els míssils entrants dins del seu abast."
+      },
+      "leaderboard": {
+        "title": "Consulta la classificació",
+        "hint": "Obre la classificació per comparar la puntuació amb la d’altres jugadors."
+      },
+      "win": {
+        "title": "Guanya la partida",
+        "hint": "Continua expandint-te per guanyar. Quan estiguis a punt, continua per desbloquejar tots els controls."
+      }
+    },
+    "step.pause.resume": "La partida està en pausa. Toca Reprèn per continuar el tutorial.",
+    "skip.confirm": "Vols ometre el tutorial? Pots tornar-lo a jugar des d’Ajuda.",
+    "step.port.expand": "Expandeix-te amb Atacar fins a arribar a la costa. L’indicador assenyalarà un lloc vàlid per construir un port."
+  },
+  "cooldown": "Temps de reutilització"
 }

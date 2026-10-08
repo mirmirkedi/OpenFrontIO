@@ -1884,7 +1884,7 @@
     "move_up": "Liiguta Kaamera Ülesse",
     "move_up_desc": "Liiguta Kaamerat ülesse poole",
     "nuke_alliance_safety_desc": "Hoiab ära juhuslikud tuumalöögid vastloodud liitlastele.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 linnuke (0,1 s)} other {{count}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tikk (0.1s)} other {{count} tikk ({seconds}s)}}",
     "nuke_alliance_safety_label": "Liitlassõbralik-tuleohutus",
     "off": "Väljas",
     "on": "Sees",
@@ -1928,7 +1928,9 @@
     "dark_mode_label": "Tume režiim",
     "dark_mode_desc": "Lülita saidi välimus heleda ja tumeda teema vahel",
     "structure_sprites_label": "Struktuuri Ikoonid",
-    "structure_sprites_desc": "Lülita struktuuri ikoonid sissa/välja"
+    "structure_sprites_desc": "Lülita struktuuri ikoonid sissa/välja",
+    "music_off": "Lülita muusika välja",
+    "music_on": "Lülita muusika sisse"
   },
   "username": {
     "account_invalid_chars": "Kasutajanimi võib sisaldada ainult tähti, numbreid, allkriipse, sidekriipse ja üksikuid tühikuid sõnade vahel.",
@@ -1979,7 +1981,9 @@
     "play_badge": "MAAILMA DOMINATION",
     "play_description": "Mängige robotite vastu mis tahes kaardil.",
     "play_title": "Kas olete lahinguks valmis?",
-    "setup_header": "LAHINGU SEADISTAMINE"
+    "setup_header": "LAHINGU SEADISTAMINE",
+    "music_off": "Lülita muusika sisse",
+    "music_on": "Lülita muusika välja"
   },
   "flag_input": {
     "title": "Vali Lipp",
@@ -1991,5 +1995,111 @@
     "description": "(ALFA)",
     "login_required": "Logi sisse, et mängida edetabelimänge!",
     "must_login": "Sa pead olema sisse logitud, et mängida edetabelimänge!"
-  }
+  },
+  "user_profile": {
+    "title": "Mängija profiil",
+    "preview_heading": "TAKTILINE IDENTITEET",
+    "player_name": "Mängija nimi",
+    "name_placeholder": "Sisesta kasutajanimi...",
+    "random_name": "Juhuslik nimi",
+    "characters": "{current}/{max}",
+    "flag_heading": "RIIGILIPP",
+    "search_flags": "Otsi riigi või koodi järgi...",
+    "no_flag": "Liputa",
+    "all_continents": "Kõik",
+    "continent_europe": "Euroopa",
+    "continent_asia": "Aasia",
+    "continent_americas": "Ameerika",
+    "continent_africa": "Aafrika",
+    "continent_oceania": "Okeaania",
+    "save": "Salvesta profiil",
+    "saved": "Profiil salvestati edukalt!",
+    "no_flags_found": "Otsingule ei vasta ükski lipp.",
+    "default_username": "Mängija",
+    "clear_name": "Tühjenda nimi",
+    "clear_search": "Tühjenda otsing",
+    "flag": "Lipp"
+  },
+  "tutorial": {
+    "progress": "SAMM {current}/{total}",
+    "controls.speed": "Ava mängu kiiruse juhtnupud",
+    "controls.pause": "Peata mäng",
+    "controls.resume": "Jätka mängu",
+    "skip": "Jäta õpetus vahele",
+    "continue": "Jätka mängimist",
+    "step": {
+      "zoom": {
+        "title": "Suumi sisse",
+        "hint": "Suumi esiletõstetud ala sisse klahviga +, kerimisrattaga või kahe sõrmega. Võid kasutada ka suuminuppu."
+      },
+      "spawn": {
+        "title": "Vali alguspunkt",
+        "hint": "Alguspunkti valimiseks puuduta esiletõstetud kohta."
+      },
+      "expand": {
+        "title": "Laienda oma territooriumi",
+        "hint": "Puuduta esiletõstetud vaba maad ja vali Ründa."
+      },
+      "attack": {
+        "title": "Ründa naabrit",
+        "hint": "Puuduta esiletõstetud naaberriiki ja vali Ründa."
+      },
+      "speed": {
+        "title": "Juhi mängu kiirust",
+        "hint": "Ava kiiruse juhtnupud ja vali kiirus."
+      },
+      "pause": {
+        "title": "Peata ja jätka",
+        "hint": "Puuduta Peata ja seejärel jätkamiseks Jätka."
+      },
+      "city": {
+        "title": "Ehita linn",
+        "hint": "Puuduta esiletõstetud maad, ava Ehita ja vali Linn."
+      },
+      "factory": {
+        "title": "Ehita tehas",
+        "hint": "Puuduta esiletõstetud maad, ava Ehita ja vali Tehas."
+      },
+      "defense": {
+        "title": "Kaitse piiri",
+        "hint": "Puuduta esiletõstetud maad, ava Ehita ja vali Kaitsepost."
+      },
+      "ally": {
+        "title": "Taotle liitu",
+        "hint": "Puuduta esiletõstetud naabrit ja vali Taotle liitu."
+      },
+      "port": {
+        "title": "Ehita sadam",
+        "hint": "Puuduta rannikul esiletõstetud maad, ava Ehita ja vali Sadam. Sadamad võimaldavad ehitada sõjalaevu ja saata kulda teenivaid kaubalaevu."
+      },
+      "warship": {
+        "title": "Saada sõjalaev teele",
+        "hint": "Puuduta sadama lähedal esiletõstetud vett, ava Ründa ja vali Sõjalaev. Sõjalaevad patrullivad, hõivavad kaubalaevu ja hävitavad vaenlase laevu."
+      },
+      "silo": {
+        "title": "Ehita raketisilo",
+        "hint": "Puuduta esiletõstetud maad, ava Ehita ja vali Raketisilo. Silod lasevad rakette valitud sihtmärgi pihta."
+      },
+      "rocket": {
+        "title": "Lase välja aatomipomm",
+        "hint": "Puuduta esiletõstetud vaenlast, ava Ründa ja vali Aatomipomm. Pomm hävitab kokkupõrkekohas territooriumi, hooned ja laevad."
+      },
+      "sam": {
+        "title": "Ehita SAM-kanderakett",
+        "hint": "Puuduta esiletõstetud maad, ava Ehita ja vali SAM-kanderakett. See tulistab levialasse jõudvad raketid alla."
+      },
+      "leaderboard": {
+        "title": "Vaata edetabelit",
+        "hint": "Ava edetabel, et võrrelda oma tulemust teiste mängijate omaga."
+      },
+      "win": {
+        "title": "Võida mäng",
+        "hint": "Võidu saavutamiseks jätka laienemist. Kui oled valmis, jätka kõigi juhtnuppude avamiseks."
+      }
+    },
+    "step.pause.resume": "Mäng on peatatud. Õpetuse jätkamiseks puuduta Jätka.",
+    "skip.confirm": "Jäta õpetus vahele? Saad seda uuesti mängida jaotises Abi.",
+    "step.port.expand": "Laienda territooriumi käsuga Ründa, kuni jõuad rannikule. Marker näitab sobivat sadama asukohta."
+  },
+  "cooldown": "Jahtumisaeg"
 }

@@ -535,8 +535,8 @@
     "accept_alliance": "Acceptera",
     "alliance_accepted": "accepterade",
     "alliance_expired": "Din allians med {name} har löpt ut",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# nuke lanserad av {name} other {# kärnvapen lanserade av {name}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {# kärnvapen lanseras mot {name} other {# kärnvapen avfyrades mot {name}}",
+    "alliance_nukes_destroyed_incoming": "Alliansen förstörde {count} robotar som avfyrats av {name}.",
+    "alliance_nukes_destroyed_outgoing": "Alliansen förstörde {count} robotar som avfyrats mot {name}.",
     "alliance_rejected": "nekade",
     "alliance_renewed": "Din allians med {name} har förnyats",
     "alliance_request_sent": "Alliansförfrågan skickad till {name}.",
@@ -1890,7 +1890,7 @@
     "move_up": "Flytta Kameran Upp",
     "move_up_desc": "Flytta kameran uppåt",
     "nuke_alliance_safety_desc": "Förhindrar oavsiktliga kärnvapenangrepp på nybildade allierade.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 bock (0,1s)} other {{räkna}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1s)} other {{count} tick ({seconds}s)}}",
     "nuke_alliance_safety_label": "Allierat vänlig-brandsäkerhet",
     "off": "Av",
     "on": "På",
@@ -1946,7 +1946,9 @@
     "troop_ratio_label": "🪖🛠️ Trupp- och Arbetarskala",
     "troop_ratio_desc": "Anpassa balansen mellan trupper (för strid) och arbetare (för guldproduktion) (1–100%)",
     "terrain_enabled": "Terräng vy aktiverad",
-    "terrain_disabled": "Terräng vy avaktiverad"
+    "terrain_disabled": "Terräng vy avaktiverad",
+    "music_off": "Stäng av musik",
+    "music_on": "Slå på musik"
   },
   "username": {
     "account_invalid_chars": "Användarnamn kan bara innehålla bokstäver, siffror, understreck, bindestreck och enstaka mellanslag mellan ord.",
@@ -1997,7 +1999,9 @@
     "play_badge": "VÄRLDSDOMINATION",
     "play_description": "Spela mot bots på vilken karta som helst.",
     "play_title": "Redo för strid?",
-    "setup_header": "BATTLE SETUP"
+    "setup_header": "BATTLE SETUP",
+    "music_off": "Slå på musik",
+    "music_on": "Stäng av musik"
   },
   "player_info_overlay": {
     "type": "Typ",
@@ -2035,5 +2039,111 @@
     "redirecting": "Du blir omdirigerad...",
     "not_authorized": "Du har inte behörighet att komma åt den här webbplatsen.",
     "contact_admin": "Om du tror att du ser detta meddelande felaktigt, kontakta webbplatsens administratör."
-  }
+  },
+  "user_profile": {
+    "title": "Spelarprofilen",
+    "preview_heading": "TAKTISK IDENTITET",
+    "player_name": "Spelarnamn",
+    "name_placeholder": "Ange ett användarnamn",
+    "random_name": "Slumpmässig ordning",
+    "characters": "{current}/{max}",
+    "flag_heading": "Egen flagg",
+    "search_flags": "Sök land eller kod...",
+    "no_flag": "Ingen flagga",
+    "all_continents": "Alla",
+    "continent_europe": "Europa",
+    "continent_asia": "Asien",
+    "continent_americas": "Amerika ",
+    "continent_africa": "Afrika",
+    "continent_oceania": "Oceanien",
+    "save": "Spara ändring",
+    "saved": "Profilen har sparats!",
+    "no_flags_found": "Inga flaggor matchar din sökning.",
+    "default_username": "Spelare",
+    "clear_name": "Rensa namn",
+    "clear_search": "Rensa sökrutan",
+    "flag": "Flagga"
+  },
+  "tutorial": {
+    "progress": "STEG {current} AV {total}",
+    "controls.speed": "Öppna spelhastighetskontroller",
+    "controls.pause": "GÃ¶r paus i spelet",
+    "controls.resume": "Fortsätt spela",
+    "skip": "Hoppa över handledning",
+    "continue": "Fortsätt att spela",
+    "step": {
+      "zoom": {
+        "title": "Zooma in",
+        "hint": "Zooma in i det markerade området med +, bläddra eller två fingrar. Eller använd knappen Zooma in."
+      },
+      "spawn": {
+        "title": "Välj din utgångspunkt",
+        "hint": "Tryck på den markerade platsen för att välja din utgångspunkt."
+      },
+      "expand": {
+        "title": "Utöka ditt territorium",
+        "hint": "Tryck på det markerade öppna landet och välj sedan Attack."
+      },
+      "attack": {
+        "title": "Attackera en granne",
+        "hint": "Tryck på det markerade grannlandet och välj sedan Attack."
+      },
+      "speed": {
+        "title": "Kontrollera spelets hastighet",
+        "hint": "Öppna hastighetskontrollerna och välj sedan en hastighet."
+      },
+      "pause": {
+        "title": "Pausa och återuppta",
+        "hint": "Tryck på Pausa och sedan på Fortsätt för att fortsätta."
+      },
+      "city": {
+        "title": "Bygg en stad",
+        "hint": "Tryck på det markerade området, öppna Bygg och välj sedan Stad."
+      },
+      "factory": {
+        "title": "Bygg en fabrik",
+        "hint": "Tryck på det markerade området, öppna Bygg och välj sedan Fabrik."
+      },
+      "defense": {
+        "title": "Skydda din gräns",
+        "hint": "Tryck på det markerade området, öppna Bygg och välj sedan Försvarspost."
+      },
+      "ally": {
+        "title": "Begär en allians",
+        "hint": "Tryck på den markerade grannen och välj sedan Request Alliance."
+      },
+      "port": {
+        "title": "Bygg en hamn",
+        "hint": "Tryck på det markerade landet vid havskusten, öppna Bygg och välj sedan Hamn. Hamnar låter dig bygga krigsfartyg och tjäna guld på handel."
+      },
+      "warship": {
+        "title": "Lansera ett krigsfartyg",
+        "hint": "Tryck på det markerade vattnet vid din hamn, öppna Attack och välj sedan Krigsfartyg. Krigsfartyg patrullerar och anfaller fartyg till havs."
+      },
+      "silo": {
+        "title": "Bygg en missilsilo",
+        "hint": "Tryck på det markerade området, öppna Bygg och välj sedan Missile Silo. Silos avfyrar robotar mot ett mål du väljer."
+      },
+      "rocket": {
+        "title": "Starta en atombomb",
+        "hint": "Tryck på den markerade fienden, öppna Attack och välj sedan Atom Bomb. Atombomben förstör området där den slår ned."
+      },
+      "sam": {
+        "title": "Bygg en SAM LAUNCHER",
+        "hint": "Tryck på det markerade området, öppna Bygg och välj sedan SAM Launcher. SAM-ramper skjuter ned robotar i närheten."
+      },
+      "leaderboard": {
+        "title": "Kontrollera topplistan",
+        "hint": "Öppna topplistan för att jämföra din poäng med andra spelare."
+      },
+      "win": {
+        "title": "Vinn matchen",
+        "hint": "Fortsätt expandera för att vinna matchen. När du är redo fortsätter du att låsa upp alla kontroller."
+      }
+    },
+    "step.pause.resume": "Spelet är pausat. Tryck på Fortsätt för att fortsätta handledningen.",
+    "skip.confirm": "Hoppa över självstudiekursen? Du kan spela upp den igen från Hjälp.",
+    "step.port.expand": "Expandera med Attack tills du når havskusten. Markören kommer att peka på en giltig portplats."
+  },
+  "cooldown": "Nedkylning"
 }

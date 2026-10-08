@@ -84,7 +84,7 @@
     "username_error_failed": "Kan uw gebruikersnaam niet wijzigen. Probeer het later opnieuw.",
     "username_error_profane": "Die gebruikersnaam is niet toegestaan.",
     "username_error_taken": "Die gebruikersnaam is al in gebruik. Probeer een andere.",
-    "username_grace_warning": "Je verliest het exclusieve recht op '{name}' op {date}. Abonneer u opnieuw om deze te behouden.",
+    "username_grace_warning": "Je verliest op {date} het exclusieve recht op {name}. Abonneer je opnieuw om die naam te behouden.",
     "username_locked_until": "Vergrendeld tot {date}",
     "username_new_label": "Nieuwe naam",
     "username_not_set": "Claim uw gebruikersnaam, die wordt gebruikt als identificatie op uw profiel en in elk spel.",
@@ -531,8 +531,8 @@
     "accept_alliance": "Aanvaarden",
     "alliance_accepted": "geaccepteerd",
     "alliance_expired": "Je alliantie met {name} is verlopen",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# kernbom gelanceerd door {name} other {# kernwapens gelanceerd door {name}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {# kernbom gelanceerd richting {name} other {# kernwapens gelanceerd richting {name}}",
+    "alliance_nukes_destroyed_incoming": "Het bondgenootschap vernietigde {count} raketten die door {name} zijn gelanceerd.",
+    "alliance_nukes_destroyed_outgoing": "Het bondgenootschap vernietigde {count} raketten die op {name} waren gericht.",
     "alliance_rejected": "geweigerd",
     "alliance_renewed": "Je alliantie met {name} is hernieuwd",
     "alliance_request_sent": "Alliantieverzoek verzonden naar {name}.",
@@ -1695,7 +1695,7 @@
     "tribe_boost_gone": "Deze naam is niet meer actief en kan dus niet worden gepromoot.",
     "tribe_boost_heading": "Stamnaam versterken",
     "tribe_boost_next_expiry": "volgende boost verloopt {date}",
-    "tribe_boost_success": "'{name}' versterkt.",
+    "tribe_boost_success": "“{name}” is versterkt.",
     "tribe_duplicate": "Naam al in gebruik.",
     "tribe_name_placeholder": "Voer een stamnaam in",
     "tribe_name_required": "Voer eerst een naam in.",
@@ -1908,7 +1908,7 @@
     "move_up": "Camera omhoog",
     "move_up_desc": "Beweeg de camera naar boven",
     "nuke_alliance_safety_desc": "Voorkomt onbedoelde kernaanvallen op nieuw gevormde bondgenoten.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 tik (0,1s)} other {{graaf}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1s)} other {{count} tick ({seconds}s)}}",
     "nuke_alliance_safety_label": "Bondgenootschappelijke brandveiligheid",
     "off": "Uit",
     "on": "Aan",
@@ -1952,7 +1952,9 @@
     "dark_mode_label": "Donkere Modus",
     "dark_mode_desc": "Schakel tussen lichte en donkere thema's voor de site",
     "structure_sprites_label": "Gebouw afbeeldingen",
-    "structure_sprites_desc": "3D-afbeeldingen gebouwen in-/uitschakelen"
+    "structure_sprites_desc": "3D-afbeeldingen gebouwen in-/uitschakelen",
+    "music_off": "Muziek uitschakelen",
+    "music_on": "Zet muziek aan"
   },
   "username": {
     "account_invalid_chars": "De gebruikersnaam mag alleen letters, cijfers, onderstrepingstekens, koppeltekens en enkele spaties tussen woorden bevatten.",
@@ -2006,7 +2008,9 @@
     "play_badge": "WERELDOVERHEMD",
     "play_description": "Speel tegen bots op elke kaart.",
     "play_title": "Klaar voor de strijd?",
-    "setup_header": "GEVECHTSINSTELLING"
+    "setup_header": "GEVECHTSINSTELLING",
+    "music_off": "Zet muziek aan",
+    "music_on": "Muziek uitschakelen"
   },
   "stats_modal": {
     "title": "Statistieken",
@@ -2077,5 +2081,111 @@
     "description": "(ALFA)",
     "login_required": "Log in om competitief te spelen!",
     "must_login": "Je moet ingelogd zijn om competitieve matchmaking te spelen."
-  }
+  },
+  "user_profile": {
+    "title": "Speler profiel",
+    "preview_heading": "TACTISCHE IDENTITEIT",
+    "player_name": "Gebruikersnaam",
+    "name_placeholder": "Voer de gebruikersnaam in",
+    "random_name": "Willekeurig maken",
+    "characters": "{current}/{max}",
+    "flag_heading": "ONDER DE NATIONALE VLAG",
+    "search_flags": "Zoek land of code...",
+    "no_flag": "Geen vlag",
+    "all_continents": "All",
+    "continent_europe": "Europa",
+    "continent_asia": "Azië",
+    "continent_americas": "Amerikaans continent",
+    "continent_africa": "Afrika ",
+    "continent_oceania": "Oceanië",
+    "save": "Profiel opslaan",
+    "saved": "Profiel succesvol opgeslagen!",
+    "no_flags_found": "Er komen geen vlaggen overeen met uw zoekopdracht.",
+    "default_username": "Player",
+    "clear_name": "Naam wissen",
+    "clear_search": "Zoekopdracht wissen",
+    "flag": "Markeren"
+  },
+  "tutorial": {
+    "progress": "STAP {current} VAN {total}",
+    "controls.speed": "Open spel snelheidsregelaars",
+    "controls.pause": "Spel pauzeren",
+    "controls.resume": "Game hervatten",
+    "skip": "Instructie overslaan",
+    "continue": "Doorgaan met spelen",
+    "step": {
+      "zoom": {
+        "title": "Inzoomen",
+        "hint": "Zoom in op het gemarkeerde gebied met +, scroll of twee vingers. Of gebruik de knop Inzoomen."
+      },
+      "spawn": {
+        "title": "Kies je startpunt",
+        "hint": "Tik op de gemarkeerde plek om je startpunt te kiezen."
+      },
+      "expand": {
+        "title": "Breid je territorium uit",
+        "hint": "Tik op het gemarkeerde open land en kies vervolgens Aanvallen."
+      },
+      "attack": {
+        "title": "Een buurman aanvallen",
+        "hint": "Tik op het gemarkeerde buurland en kies vervolgens Aanvallen."
+      },
+      "speed": {
+        "title": "Controleer de spelsnelheid",
+        "hint": "Open de snelheidsregelaars en kies vervolgens een snelheid."
+      },
+      "pause": {
+        "title": "Pauzeren en hervatten",
+        "hint": "Tik op Pauzeren en vervolgens op Hervatten om door te gaan."
+      },
+      "city": {
+        "title": "Bouw een stad",
+        "hint": "Tik op het gemarkeerde land, open Bouwen en kies Stad."
+      },
+      "factory": {
+        "title": "Bouw een fabriek",
+        "hint": "Tik op het gemarkeerde land, open Bouwen en kies Fabriek."
+      },
+      "defense": {
+        "title": "Bescherm je grens",
+        "hint": "Tik op het gemarkeerde land, open Bouwen en kies Verdedigingspost."
+      },
+      "ally": {
+        "title": "Een alliantie aanvragen",
+        "hint": "Tik op de gemarkeerde buurman en kies vervolgens Alliantie aanvragen."
+      },
+      "port": {
+        "title": "Bouw een poort",
+        "hint": "Tik op het gemarkeerde land aan de oceaankust, open Bouwen en kies Haven. Havens laten je oorlogsschepen bouwen en goud verdienen met handel."
+      },
+      "warship": {
+        "title": "Lanceer een oorlogsschip",
+        "hint": "Tik op het gemarkeerde water bij je poort, open Aanval en kies Oorlogsschip. Oorlogsschepen patrouilleren en vallen schepen op zee aan."
+      },
+      "silo": {
+        "title": "Bouw een raketsilo",
+        "hint": "Tik op het gemarkeerde land, open Bouwen en kies Raketsilo. Silo’s lanceren raketten op een doel dat je kiest."
+      },
+      "rocket": {
+        "title": "Een atoombom lanceren",
+        "hint": "Tik op de gemarkeerde vijand, open Aanval en kies vervolgens Atoombom. De atoombom vernietigt het gebied waar hij inslaat."
+      },
+      "sam": {
+        "title": "Bouw een SAM LAUNCHER",
+        "hint": "Tik op het gemarkeerde land, open Bouwen en kies SAM Launcher. SAM-installaties schieten raketten in de buurt uit de lucht."
+      },
+      "leaderboard": {
+        "title": "Bekijk het scorebord",
+        "hint": "Open het scorebord om je score met andere spelers te vergelijken."
+      },
+      "win": {
+        "title": "WIN DE WEDSTRIJD ",
+        "hint": "Blijf uitbreiden om de wedstrijd te winnen. Als je klaar bent, blijf je alle bedieningselementen ontgrendelen."
+      }
+    },
+    "step.pause.resume": "Het spel is gepauzeerd. Tik op Hervatten om door te gaan met de zelfstudie.",
+    "skip.confirm": "Zelfstudie overslaan? Je kunt het opnieuw afspelen vanuit Help.",
+    "step.port.expand": "Breid uit met Attack tot je de oceaankust bereikt. De markering wijst naar een geldige poortlocatie."
+  },
+  "cooldown": "Afkoeltijd"
 }

@@ -533,8 +533,8 @@
     "accept_alliance": "Aceitar",
     "alliance_accepted": "aceitou",
     "alliance_expired": "A aliança com {name} expirou",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {Arma nuclear # lançada por {nome} other {Armas nucleares # lançadas por {name}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {Arma nuclear # lançada em direção a {nome} other {Armas nucleares # lançadas em direção a {nome}}",
+    "alliance_nukes_destroyed_incoming": "A aliança destruiu {count} mísseis lançados por {name}.",
+    "alliance_nukes_destroyed_outgoing": "A aliança destruiu {count} mísseis lançados contra {name}.",
     "alliance_rejected": "rejeitou",
     "alliance_renewed": "A aliança com {name} foi renovada",
     "alliance_request_sent": "Solicitação de aliança enviada para {name}.",
@@ -1890,7 +1890,7 @@
     "move_up": "Mover Câmara para Cima",
     "move_up_desc": "Move a câmera para cima",
     "nuke_alliance_safety_desc": "Evita ataques nucleares acidentais em aliados recém-formados.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 tique (0,1s)} other {{contar}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1s)} other {{count} tick ({seconds}s)}}",
     "nuke_alliance_safety_label": "Aliado segurança contra incêndio amigável",
     "off": "Desligado",
     "on": "Ligado",
@@ -1949,7 +1949,9 @@
     "right_click_opens_menu": "Botão direito do rato abre o menu",
     "troop_ratio_desc": "Ajuste o equilíbrio entre tropas (para combate) e trabalhadores (para produção de ouro) (1–100%)",
     "terrain_enabled": "Vista do terreno ativada",
-    "terrain_disabled": "Vista do terreno desativada"
+    "terrain_disabled": "Vista do terreno desativada",
+    "music_off": "Ligar/desligar música",
+    "music_on": "Ativar música"
   },
   "username": {
     "account_invalid_chars": "O nome de usuário só pode conter letras, números, sublinhados, hifens e espaços simples entre palavras.",
@@ -2000,7 +2002,9 @@
     "play_badge": "DOMINAÇÃO MUNDIAL",
     "play_description": "Jogue contra bots em qualquer mapa.",
     "play_title": "Pronto para a batalha?",
-    "setup_header": "CONFIGURAÇÃO DA BATALHA"
+    "setup_header": "CONFIGURAÇÃO DA BATALHA",
+    "music_off": "Ativar música",
+    "music_on": "Ligar/desligar música"
   },
   "player_info_overlay": {
     "type": "Tipo",
@@ -2038,5 +2042,111 @@
     "redirecting": "Está a ser redirecionado...",
     "not_authorized": "Não está autorizado a acessar este site.",
     "contact_admin": "Se acredita que está a ver esta mensagem por engano, entre em contacto com um administrador."
-  }
+  },
+  "user_profile": {
+    "title": "Perfil do Atleta",
+    "preview_heading": "IDENTIDADE TÁTICA",
+    "player_name": "Nome do jogador",
+    "name_placeholder": "Coloque o Nome de utilizador",
+    "random_name": "Aleatório",
+    "characters": "{current}/{max}",
+    "flag_heading": "PAVILHÃO",
+    "search_flags": "Pesquisar país ou código...",
+    "no_flag": "Sem sinal",
+    "all_continents": "All",
+    "continent_europe": "Europa",
+    "continent_asia": "Ásia",
+    "continent_americas": "Américas",
+    "continent_africa": "Africa do Sul",
+    "continent_oceania": "Oceânia",
+    "save": "Gravar Perfil",
+    "saved": "Perfil salvo com sucesso.",
+    "no_flags_found": "Nenhuma bandeira corresponde à sua pesquisa.",
+    "default_username": "Jogador",
+    "clear_name": "Limpar nome",
+    "clear_search": "Limpar a pesquisa",
+    "flag": "Sinalizador"
+  },
+  "tutorial": {
+    "progress": "ETAPA {current} DE {total}",
+    "controls.speed": "Abrir controles de velocidade do jogo",
+    "controls.pause": "Pausar o jogo",
+    "controls.resume": "Continuar jogo",
+    "skip": "Ignorar tutorial",
+    "continue": "Continuar a jogar",
+    "step": {
+      "zoom": {
+        "title": "Aumentar o 'zoom'",
+        "hint": "Amplie a área destacada com +, rolagem ou dois dedos. Ou use o botão Ampliar."
+      },
+      "spawn": {
+        "title": "Escolha um ponto de partida",
+        "hint": "Toque no local destacado para escolher o seu ponto de partida."
+      },
+      "expand": {
+        "title": "Expanda o seu território",
+        "hint": "Toque na área aberta destacada e escolha Atacar."
+      },
+      "attack": {
+        "title": "Atacar um vizinho",
+        "hint": "Toque no país vizinho destacado e escolha Atacar."
+      },
+      "speed": {
+        "title": "Controlar a velocidade do jogo",
+        "hint": "Abra os controles de velocidade e escolha uma velocidade."
+      },
+      "pause": {
+        "title": "Pausar e retomar",
+        "hint": "Toque em Pausar e em Continuar para continuar."
+      },
+      "city": {
+        "title": "Construir uma Cidade",
+        "hint": "Toque no terreno destacado, abra Construir e escolha Cidade."
+      },
+      "factory": {
+        "title": "Construa uma fábrica",
+        "hint": "Toque no terreno destacado, abra Construir e escolha Fábrica."
+      },
+      "defense": {
+        "title": "Proteja a sua fronteira",
+        "hint": "Toque no terreno destacado, abra Construir e escolha Posto de Defesa."
+      },
+      "ally": {
+        "title": "Solicitar uma aliança",
+        "hint": "Toque no vizinho destacado e escolha Pedir aliança."
+      },
+      "port": {
+        "title": "Construir um Porto",
+        "hint": "Toque na terra destacada na costa oceânica, abra Construir e escolha Porto. Os portos permitem construir navios de guerra e ganhar ouro com o comércio."
+      },
+      "warship": {
+        "title": "Lançar uma Nave de Guerra",
+        "hint": "Toque na água destacada pelo seu Porto, abra Ataque e escolha Navio de Guerra. Os navios de guerra patrulham e atacam embarcações no mar."
+      },
+      "silo": {
+        "title": "Construa um Silo de Mísseis",
+        "hint": "Toque no terreno destacado, abra Construir e escolha Silo de Mísseis. Os silos lançam mísseis contra o alvo que escolheres."
+      },
+      "rocket": {
+        "title": "Lançar uma Bomba Atômica",
+        "hint": "Toque no inimigo destacado, abra Ataque e escolha Bomba Atômica. A bomba atómica destrói a área onde cai."
+      },
+      "sam": {
+        "title": "Crie um inicializador de SAM",
+        "hint": "Toque no terreno destacado, abra Construir e escolha Lançador de SAM. Os lançadores SAM intercetam mísseis próximos."
+      },
+      "leaderboard": {
+        "title": "Verifique a tabela de classificação",
+        "hint": "Abra a tabela de classificação para comparar a sua pontuação com a de outros jogadores."
+      },
+      "win": {
+        "title": "GANHE O JOGO ",
+        "hint": "Continue a expandir-se para ganhar o jogo. Quando estiver pronto, continue a desbloquear todos os controlos."
+      }
+    },
+    "step.pause.resume": "O jogo está pausado. Toque em Continuar para continuar o tutorial.",
+    "skip.confirm": "Pular o tutorial? Você pode reproduzi-lo novamente na Ajuda.",
+    "step.port.expand": "Expanda com Ataque até chegar à costa oceânica. O marcador apontará para uma localização válida da Porta."
+  },
+  "cooldown": "Recarga"
 }

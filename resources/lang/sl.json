@@ -534,8 +534,8 @@
     "accept_alliance": "Sprejmi",
     "alliance_accepted": "sprejema",
     "alliance_expired": "Tvoje zavezništvo z {name} je poteklo",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# nuke, ki ga je sprožil {name} other {# jedrsko orožje, ki ga je izstrelil {name}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {Jedrsko orožje # izstreljeno proti {name} other {# jedrske bombe, izstreljene proti {name}}",
+    "alliance_nukes_destroyed_incoming": "Zavezništvo je uničilo {count} raket, ki jih je izstrelil {name}.",
+    "alliance_nukes_destroyed_outgoing": "Zavezništvo je uničilo {count} raket, izstreljenih proti igralcu {name}.",
     "alliance_rejected": "zavrača",
     "alliance_renewed": "Vaše zavezništvo z {name} je bilo obnovljeno",
     "alliance_request_sent": "Zahteva za zvezo poslana na {name}.",
@@ -1913,7 +1913,7 @@
     "move_up": "Premakni kamero gor",
     "move_up_desc": "Premakni kamero navzgor",
     "nuke_alliance_safety_desc": "Preprečuje nenamerne jedrske napade na novo ustanovljene zaveznike.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 tik (0,1 s)} other {{štetje}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tik (0.1s)} other {{count} tik ({seconds}s)}}",
     "nuke_alliance_safety_label": "Ally prijazna protipožarna varnost",
     "off": "Izklop",
     "on": "Vklop",
@@ -1974,7 +1974,9 @@
     "performance_overlay_enabled": "Prekrivanje zmogljivosti je omogočeno",
     "performance_overlay_disabled": "Prekrivanje zmogljivosti je onemogočeno",
     "terrain_enabled": "Terenski pogled vklopljen",
-    "terrain_disabled": "Terenski pogled izklopljen"
+    "terrain_disabled": "Terenski pogled izklopljen",
+    "music_off": "Izklopi glasbo",
+    "music_on": "Vklopi glasbo"
   },
   "username": {
     "account_invalid_chars": "Uporabniško ime lahko vsebuje samo črke, številke, podčrtaje, vezaje in posamezne presledke med besedami.",
@@ -2025,7 +2027,9 @@
     "play_badge": "SVETOVNA DOMINACIJA",
     "play_description": "Igrajte proti botom na katerem koli zemljevidu.",
     "play_title": "Pripravljen na boj?",
-    "setup_header": "POSTAVITEV BITKE"
+    "setup_header": "POSTAVITEV BITKE",
+    "music_off": "Vklopi glasbo",
+    "music_on": "Izklopi glasbo"
   },
   "player_info_overlay": {
     "type": "Tip",
@@ -2069,5 +2073,111 @@
     "redirecting": "Preusmerjeni ste...",
     "not_authorized": "Nimate dovoljenja za dostop do tega spletnega mesta.",
     "contact_admin": "Če menite, da se vam je to sporočilo prikazalo pomotoma, se obrnite na skrbnika spletnega mesta."
-  }
+  },
+  "user_profile": {
+    "title": "Profil igralca",
+    "preview_heading": "TAKTIČNA IDENTITETA",
+    "player_name": "Ime igralca",
+    "name_placeholder": "Vnesi uporabniško ime ...",
+    "random_name": "Naključno ime",
+    "characters": "{current}/{max}",
+    "flag_heading": "DRŽAVNA ZASTAVA",
+    "search_flags": "Išči državo ali kodo ...",
+    "no_flag": "Brez zastave",
+    "all_continents": "Vse",
+    "continent_europe": "Evropa",
+    "continent_asia": "Azija",
+    "continent_americas": "Amerika",
+    "continent_africa": "Afrika",
+    "continent_oceania": "Oceanija",
+    "save": "Shrani profil",
+    "saved": "Profil je bil uspešno shranjen!",
+    "no_flags_found": "Iskanju ne ustreza nobena zastava.",
+    "default_username": "Igralec",
+    "clear_name": "Izbriši ime",
+    "clear_search": "Počisti iskanje",
+    "flag": "Zastava"
+  },
+  "tutorial": {
+    "progress": "KORAK {current} OD {total}",
+    "controls.speed": "Odpri nastavitve hitrosti igre",
+    "controls.pause": "Začasno ustavi igro",
+    "controls.resume": "Nadaljuj igro",
+    "skip": "Preskoči vadnico",
+    "continue": "Nadaljuj z igranjem",
+    "step": {
+      "zoom": {
+        "title": "Povečaj",
+        "hint": "Povečaj označeno območje z gumbom +, kolescem ali dvema prstoma. Uporabiš lahko tudi gumb za povečavo."
+      },
+      "spawn": {
+        "title": "Izberi začetno točko",
+        "hint": "Dotakni se označenega mesta in izberi začetno točko."
+      },
+      "expand": {
+        "title": "Razširi svoje ozemlje",
+        "hint": "Dotakni se označene prazne zemlje in izberi Napad."
+      },
+      "attack": {
+        "title": "Napadi soseda",
+        "hint": "Dotakni se označene sosednje države in izberi Napad."
+      },
+      "speed": {
+        "title": "Nadzoruj hitrost igre",
+        "hint": "Odpri nastavitve hitrosti in izberi hitrost."
+      },
+      "pause": {
+        "title": "Začasna ustavitev in nadaljevanje",
+        "hint": "Dotakni se Začasno ustavi, nato pa Nadaljuj."
+      },
+      "city": {
+        "title": "Zgradi mesto",
+        "hint": "Dotakni se označene zemlje, odpri Gradnja in izberi Mesto."
+      },
+      "factory": {
+        "title": "Zgradi tovarno",
+        "hint": "Dotakni se označene zemlje, odpri Gradnja in izberi Tovarna."
+      },
+      "defense": {
+        "title": "Zaščiti mejo",
+        "hint": "Dotakni se označene zemlje, odpri Gradnja in izberi Obrambno postojanko."
+      },
+      "ally": {
+        "title": "Zaprosi za zavezništvo",
+        "hint": "Dotakni se označenega soseda in izberi Zaprosi za zavezništvo."
+      },
+      "port": {
+        "title": "Zgradi pristanišče",
+        "hint": "Dotakni se označene zemlje ob obali, odpri Gradnja in izberi Pristanišče. Pristanišča omogočajo gradnjo vojaških ladij in pošiljajo trgovske ladje, ki prinašajo zlato."
+      },
+      "warship": {
+        "title": "Pošlji vojaško ladjo",
+        "hint": "Dotakni se označene vode ob pristanišču, odpri Napad in izberi Vojaška ladja. Ladje patruljirajo, zajemajo trgovske ladje in uničujejo sovražna plovila."
+      },
+      "silo": {
+        "title": "Zgradi raketni silos",
+        "hint": "Dotakni se označene zemlje, odpri Gradnja in izberi Raketni silos. Silosi izstreljujejo rakete proti izbrani tarči."
+      },
+      "rocket": {
+        "title": "Izstreli atomsko bombo",
+        "hint": "Dotakni se označenega sovražnika, odpri Napad in izberi Atomska bomba. Bomba ob zadetku uniči ozemlje, zgradbe in ladje."
+      },
+      "sam": {
+        "title": "Zgradi izstrelišče SAM",
+        "hint": "Dotakni se označene zemlje, odpri Gradnja in izberi Izstrelišče SAM. V svojem dosegu sestreljuje prihajajoče rakete."
+      },
+      "leaderboard": {
+        "title": "Preveri lestvico",
+        "hint": "Odpri lestvico in primerjaj svoj rezultat z rezultati drugih igralcev."
+      },
+      "win": {
+        "title": "Zmagaj v tekmi",
+        "hint": "Širi se, da zmagaš. Ko boš pripravljen, nadaljuj in odkleni vse ukaze."
+      }
+    },
+    "step.pause.resume": "Igra je začasno ustavljena. Dotakni se Nadaljuj za nadaljevanje vadnice.",
+    "skip.confirm": "Preskoči vadnico? Znova jo lahko začneš v Pomoči.",
+    "step.port.expand": "Širi se z Napadom, dokler ne dosežeš obale. Oznaka bo pokazala primerno mesto za pristanišče."
+  },
+  "cooldown": "Čas ohlajanja"
 }

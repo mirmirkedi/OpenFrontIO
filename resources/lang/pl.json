@@ -534,8 +534,8 @@
     "accept_alliance": "Akceptuj",
     "alliance_accepted": "zaakceptował",
     "alliance_expired": "Twój sojusz z {name} wygasł!",
-    "alliance_nukes_destroyed_incoming": "{count, plural, one {# broń nuklearna wystrzelona przez {name} other {# nuklearne wystrzelone przez {name}}",
-    "alliance_nukes_destroyed_outgoing": "{count, plural, one {# broń nuklearna wystrzelona w kierunku {name} other {# rakiety nuklearne wystrzelone w kierunku {name}}",
+    "alliance_nukes_destroyed_incoming": "Sojusz zniszczył {count} pocisków wystrzelonych przez {name}.",
+    "alliance_nukes_destroyed_outgoing": "Sojusz zniszczył {count} pocisków wystrzelonych w stronę {name}.",
     "alliance_rejected": "odrzucił",
     "alliance_renewed": "Twój sojusz z {name} został przedłużony",
     "alliance_request_sent": "Prośba o sojusz wysłana do {name}.",
@@ -1897,7 +1897,7 @@
     "move_up": "Przesuń kamerę w górę",
     "move_up_desc": "Przesuwa kamerę w górę",
     "nuke_alliance_safety_desc": "Zapobiega przypadkowym atakom nuklearnym na nowo utworzonych sojuszników.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 takt (0,1 s)} other {{liczyć}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tik (0.1s)} other {{count} tik ({seconds}s)}}",
     "nuke_alliance_safety_label": "Przyjazne dla sojuszników bezpieczeństwo przeciwpożarowe",
     "off": "Wyłączone",
     "on": "Włączone",
@@ -1942,7 +1942,9 @@
     "dark_mode_desc": "Przełącz wygląd strony pomiędzy jasnym a ciemnym trybem",
     "structure_sprites_label": "Grafiki budynków",
     "structure_sprites_desc": "Przełącz grafikę struktur",
-    "troop_ratio_desc": "Dostosuj balans między żołnierzami (do walki) a pracownikami (do produkcji złota) (1–100%)"
+    "troop_ratio_desc": "Dostosuj balans między żołnierzami (do walki) a pracownikami (do produkcji złota) (1–100%)",
+    "music_off": "Wyłącz muzykę",
+    "music_on": "Włącz muzykę"
   },
   "username": {
     "account_invalid_chars": "Nazwa użytkownika może zawierać tylko litery, cyfry, podkreślenia, łączniki i pojedyncze spacje między słowami.",
@@ -1993,7 +1995,9 @@
     "play_badge": "DOMINACJA ŚWIATA",
     "play_description": "Graj z botami na dowolnej mapie.",
     "play_title": "Gotowy do bitwy?",
-    "setup_header": "PRZYGOTOWANIE BITWY"
+    "setup_header": "PRZYGOTOWANIE BITWY",
+    "music_off": "Włącz muzykę",
+    "music_on": "Wyłącz muzykę"
   },
   "player_info_overlay": {
     "type": "Rodzaj",
@@ -2042,10 +2046,10 @@
     "title": "Profil gracza",
     "preview_heading": "TOŻSAMOŚĆ TAKTYCZNA",
     "player_name": "Nazwa gracza",
-    "name_placeholder": "Wprowadź nazwę...",
-    "random_name": "Losowo",
+    "name_placeholder": "Wpisz nazwę użytkownika...",
+    "random_name": "Losuj",
     "characters": "{current}/{max}",
-    "flag_heading": "FLAGA NARODOWA",
+    "flag_heading": "FLAGA PAŃSTWOWA",
     "search_flags": "Szukaj kraju lub kodu...",
     "no_flag": "Brak flagi",
     "all_continents": "Wszystkie",
@@ -2055,11 +2059,93 @@
     "continent_africa": "Afryka",
     "continent_oceania": "Oceania",
     "save": "Zapisz profil",
-    "saved": "Profil został pomyślnie zapisany!",
-    "no_flags_found": "Nie znaleziono pasujących flag.",
+    "saved": "Profil został zapisany!",
+    "no_flags_found": "Żadne flagi nie pasują do wyszukiwania.",
     "default_username": "Gracz",
     "clear_name": "Wyczyść nazwę",
     "clear_search": "Wyczyść wyszukiwanie",
     "flag": "Flaga"
-  }
+  },
+  "tutorial": {
+    "progress": "KROK {current} Z {total}",
+    "controls.speed": "Otwórz ustawienia prędkości gry",
+    "controls.pause": "Wstrzymaj grę",
+    "controls.resume": "Wznów grę",
+    "skip": "Pomiń samouczek",
+    "continue": "Graj dalej",
+    "step": {
+      "zoom": {
+        "title": "Powiększ",
+        "hint": "Przybliż podświetlony obszar przyciskiem +, kółkiem myszy lub dwoma palcami. Możesz też użyć przycisku powiększania."
+      },
+      "spawn": {
+        "title": "Wybierz miejsce startu",
+        "hint": "Dotknij podświetlonego miejsca, aby wybrać punkt startowy."
+      },
+      "expand": {
+        "title": "Rozszerzaj swoje terytorium",
+        "hint": "Dotknij podświetlonego wolnego terenu i wybierz Atak."
+      },
+      "attack": {
+        "title": "Zaatakuj sąsiada",
+        "hint": "Dotknij podświetlonego sąsiedniego kraju i wybierz Atak."
+      },
+      "speed": {
+        "title": "Ustaw prędkość gry",
+        "hint": "Otwórz ustawienia prędkości i wybierz tempo."
+      },
+      "pause": {
+        "title": "Wstrzymaj i wznów",
+        "hint": "Dotknij Pauza, a następnie Wznów, aby kontynuować."
+      },
+      "city": {
+        "title": "Zbuduj miasto",
+        "hint": "Dotknij podświetlonego terenu, otwórz Budowa i wybierz Miasto."
+      },
+      "factory": {
+        "title": "Zbuduj fabrykę",
+        "hint": "Dotknij podświetlonego terenu, otwórz Budowa i wybierz Fabryka."
+      },
+      "defense": {
+        "title": "Chroń granicę",
+        "hint": "Dotknij podświetlonego terenu, otwórz Budowa i wybierz Posterunek obronny."
+      },
+      "ally": {
+        "title": "Poproś o sojusz",
+        "hint": "Dotknij podświetlonego sąsiada i wybierz Poproś o sojusz."
+      },
+      "port": {
+        "title": "Zbuduj port",
+        "hint": "Dotknij podświetlonego terenu przy wybrzeżu, otwórz Budowa i wybierz Port. Porty pozwalają budować okręty i wysyłają statki handlowe, które przynoszą złoto."
+      },
+      "warship": {
+        "title": "Wyślij okręt wojenny",
+        "hint": "Dotknij podświetlonej wody przy porcie, otwórz Atak i wybierz Okręt wojenny. Okręty patrolują wody, przechwytują statki handlowe i niszczą wrogie jednostki."
+      },
+      "silo": {
+        "title": "Zbuduj silos rakietowy",
+        "hint": "Dotknij podświetlonego terenu, otwórz Budowa i wybierz Silos rakietowy. Silosy umożliwiają wystrzeliwanie rakiet w wybrany cel."
+      },
+      "rocket": {
+        "title": "Wystrzel bombę atomową",
+        "hint": "Dotknij podświetlonego wroga, otwórz Atak i wybierz Bombę atomową. Bomba niszczy teren, budynki i jednostki w miejscu uderzenia."
+      },
+      "sam": {
+        "title": "Zbuduj wyrzutnię SAM",
+        "hint": "Dotknij podświetlonego terenu, otwórz Budowa i wybierz Wyrzutnię SAM. Zestrzeliwuje ona nadlatujące pociski w swoim zasięgu."
+      },
+      "leaderboard": {
+        "title": "Sprawdź ranking",
+        "hint": "Otwórz ranking, aby porównać swój wynik z wynikami innych graczy."
+      },
+      "win": {
+        "title": "Wygraj mecz",
+        "hint": "Rozwijaj swoje terytorium, aby wygrać. Gdy będziesz gotowy, kontynuuj, aby odblokować wszystkie elementy sterowania."
+      }
+    },
+    "step.pause.resume": "Gra jest wstrzymana. Dotknij Wznów, aby kontynuować samouczek.",
+    "skip.confirm": "Pominąć samouczek? Możesz ponownie uruchomić go w Pomocy.",
+    "step.port.expand": "Używaj Ataku, aż dotrzesz do wybrzeża. Znacznik wskaże prawidłowe miejsce na port."
+  },
+  "cooldown": "Czas odnowienia"
 }

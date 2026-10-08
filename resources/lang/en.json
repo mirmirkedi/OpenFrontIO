@@ -1948,23 +1948,23 @@
       },
       "port": {
         "title": "Build a Port",
-        "hint": "Tap the highlighted land on the ocean coast, open Build, then choose Port."
+        "hint": "Tap the highlighted land on the ocean coast, open Build, then choose Port. Ports let you build warships and earn gold from trade ships."
       },
       "warship": {
         "title": "Launch a Warship",
-        "hint": "Tap the highlighted water by your Port, open Attack, then choose Warship."
+        "hint": "Tap the highlighted water by your Port, open Attack, then choose Warship. Warships patrol and attack ships at sea."
       },
       "silo": {
         "title": "Build a Missile Silo",
-        "hint": "Tap the highlighted land, open Build, then choose Missile Silo."
+        "hint": "Tap the highlighted land, open Build, then choose Missile Silo. Silos launch missiles at a target you choose."
       },
       "rocket": {
         "title": "Launch an Atom Bomb",
-        "hint": "Tap the highlighted enemy, open Attack, then choose Atom Bomb."
+        "hint": "Tap the highlighted enemy, open Attack, then choose Atom Bomb. Atom bombs destroy the area where they land."
       },
       "sam": {
         "title": "Build a SAM Launcher",
-        "hint": "Tap the highlighted land, open Build, then choose SAM Launcher."
+        "hint": "Tap the highlighted land, open Build, then choose SAM Launcher. SAM launchers shoot down nearby missiles."
       },
       "leaderboard": {
         "title": "Check the leaderboard",
@@ -1978,5 +1978,6 @@
     "step.pause.resume": "The game is paused. Tap Resume to continue the tutorial.",
     "skip.confirm": "Skip the tutorial? You can play it again from Help.",
     "step.port.expand": "Expand with Attack until you reach the ocean coast. The marker will point to a valid Port location."
-  }
+  },
+  "cooldown": "Cooldown"
 }

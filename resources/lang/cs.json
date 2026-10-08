@@ -1858,7 +1858,7 @@
     "move_up": "Posunout kameru nahoru",
     "move_up_desc": "Posunout kameru nahoru",
     "nuke_alliance_safety_desc": "Zabraňuje náhodným atomovým útokům na nově vytvořené spojence.",
-    "nuke_alliance_safety_duration": "{count, plural, one {1 zaškrtnutí (0,1 s)} other {{počítat}}",
+    "nuke_alliance_safety_duration": "{count, plural, one {1 tik (0.1s)} other {{count} tik ({seconds}s)}}",
     "nuke_alliance_safety_label": "Ally friendly-fire safety",
     "off": "Vypnuto",
     "on": "Zapnuto",
@@ -1900,7 +1900,9 @@
     "zoom_out": "Oddálit",
     "zoom_out_desc": "Oddálit mapu",
     "colorblind_desc": "Použít barvy území a hranic vhodné pro barvoslepé",
-    "colorblind_label": "Režim pro barvoslepé"
+    "colorblind_label": "Režim pro barvoslepé",
+    "music_off": "Vypnout hudbu",
+    "music_on": "Zapnout hudbu"
   },
   "username": {
     "account_invalid_chars": "Uživatelské jméno smí obsahovat pouze písmena, číslice, podtržítka a spojovníky.",
@@ -1951,7 +1953,9 @@
     "play_badge": "SVĚTOVÁ DOMINACE",
     "play_description": "Hrajte proti robotům na jakékoli mapě.",
     "play_title": "Připraveni k boji?",
-    "setup_header": "NASTAVENÍ BOJE"
+    "setup_header": "NASTAVENÍ BOJE",
+    "music_off": "Zapnout hudbu",
+    "music_on": "Vypnout hudbu"
   },
   "flag_input": {
     "button_title": "Vybrat vlajku!",
@@ -1963,5 +1967,111 @@
     "login_required": "Pro hodnocené hry se přihlaste!",
     "must_login": "Pro hraní hodnocených her se musíte přihlásit.",
     "play_ranked": "1v1 hodnocená hra"
-  }
+  },
+  "user_profile": {
+    "title": "Profil hráče",
+    "preview_heading": "TAKTICKÁ IDENTITA",
+    "player_name": "Jméno hráče",
+    "name_placeholder": "Zadejte uživatelské jméno...",
+    "random_name": "Náhodné jméno",
+    "characters": "{current}/{max}",
+    "flag_heading": "STÁTNÍ VLAJKA",
+    "search_flags": "Hledat zemi nebo kód...",
+    "no_flag": "Bez vlajky",
+    "all_continents": "Vše",
+    "continent_europe": "Evropa",
+    "continent_asia": "Asie",
+    "continent_americas": "Amerika",
+    "continent_africa": "Afrika",
+    "continent_oceania": "Oceánie",
+    "save": "Uložit profil",
+    "saved": "Profil byl úspěšně uložen!",
+    "no_flags_found": "Vyhledávání neodpovídají žádné vlajky.",
+    "default_username": "Hráč",
+    "clear_name": "Vymazat jméno",
+    "clear_search": "Vymazat hledání",
+    "flag": "Vlajka"
+  },
+  "tutorial": {
+    "progress": "KROK {current} Z {total}",
+    "controls.speed": "Otevři ovládání rychlosti hry",
+    "controls.pause": "Pozastavit hru",
+    "controls.resume": "Pokračovat ve hře",
+    "skip": "Přeskočit tutoriál",
+    "continue": "Pokračovat ve hře",
+    "step": {
+      "zoom": {
+        "title": "Přiblížit",
+        "hint": "Přibliž označenou oblast tlačítkem +, kolečkem nebo dvěma prsty. Můžeš také použít tlačítko Přiblížit."
+      },
+      "spawn": {
+        "title": "Vyber místo startu",
+        "hint": "Klepnutím na označené místo zvolíš svůj start."
+      },
+      "expand": {
+        "title": "Rozšiř své území",
+        "hint": "Klepni na označenou volnou půdu a vyber Útok."
+      },
+      "attack": {
+        "title": "Zaútoč na souseda",
+        "hint": "Klepni na označenou sousední zemi a vyber Útok."
+      },
+      "speed": {
+        "title": "Ovládej rychlost hry",
+        "hint": "Otevři ovládání rychlosti a zvol tempo."
+      },
+      "pause": {
+        "title": "Pozastavení a pokračování",
+        "hint": "Klepni na Pauza a potom na Pokračovat."
+      },
+      "city": {
+        "title": "Postav město",
+        "hint": "Klepni na označenou půdu, otevři Stavbu a vyber Město."
+      },
+      "factory": {
+        "title": "Postav továrnu",
+        "hint": "Klepni na označenou půdu, otevři Stavbu a vyber Továrna."
+      },
+      "defense": {
+        "title": "Chraň hranici",
+        "hint": "Klepni na označenou půdu, otevři Stavbu a vyber Obranné stanoviště."
+      },
+      "ally": {
+        "title": "Požádej o spojenectví",
+        "hint": "Klepni na označeného souseda a vyber Požádat o spojenectví."
+      },
+      "port": {
+        "title": "Postav přístav",
+        "hint": "Klepni na označenou půdu u pobřeží, otevři Stavbu a vyber Přístav. Přístavy umožňují stavět válečné lodě a posílat obchodní lodě, které vydělávají zlato."
+      },
+      "warship": {
+        "title": "Vyšli válečnou loď",
+        "hint": "Klepni na označenou vodu u přístavu, otevři Útok a vyber Válečná loď. Lodě hlídkují, zajímají obchodní lodě a ničí nepřátelská plavidla."
+      },
+      "silo": {
+        "title": "Postav raketové silo",
+        "hint": "Klepni na označenou půdu, otevři Stavbu a vyber Raketové silo. Sila umožňují vypouštět rakety na zvolený cíl."
+      },
+      "rocket": {
+        "title": "Vypusť atomovou bombu",
+        "hint": "Klepni na označeného nepřítele, otevři Útok a vyber Atomová bomba. Zničí území, budovy i lodě v místě dopadu."
+      },
+      "sam": {
+        "title": "Postav odpalovací zařízení SAM",
+        "hint": "Klepni na označenou půdu, otevři Stavbu a vyber Odpalovací zařízení SAM. V dosahu sestřeluje přilétající rakety."
+      },
+      "leaderboard": {
+        "title": "Zobraz žebříček",
+        "hint": "Otevři žebříček a porovnej své skóre s ostatními hráči."
+      },
+      "win": {
+        "title": "Vyhraj zápas",
+        "hint": "Rozšiřuj své území a vyhraj. Až budeš připraven, pokračuj a odemkni všechna ovládání."
+      }
+    },
+    "step.pause.resume": "Hra je pozastavená. Klepnutím na Pokračovat navážeš na tutoriál.",
+    "skip.confirm": "Přeskočit tutoriál? Můžeš si ho znovu zahrát v Nápovědě.",
+    "step.port.expand": "Útoč a rozšiřuj území, dokud nedosáhneš pobřeží. Ukazatel označí vhodné místo pro přístav."
+  },
+  "cooldown": "Doba obnovení"
 }
