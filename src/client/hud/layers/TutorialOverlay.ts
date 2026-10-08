@@ -370,6 +370,8 @@ export class TutorialOverlay extends LitElement implements Controller {
   private mapFocusTile: ReturnType<GameView["ref"]> | null = null;
   private mapTargetStepIndex = -1;
   private mapTargetOwnerID: number | null = null;
+  private siloBuildTargetRequest = false;
+  private checkedSiloBuildTargets = new Set<number>();
   private tutorialCountryIdentityApplied = false;
   private mapActionPointer: {
     id: number;
@@ -780,6 +782,8 @@ export class TutorialOverlay extends LitElement implements Controller {
         if (this.attackAdvanceAt === 0) {
           this.attackAdvanceAt =
             performance.now() + TUTORIAL_STEP_ADVANCE_DELAY_MS;
+          this.rect = null;
+          this.requestUpdate();
         }
       }
     });
@@ -1026,12 +1030,12 @@ export class TutorialOverlay extends LitElement implements Controller {
       window.innerWidth / 2,
       window.innerHeight / 2,
     );
-    this.warshipCameraRestorePosition = { ...center, zoom: scale };
-    // Shifting the camera center left moves the unchanged water target right
-    // on screen, away from the hard-to-tap edge.
+    this.warshipCameraRestorePosition = { ...center, zoom: warshipStepScale };
+    // Pan the camera left by one spotlight diameter so the nearby water stays
+    // comfortably tappable; the original center is restored without zooming in.
     this.eventBus.emit(
       new GoToPositionEvent(
-        center.x - (viewportWidth * 0.06) / warshipStepScale,
+        center.x - MAP_SPOTLIGHT_SIZE / warshipStepScale,
         center.y,
         warshipStepScale,
       ),
@@ -1237,6 +1241,11 @@ export class TutorialOverlay extends LitElement implements Controller {
       tile: number;
       clearance: number;
     } | null = null;
+    const siloFallbackCandidates: {
+      rect: DOMRect;
+      score: number;
+      tile: number;
+    }[] = [];
     const ownedUnits =
       player && (wantsOwnedLand || this.current.id === "expand")
         ? this.unitsOwnedBy(player)
@@ -1282,16 +1291,25 @@ export class TutorialOverlay extends LitElement implements Controller {
         ) {
           continue;
         }
-        if (
-          player &&
-          wantsOwnedLand &&
-          !this.isValidStructureBuildTile(
+        if (player && wantsOwnedLand) {
+          const structureTileIsValid = this.isValidStructureBuildTile(
             tile,
             buildStructures,
             structureMinDistance,
-          )
-        ) {
-          continue;
+          );
+          if (!structureTileIsValid) {
+            if (
+              isSiloStep &&
+              this.nearestUnitDistance(ownedUnits, point.x, point.y) > 6
+            ) {
+              siloFallbackCandidates.push({
+                rect: this.rectAtPoint(point.x, point.y),
+                score: Math.hypot(point.x - targetX, point.y - targetY),
+                tile,
+              });
+            }
+            continue;
+          }
         }
         if (
           player &&
@@ -1338,8 +1356,14 @@ export class TutorialOverlay extends LitElement implements Controller {
         }
       }
     }
-    if (best) this.rememberMapTarget(best.tile);
-    else this.clearMapTarget();
+    if (best) {
+      this.rememberMapTarget(best.tile);
+    } else {
+      this.clearMapTarget();
+      if (isSiloStep && player) {
+        this.checkSiloBuildableCandidates(player, siloFallbackCandidates);
+      }
+    }
     if (this.current.id === "spawn") {
       this.spawnTargetTile = best?.tile ?? null;
     }
@@ -1555,6 +1579,59 @@ export class TutorialOverlay extends LitElement implements Controller {
     });
   }
 
+  private checkSiloBuildableCandidates(
+    player: TutorialPlayer,
+    candidates: { rect: DOMRect; score: number; tile: number }[],
+  ) {
+    if (this.siloBuildTargetRequest || candidates.length === 0) return;
+
+    const candidatesByTile = new Map<
+      number,
+      { rect: DOMRect; score: number; tile: number }
+    >();
+    for (const candidate of candidates) {
+      if (this.checkedSiloBuildTargets.has(candidate.tile)) continue;
+      const existing = candidatesByTile.get(candidate.tile);
+      if (!existing || candidate.score < existing.score) {
+        candidatesByTile.set(candidate.tile, candidate);
+      }
+    }
+    const untested = [...candidatesByTile.values()]
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 16);
+    if (untested.length === 0) return;
+
+    this.siloBuildTargetRequest = true;
+    void (async () => {
+      for (const candidate of untested) {
+        this.checkedSiloBuildTargets.add(candidate.tile);
+        const buildables = await player.buildables(candidate.tile, [
+          UnitType.MissileSilo,
+        ]);
+        const silo = buildables.find(
+          (buildable) => buildable.type === UnitType.MissileSilo,
+        );
+        if (
+          !this.active ||
+          this.current.id !== "silo" ||
+          !silo ||
+          silo.canBuild === false
+        ) {
+          continue;
+        }
+
+        this.rememberMapTarget(candidate.tile);
+        this.rect = candidate.rect;
+        this.requestUpdate();
+        return;
+      }
+    })()
+      .catch(() => undefined)
+      .finally(() => {
+        this.siloBuildTargetRequest = false;
+      });
+  }
+
   private hasUnitNearPoint(
     units: readonly { tile: () => number; isActive: () => boolean }[],
     x: number,
@@ -1750,17 +1827,15 @@ export class TutorialOverlay extends LitElement implements Controller {
     const portTile = port.tile();
     const visited = new Set<number>([portTile]);
     let frontier = [portTile];
-    // The Port is often near the left coast. Bias the launch target slightly
-    // right so its spotlight stays comfortably tappable on narrow screens.
     const centerX = window.innerWidth * 0.56;
     const centerY = window.innerHeight * 0.46;
+    const candidates: {
+      tile: number;
+      point: { x: number; y: number };
+      score: number;
+    }[] = [];
     for (let depth = 1; depth <= 5; depth++) {
       const next: number[] = [];
-      const candidates: {
-        tile: number;
-        point: { x: number; y: number };
-        score: number;
-      }[] = [];
       for (const tile of frontier) {
         for (const neighbor of this.game.neighbors(tile)) {
           if (visited.has(neighbor)) continue;
@@ -1785,15 +1860,16 @@ export class TutorialOverlay extends LitElement implements Controller {
           });
         }
       }
-      if (candidates.length > 0) {
-        candidates.sort((a, b) => a.score - b.score);
-        const target = candidates[0];
-        // Buildables are queried against the clicked tile. Use connected
-        // ocean so Warship is buildable; the Port is only the launch anchor.
-        this.rememberMapTarget(target.tile);
-        return this.rectAtPoint(target.point.x, target.point.y);
-      }
       frontier = next;
+    }
+
+    if (candidates.length > 0) {
+      candidates.sort((a, b) => a.score - b.score);
+      const target = candidates[0];
+      // Buildables are queried against the clicked tile. Use connected
+      // ocean so Warship is buildable; the Port is only the launch anchor.
+      this.rememberMapTarget(target.tile);
+      return this.rectAtPoint(target.point.x, target.point.y);
     }
 
     // The clicked tile is connected ocean by the Port. The spotlight may

@@ -436,7 +436,8 @@ export class Config {
       case UnitType.MissileSilo:
         info = {
           cost: this.costWrapper(() => 1_000_000, UnitType.MissileSilo),
-          constructionDuration: this.instantBuild() ? 0 : 10 * 10,
+          constructionDuration:
+            this.instantBuild() || this.gameConfig().tutorial ? 0 : 10 * 10,
           upgradable: true,
         };
         break;
