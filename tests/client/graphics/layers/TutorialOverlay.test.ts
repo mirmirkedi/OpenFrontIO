@@ -776,7 +776,7 @@ describe("TutorialOverlay deterministic progression", () => {
     }
   });
 
-  test("attack step smoothly zooms out by 20 percent instead of fitting the whole map", () => {
+  test("attack step smoothly zooms out by 30 percent instead of fitting the whole map", () => {
     const { overlay, eventBus } = createOverlay(2);
     const player = { smallID: () => 1 };
     const emit = vi.spyOn(eventBus, "emit");
@@ -788,9 +788,9 @@ describe("TutorialOverlay deterministic progression", () => {
 
     Reflect.get(overlay, "zoomOutForAttackStep").call(overlay);
 
-    expect(Reflect.get(overlay, "lockedZoomScale")).toBeCloseTo(3.2);
+    expect(Reflect.get(overlay, "lockedZoomScale")).toBeCloseTo(2.8);
     expect(emit).toHaveBeenCalledWith(
-      new GoToPlayerEvent(player as never, 3.2),
+      new GoToPlayerEvent(player as never, 2.8),
     );
     overlay.stop();
   });
@@ -866,7 +866,7 @@ describe("TutorialOverlay deterministic progression", () => {
     overlay.stop();
   });
 
-  test("Warship lesson hides the spotlight when the Port has only a narrow sea edge", () => {
+  test("Warship lesson keeps a visible spotlight on a narrow sea edge", () => {
     const { overlay } = createOverlay(9);
     const portTile = 200;
     const narrowSea = 225;
@@ -889,7 +889,11 @@ describe("TutorialOverlay deterministic progression", () => {
       worldToScreenCoordinates: (cell: { x: number; y: number }) => cell,
     } as never;
 
-    expect(Reflect.get(overlay, "findMapTarget").call(overlay)).toBeNull();
+    const target = Reflect.get(overlay, "findMapTarget").call(
+      overlay,
+    ) as DOMRect;
+    expect(target).not.toBeNull();
+    expect(Reflect.get(overlay, "mapTargetTile")).toBe(narrowSea);
     overlay.stop();
   });
 

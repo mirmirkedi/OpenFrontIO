@@ -32,6 +32,7 @@ import {
 } from "./Cosmetics";
 import { updateCrazyGamesNavButton } from "./CrazyGamesAccountButton";
 import { crazyGamesSDK } from "./CrazyGamesSDK";
+import { initializeDefaultCountryFlag } from "./DefaultCountryFlag";
 import {
   composeVersionDisplay,
   desktopVersion,
@@ -962,6 +963,8 @@ class Client {
     }
     const auth = isOpenTroopApp() ? false : await userAuth();
     const playerRole = auth !== false ? (auth.claims.role ?? null) : null;
+    if (!isOpenTroopApp()) await getUserMe();
+    await initializeDefaultCountryFlag(this.userSettings);
     // Ensure the one-shot Steam name-seed has settled before reading
     // getUsername(), mirroring how getClanCheck() runs in parallel with the
     // handshake. whenSeeded() always resolves (falling back to the generated

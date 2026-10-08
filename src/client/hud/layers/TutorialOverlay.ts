@@ -1,9 +1,11 @@
 import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import Countries from "resources/countries.json" with { type: "json" };
 import { assetUrl } from "../../../core/AssetUrls";
 import { EventBus } from "../../../core/EventBus";
 import { Cell, GameType, Structures, UnitType } from "../../../core/game/Game";
 import type { Controller } from "../../Controller";
+import { getLocalizedCountryName } from "../../CountryLocalization";
 import {
   AttackRatioEvent,
   CloseViewEvent,
@@ -320,7 +322,11 @@ export class TutorialOverlay extends LitElement implements Controller {
   private refreshTimer: number | undefined;
   private lockedZoomScale: number | null = null;
   private zoomCenterWorld: { x: number; y: number } | null = null;
-  private warshipCameraRestorePosition: { x: number; y: number } | null = null;
+  private warshipCameraRestorePosition: {
+    x: number;
+    y: number;
+    zoom: number;
+  } | null = null;
   private attackNeighborFocusRequested = false;
   private tutorialGestureScale: number | null = null;
   private tutorialAllowedPointers = new Set<number>();
@@ -788,7 +794,10 @@ export class TutorialOverlay extends LitElement implements Controller {
       !this.tutorialCountryIdentityApplied &&
       player.state?.spawnTile !== undefined
     ) {
-      const country = this.game.countryForTile(player.state!.spawnTile!);
+      const country = this.tutorialCountryForPlayer(
+        player,
+        player.state!.spawnTile!,
+      );
       if (country) {
         player.setTutorialCountryIdentity(country.name, country.flag);
         this.tutorialCountryIdentityApplied = true;
@@ -841,6 +850,31 @@ export class TutorialOverlay extends LitElement implements Controller {
     return STEPS[this.stepIndex];
   }
 
+  private tutorialCountryForPlayer(
+    player: TutorialPlayer,
+    spawnTile: NonNullable<NonNullable<TutorialPlayer["state"]>["spawnTile"]>,
+  ) {
+    const selectedFlag = player.cosmetics.flag;
+    const flagCode = selectedFlag?.match(/^\/flags\/([^/]+)\.svg$/i)?.[1];
+    const selectedCountry = flagCode
+      ? (Countries as { code: string; name: string }[]).find(
+          (country) =>
+            encodeURIComponent(country.code).toLowerCase() ===
+            flagCode.toLowerCase(),
+        )
+      : undefined;
+    if (selectedCountry) {
+      return {
+        name: getLocalizedCountryName(
+          selectedCountry.code,
+          selectedCountry.name,
+        ),
+        flag: selectedFlag,
+      };
+    }
+    return this.game.countryForTile(spawnTile);
+  }
+
   private complete(id: string) {
     if (!this.active || this.current.id !== id) return;
     if (id === "expand") this.zoomOutForAttackStep();
@@ -870,12 +904,12 @@ export class TutorialOverlay extends LitElement implements Controller {
     const viewportWidth = this.transformHandler.width?.() ?? window.innerWidth;
     const mapWidth = this.game.width?.() ?? Number.POSITIVE_INFINITY;
     const minimumScale = Math.max(0.2, viewportWidth / mapWidth);
-    // Reduce the current zoom by 20%. Setting the absolute scale to 0.2
+    // Reduce the current zoom by 30%. Setting the absolute scale to 0.2
     // makes the whole world fit on screen on phones, far beyond the intended
     // small step back needed to reveal a neighboring country.
     this.lockedZoomScale = Math.max(
       minimumScale,
-      this.transformHandler.scale * 0.8,
+      this.transformHandler.scale * 0.7,
     );
     this.eventBus.emit(new GoToPlayerEvent(player, this.lockedZoomScale));
   }
@@ -905,17 +939,21 @@ export class TutorialOverlay extends LitElement implements Controller {
     const viewportWidth = this.transformHandler.width?.() ?? window.innerWidth;
     const scale = this.transformHandler.scale;
     if (!Number.isFinite(scale) || scale <= 0) return;
+    const mapWidth = this.game.width?.() ?? Number.POSITIVE_INFINITY;
+    const minimumScale = Math.max(0.2, viewportWidth / mapWidth);
+    const warshipStepScale = Math.max(minimumScale, scale * 0.7);
     const center = this.transformHandler.screenToWorldCoordinatesFloat(
       window.innerWidth / 2,
       window.innerHeight / 2,
     );
-    this.warshipCameraRestorePosition = center;
+    this.warshipCameraRestorePosition = { ...center, zoom: scale };
     // Shifting the camera center left moves the unchanged water target right
     // on screen, away from the hard-to-tap edge.
     this.eventBus.emit(
       new GoToPositionEvent(
-        center.x - (viewportWidth * 0.06) / scale,
+        center.x - (viewportWidth * 0.06) / warshipStepScale,
         center.y,
+        warshipStepScale,
       ),
     );
   }
@@ -924,7 +962,9 @@ export class TutorialOverlay extends LitElement implements Controller {
     const position = this.warshipCameraRestorePosition;
     if (!position) return;
     this.warshipCameraRestorePosition = null;
-    this.eventBus.emit(new GoToPositionEvent(position.x, position.y));
+    this.eventBus.emit(
+      new GoToPositionEvent(position.x, position.y, position.zoom),
+    );
   }
 
   private pointInRect(x: number, y: number) {
@@ -1093,6 +1133,7 @@ export class TutorialOverlay extends LitElement implements Controller {
       this.current.id,
     );
     const wantsOwnedLand = this.current.unit !== undefined;
+    const isSiloStep = this.current.unit === UnitType.MissileSilo;
     if (wantsEnemy) {
       return player ? this.findNeighborEnemyTarget(player) : null;
     }
@@ -1126,8 +1167,8 @@ export class TutorialOverlay extends LitElement implements Controller {
     const structureMinDistance =
       this.game.config?.().structureMinDist?.() ?? 15;
 
-    for (let y = top; y <= bottom; y += 16) {
-      for (let x = left; x <= right; x += 16) {
+    for (let y = top; y <= bottom; y += isSiloStep ? 8 : 16) {
+      for (let x = left; x <= right; x += isSiloStep ? 8 : 16) {
         const cell = this.transformHandler.screenToWorldCoordinates(x, y);
         if (!this.game.isValidCoord(cell.x, cell.y)) continue;
         const tile = this.game.ref(cell.x, cell.y);
@@ -1153,7 +1194,8 @@ export class TutorialOverlay extends LitElement implements Controller {
           this.current.id !== "spawn" &&
           !this.spotlightMatchesRegion(point.x, point.y, (sample) =>
             this.isLandOwnedBy(sample, ownerID),
-          )
+          ) &&
+          !isSiloStep
         ) {
           continue;
         }
@@ -1187,7 +1229,9 @@ export class TutorialOverlay extends LitElement implements Controller {
             point.x,
             point.y,
           );
-          if (unitClearance <= MAP_SPOTLIGHT_RADIUS + 6) continue;
+          if (unitClearance <= (isSiloStep ? 6 : MAP_SPOTLIGHT_RADIUS + 6)) {
+            continue;
+          }
           const borderClearance = this.ownedLandClearance(
             point.x,
             point.y,
@@ -1331,12 +1375,23 @@ export class TutorialOverlay extends LitElement implements Controller {
     }
 
     if (this.current.unit && player) {
+      const isSiloStep = this.current.unit === UnitType.MissileSilo;
+      if (!this.isLandOwnedBy(targetTile, player.smallID())) return null;
       if (
-        !this.isLandOwnedBy(targetTile, player.smallID()) ||
+        !isSiloStep &&
         !this.spotlightMatchesRegion(point.x, point.y, (tile) =>
           this.isLandOwnedBy(tile, player.smallID()),
-        ) ||
-        this.hasUnitNearPoint(this.unitsOwnedBy(player), point.x, point.y)
+        )
+      ) {
+        return null;
+      }
+      if (
+        this.hasUnitNearPoint(
+          this.unitsOwnedBy(player),
+          point.x,
+          point.y,
+          isSiloStep ? 6 : MAP_SPOTLIGHT_RADIUS + 6,
+        )
       ) {
         return null;
       }
@@ -1619,9 +1674,10 @@ export class TutorialOverlay extends LitElement implements Controller {
             new Cell(this.game.x(neighbor) + 0.5, this.game.y(neighbor) + 0.5),
           );
           if (
-            !this.spotlightMatchesRegion(point.x, point.y, (sample) =>
-              this.game.isOcean(sample),
-            )
+            point.x < MAP_SPOTLIGHT_RADIUS ||
+            point.x > window.innerWidth - MAP_SPOTLIGHT_RADIUS ||
+            point.y < MAP_SPOTLIGHT_RADIUS ||
+            point.y > window.innerHeight - MAP_SPOTLIGHT_RADIUS
           ) {
             continue;
           }
@@ -1643,8 +1699,9 @@ export class TutorialOverlay extends LitElement implements Controller {
       frontier = next;
     }
 
-    // Never place the Warship spotlight across land. If the adjacent water is
-    // too narrow for the full ring, wait until a fully ocean region is visible.
+    // The clicked tile is connected ocean by the Port. The spotlight may
+    // overlap the shoreline; requiring its entire ring to be ocean can hide
+    // the Warship target even when a valid launch tile is visible.
     this.clearMapTarget();
     return null;
   }

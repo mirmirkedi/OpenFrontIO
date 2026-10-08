@@ -27,8 +27,8 @@ import { modalHeader } from "./components/ui/ModalHeader";
 import { getPlayerCosmetics } from "./Cosmetics";
 import { crazyGamesSDK } from "./CrazyGamesSDK";
 import { clearActiveLocalGame } from "./LocalPersistantStats";
-import { prepareTutorialForGameStart } from "./TutorialProgress";
 import { JoinLobbyEvent } from "./Main";
+import { prepareTutorialForGameStart } from "./TutorialProgress";
 import { genAnonUsername, UsernameInput } from "./UsernameInput";
 import {
   getBotsForCompactMap,
@@ -966,9 +966,7 @@ export class SinglePlayerModal extends BaseModal {
                 ? Difficulty.Easy
                 : this.selectedDifficulty,
               maxTimerValue: tutorialMode ? undefined : finalMaxTimerValue,
-              bots: tutorialMode
-                ? Math.max(1, Math.min(this.bots, 5))
-                : this.bots,
+              bots: tutorialMode ? 1 : this.bots,
               infiniteGold: tutorialMode || this.infiniteGold,
               donateGold: this.gameMode === GameMode.Team,
               donateTroops: this.gameMode === GameMode.Team,
@@ -982,10 +980,9 @@ export class SinglePlayerModal extends BaseModal {
               )
                 .map((u) => Object.values(UnitType).find((ut) => ut === u))
                 .filter((ut): ut is UnitType => ut !== undefined),
-              nations: sliderToNationsConfig(
-                this.nations,
-                this.defaultNationCount,
-              ),
+              nations: tutorialMode
+                ? "disabled"
+                : sliderToNationsConfig(this.nations, this.defaultNationCount),
               ...(this.goldMultiplier && this.goldMultiplierValue
                 ? { goldMultiplier: this.goldMultiplierValue }
                 : {}),

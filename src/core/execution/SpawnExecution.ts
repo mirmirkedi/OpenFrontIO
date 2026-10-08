@@ -162,13 +162,19 @@ export class SpawnExecution implements Execution {
       const humanSpawn = human?.spawnTile();
       if (humanSpawn !== undefined) {
         const distance = 32;
+        // Keep the tutorial opponent on the player's right. If the ideal
+        // point is occupied or unsuitable, search nearby points on that side
+        // instead of flipping the opponent to the left or above/below.
         const offsets = [
           [distance, 0],
-          [-distance, 0],
-          [0, distance],
-          [0, -distance],
           [distance, distance],
-          [-distance, -distance],
+          [distance, -distance],
+          [distance * 1.5, 0],
+          [distance * 1.5, distance],
+          [distance * 1.5, -distance],
+          [distance * 2, 0],
+          [distance * 2, distance],
+          [distance * 2, -distance],
         ];
         for (const [dx, dy] of offsets) {
           const x = this.mg.x(humanSpawn) + dx;

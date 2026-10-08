@@ -63,6 +63,8 @@ export const USER_SETTINGS_CHANGED_EVENT = "event:user-settings-changed";
  */
 export const PATTERN_KEY = "territoryPattern";
 export const FLAG_KEY = "flag";
+export const FLAG_INITIALIZATION_COMPLETE_KEY =
+  "settings.flagInitializationComplete";
 export const CROWN_KEY = "crown";
 export const COLOR_KEY = "settings.territoryColor";
 export const PERFORMANCE_OVERLAY_KEY = "settings.performanceOverlay";
@@ -86,6 +88,7 @@ const STATS_COLUMNS_KEYS: Record<StatsTableKind, string> = {
 const PER_PLAYER_KEYS: readonly string[] = [
   PATTERN_KEY,
   FLAG_KEY,
+  FLAG_INITIALIZATION_COMPLETE_KEY,
   CROWN_KEY,
   EFFECTS_KEY,
 ];
@@ -410,7 +413,16 @@ export class UserSettings {
     return flag;
   }
 
+  isCountryFlagInitializationComplete(): boolean {
+    return this.getCached(FLAG_INITIALIZATION_COMPLETE_KEY) === "true";
+  }
+
+  markCountryFlagInitializationComplete(): void {
+    this.setCached(FLAG_INITIALIZATION_COMPLETE_KEY, "true");
+  }
+
   setFlag(flag: string): void {
+    this.markCountryFlagInitializationComplete();
     if (flag === "country:xx") {
       this.clearFlag(true);
     } else {
@@ -419,6 +431,7 @@ export class UserSettings {
   }
 
   clearFlag(emitChange: boolean = false): void {
+    this.markCountryFlagInitializationComplete();
     this.removeCached(FLAG_KEY, emitChange);
   }
 
