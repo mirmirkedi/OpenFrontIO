@@ -170,7 +170,9 @@ export class SpawnExecution implements Execution {
         }
 
         if (!this.tutorialNukeTarget && spawnedTutorialBots === 0) {
-          const distance = 32;
+          // Nudge the nearby tutorial opponent only a few tiles farther right
+          // so it remains reachable after two expansion attacks.
+          const distance = 36;
           // Keep the tutorial opponent on the player's right. If the ideal
           // point is occupied or unsuitable, search nearby points on that side
           // instead of flipping the opponent to the left or above/below.

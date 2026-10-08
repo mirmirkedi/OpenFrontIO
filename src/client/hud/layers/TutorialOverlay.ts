@@ -26,6 +26,7 @@ import type { TransformHandler } from "../../TransformHandler";
 import { GoToPlayerEvent, GoToPositionEvent } from "../../TransformHandler";
 import {
   BuildUnitIntentEvent,
+  SendWinnerEvent,
   SendAllianceRequestIntentEvent,
   SendAttackIntentEvent,
 } from "../../Transport";
@@ -861,6 +862,16 @@ export class TutorialOverlay extends LitElement implements Controller {
     this.eventBus.on(SendAllianceRequestIntentEvent, () =>
       this.complete("ally"),
     );
+    this.eventBus.on(SendWinnerEvent, ({ winner }) => {
+      const player = this.game.myPlayer();
+      if (
+        this.active &&
+        winner?.[0] === "player" &&
+        winner[1] === player?.clientID()
+      ) {
+        this.finish();
+      }
+    });
     this.eventBus.on(BuildUnitIntentEvent, (event) => {
       if (this.current.unit === event.unit) this.complete(this.current.id);
       if (
