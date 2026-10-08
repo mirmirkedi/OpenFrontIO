@@ -372,7 +372,7 @@ export class TutorialOverlay extends LitElement implements Controller {
   private mapTargetStepIndex = -1;
   private mapTargetOwnerID: number | null = null;
   private siloBuildTargetRequest = false;
-  private checkedSiloBuildTargets = new Set<number>();
+  private checkedSiloBuildTargets = new Set<string>();
   private tutorialCountryIdentityApplied = false;
   private mapActionPointer: {
     id: number;
@@ -1337,6 +1337,8 @@ export class TutorialOverlay extends LitElement implements Controller {
     );
     const wantsOwnedLand = this.current.unit !== undefined;
     const isSiloStep = this.current.unit === UnitType.MissileSilo;
+    const isSamStep = this.current.unit === UnitType.SAMLauncher;
+    const checksStructureBuildables = isSiloStep || isSamStep;
     if (wantsEnemy) {
       return player ? this.findNeighborEnemyTarget(player) : null;
     }
@@ -1378,8 +1380,16 @@ export class TutorialOverlay extends LitElement implements Controller {
     const structureMinDistance =
       this.game.config?.().structureMinDist?.() ?? 15;
 
-    for (let y = top; y <= bottom; y += isSiloStep ? 8 : 16) {
-      for (let x = left; x <= right; x += isSiloStep ? 8 : 16) {
+    for (
+      let y = top;
+      y <= bottom;
+      y += checksStructureBuildables ? 8 : 16
+    ) {
+      for (
+        let x = left;
+        x <= right;
+        x += checksStructureBuildables ? 8 : 16
+      ) {
         const cell = this.transformHandler.screenToWorldCoordinates(x, y);
         if (!this.game.isValidCoord(cell.x, cell.y)) continue;
         const tile = this.game.ref(cell.x, cell.y);
@@ -1406,7 +1416,7 @@ export class TutorialOverlay extends LitElement implements Controller {
           !this.spotlightMatchesRegion(point.x, point.y, (sample) =>
             this.isLandOwnedBy(sample, ownerID),
           ) &&
-          !isSiloStep
+          !checksStructureBuildables
         ) {
           continue;
         }
@@ -1417,7 +1427,7 @@ export class TutorialOverlay extends LitElement implements Controller {
             structureMinDistance,
           );
           if (!structureTileIsValid) {
-            if (isSiloStep) {
+            if (checksStructureBuildables) {
               const unitClearance = this.nearestUnitDistance(
                 ownedUnits,
                 point.x,
@@ -1457,8 +1467,11 @@ export class TutorialOverlay extends LitElement implements Controller {
             point.x,
             point.y,
           );
-          if (unitClearance <= (isSiloStep ? 6 : MAP_SPOTLIGHT_RADIUS + 6)) {
-            if (isSiloStep) {
+          if (
+            unitClearance <=
+            (checksStructureBuildables ? 6 : MAP_SPOTLIGHT_RADIUS + 6)
+          ) {
+            if (checksStructureBuildables) {
               siloFallbackCandidates.push({
                 rect: this.rectAtPoint(point.x, point.y),
                 score: Math.hypot(point.x - targetX, point.y - targetY),
@@ -1480,12 +1493,22 @@ export class TutorialOverlay extends LitElement implements Controller {
           );
           clearance = Math.min(borderClearance, unitClearance);
         }
-        const coverage = isSiloStep
+        const coverage = checksStructureBuildables
           ? this.spotlightRegionCoverage(point.x, point.y, (sample) =>
               this.isLandOwnedBy(sample, ownerID),
             )
           : 1;
         const score = Math.hypot(point.x - targetX, point.y - targetY);
+        if (checksStructureBuildables) {
+          siloFallbackCandidates.push({
+            rect: this.rectAtPoint(point.x, point.y),
+            score,
+            tile,
+            clearance,
+            coverage,
+          });
+          continue;
+        }
         const hasBetterOwnedLandPlacement =
           best !== null &&
           wantsOwnedLand &&
@@ -1518,7 +1541,7 @@ export class TutorialOverlay extends LitElement implements Controller {
       this.rememberMapTarget(best.tile);
     } else {
       this.clearMapTarget();
-      if (isSiloStep && player) {
+      if (checksStructureBuildables && player) {
         this.checkSiloBuildableCandidates(player, siloFallbackCandidates);
       }
     }
@@ -1654,10 +1677,12 @@ export class TutorialOverlay extends LitElement implements Controller {
     }
 
     if (this.current.unit && player) {
-      const isSiloStep = this.current.unit === UnitType.MissileSilo;
+      const checksStructureBuildables =
+        this.current.unit === UnitType.MissileSilo ||
+        this.current.unit === UnitType.SAMLauncher;
       if (!this.isLandOwnedBy(targetTile, player.smallID())) return null;
       if (
-        !isSiloStep &&
+        !checksStructureBuildables &&
         !this.spotlightMatchesRegion(point.x, point.y, (tile) =>
           this.isLandOwnedBy(tile, player.smallID()),
         )
@@ -1669,7 +1694,7 @@ export class TutorialOverlay extends LitElement implements Controller {
           this.unitsOwnedBy(player),
           point.x,
           point.y,
-          isSiloStep ? 6 : MAP_SPOTLIGHT_RADIUS + 6,
+          checksStructureBuildables ? 6 : MAP_SPOTLIGHT_RADIUS + 6,
         )
       ) {
         return null;
@@ -1775,6 +1800,13 @@ export class TutorialOverlay extends LitElement implements Controller {
     }[],
   ) {
     if (this.siloBuildTargetRequest || candidates.length === 0) return;
+    const buildType = this.current.unit;
+    if (
+      buildType !== UnitType.MissileSilo &&
+      buildType !== UnitType.SAMLauncher
+    ) {
+      return;
+    }
 
     const candidatesByTile = new Map<
       number,
@@ -1787,7 +1819,8 @@ export class TutorialOverlay extends LitElement implements Controller {
       }
     >();
     for (const candidate of candidates) {
-      if (this.checkedSiloBuildTargets.has(candidate.tile)) continue;
+      const targetKey = `${buildType}:${candidate.tile}`;
+      if (this.checkedSiloBuildTargets.has(targetKey)) continue;
       const existing = candidatesByTile.get(candidate.tile);
       if (
         !existing ||
@@ -1813,16 +1846,17 @@ export class TutorialOverlay extends LitElement implements Controller {
     this.siloBuildTargetRequest = true;
     void (async () => {
       for (const candidate of untested) {
-        this.checkedSiloBuildTargets.add(candidate.tile);
+        const targetKey = `${buildType}:${candidate.tile}`;
+        this.checkedSiloBuildTargets.add(targetKey);
         const buildables = await player.buildables(candidate.tile, [
-          UnitType.MissileSilo,
+          buildType,
         ]);
         const silo = buildables.find(
-          (buildable) => buildable.type === UnitType.MissileSilo,
+          (buildable) => buildable.type === buildType,
         );
         if (
           !this.active ||
-          this.current.id !== "silo" ||
+          this.current.unit !== buildType ||
           !silo ||
           silo.canBuild === false
         ) {
