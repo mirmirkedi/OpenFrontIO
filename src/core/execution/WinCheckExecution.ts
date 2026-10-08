@@ -90,6 +90,13 @@ export class WinCheckExecution implements Execution {
       return;
     }
 
+    if (this.mg.config().gameConfig().tutorial && sorted.length === 1) {
+      this.mg.setWinner(sorted[0], this.mg.stats().stats());
+      console.log(`${sorted[0].name()} has won the tutorial`);
+      this.active = false;
+      return;
+    }
+
     if (this.mg.config().gameConfig().rankedType === RankedType.OneVOne) {
       const humans = sorted.filter(
         (p) => p.type() === PlayerType.Human && !p.isDisconnected(),

@@ -9,6 +9,10 @@ import { GameMode, GameType, Gold } from "../../../core/game/Game";
 import { TileRef } from "../../../core/game/GameMap";
 import { GameUpdateType } from "../../../core/game/GameUpdates";
 import { UserSettings } from "../../../core/game/UserSettings";
+import {
+  TUTORIAL_ATTACK_RATIO,
+  TUTORIAL_LAUNCH_PENDING_KEY,
+} from "../../TutorialProgress";
 import { Controller } from "../../Controller";
 import { AttackRatioEvent } from "../../InputHandler";
 import { UIState } from "../../UIState";
@@ -75,7 +79,15 @@ export class ControlPanel extends LitElement implements Controller {
   private static readonly ATTACK_THRESHOLD_TICKS = 15 * 10; // 15 seconds
 
   init() {
-    this.attackRatio = new UserSettings().attackRatio();
+    const tutorialMode =
+      this.game.config().gameConfig().gameType === GameType.Singleplayer &&
+      localStorage.getItem("openfront.tutorial.active") === "true" &&
+      (sessionStorage.getItem(TUTORIAL_LAUNCH_PENDING_KEY) === "true" ||
+        (localStorage.getItem("openfront.tutorial.completed") !== "true" &&
+          localStorage.getItem("openfront.tutorial.skipped") !== "true"));
+    this.attackRatio = tutorialMode
+      ? TUTORIAL_ATTACK_RATIO
+      : new UserSettings().attackRatio();
     this.uiState.attackRatio = this.attackRatio;
     this.eventBus.on(AttackRatioEvent, (event) => {
       let newAttackRatio = this.attackRatio + event.attackRatio / 100;

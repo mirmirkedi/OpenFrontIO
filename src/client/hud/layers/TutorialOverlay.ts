@@ -13,7 +13,6 @@ import {
 import type { Controller } from "../../Controller";
 import { getLocalizedCountryName } from "../../CountryLocalization";
 import {
-  AttackRatioEvent,
   CloseViewEvent,
   ContextMenuEvent,
   MouseUpEvent,
@@ -28,7 +27,10 @@ import {
   SendAllianceRequestIntentEvent,
   SendAttackIntentEvent,
 } from "../../Transport";
-import { activateTutorialForGame } from "../../TutorialProgress";
+import {
+  activateTutorialForGame,
+  TUTORIAL_ATTACK_RATIO,
+} from "../../TutorialProgress";
 import type { UIState } from "../../UIState";
 import { translateText } from "../../Utils";
 import type { GameView } from "../../view";
@@ -42,10 +44,10 @@ const STEP_KEY = "openfront.tutorial.step";
 const SPEED_STEP_REMOVED_KEY = "openfront.tutorial.speed-step-removed";
 const STEP_INDEX_VERSION_KEY = "openfront.tutorial.step-index-version";
 const TUTORIAL_ZOOM_SCALE = 4.0;
-const TUTORIAL_ATTACK_RATIO = 0.25;
 const TARGET_REFRESH_INTERVAL_MS = 300;
 const MAP_SPOTLIGHT_SIZE = 48;
 const MAP_SPOTLIGHT_RADIUS = MAP_SPOTLIGHT_SIZE / 2;
+const TUTORIAL_STEP_ADVANCE_DELAY_MS = 2000;
 const BUILD_TARGET_MAX_INTERIOR_RADIUS = 96;
 const BUILD_TARGET_INTERIOR_RADIUS_STEP = 8;
 
@@ -341,6 +343,8 @@ export class TutorialOverlay extends LitElement implements Controller {
   private rocketFocusRequested = false;
   private rocketLaunched = false;
   private rocketTargetSmallID: number | null = null;
+  private rocketAdvanceAt = 0;
+  private attackAdvanceAt = 0;
   private attackNeighborFocusRequested = false;
   private tutorialGestureScale: number | null = null;
   private tutorialAllowedPointers = new Set<number>();
@@ -767,7 +771,11 @@ export class TutorialOverlay extends LitElement implements Controller {
         // The spotlight is refreshed while the map grows, so the rendered
         // country can move by a few tiles between the hint and the tap. Any
         // real ground attack here is therefore the intentional tutorial step.
-        this.complete("attack");
+        // Hold this camera for two seconds so the player can see the attack.
+        if (this.attackAdvanceAt === 0) {
+          this.attackAdvanceAt =
+            performance.now() + TUTORIAL_STEP_ADVANCE_DELAY_MS;
+        }
       }
     });
     this.eventBus.on(SendAllianceRequestIntentEvent, () =>
@@ -785,15 +793,6 @@ export class TutorialOverlay extends LitElement implements Controller {
         }
       }
     });
-
-    // Keep the first expansion readable with a small default attack ratio.
-    if (this.uiState.attackRatio !== TUTORIAL_ATTACK_RATIO) {
-      this.eventBus.emit(
-        new AttackRatioEvent(
-          (TUTORIAL_ATTACK_RATIO - this.uiState.attackRatio) * 100,
-        ),
-      );
-    }
 
     // `active` is deliberately not a Lit state field. The game renderer can
     // initialize this layer after its first render, so explicitly render the
@@ -816,7 +815,22 @@ export class TutorialOverlay extends LitElement implements Controller {
       const target = this.game
         .players()
         .find((candidate) => candidate.smallID() === this.rocketTargetSmallID);
-      if (!target || !target.isAlive()) this.complete("rocket");
+      if (!target || !target.isAlive()) {
+        if (this.rocketAdvanceAt === 0) {
+          this.rocketAdvanceAt =
+            performance.now() + TUTORIAL_STEP_ADVANCE_DELAY_MS;
+        }
+      }
+      if (this.rocketAdvanceAt > 0 && performance.now() >= this.rocketAdvanceAt) {
+        this.complete("rocket");
+      }
+    }
+    if (
+      this.current.id === "attack" &&
+      this.attackAdvanceAt > 0 &&
+      performance.now() >= this.attackAdvanceAt
+    ) {
+      this.complete("attack");
     }
     if (
       !this.tutorialCountryIdentityApplied &&
@@ -854,6 +868,8 @@ export class TutorialOverlay extends LitElement implements Controller {
     this.restoreRocketCamera();
     this.restoreWarshipCamera();
     this.active = false;
+    this.attackAdvanceAt = 0;
+    this.rocketAdvanceAt = 0;
     this.spawnPointer = null;
     this.mapActionPointer = null;
     this.clearMapTarget();
@@ -910,7 +926,11 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (id === "expand") this.zoomOutForAttackStep();
     if (id === "port") this.shiftCameraForWarshipStep();
     if (id === "warship") this.restoreWarshipCamera();
-    if (id === "rocket") this.restoreRocketCamera();
+    if (id === "rocket") {
+      this.restoreRocketCamera();
+      this.rocketAdvanceAt = 0;
+    }
+    if (id === "attack") this.attackAdvanceAt = 0;
     if (id === "silo") {
       this.rocketFocusRequested = false;
       this.rocketLaunched = false;
@@ -2033,7 +2053,12 @@ export class TutorialOverlay extends LitElement implements Controller {
   }
 
   private refreshTarget() {
-    if (!this.active) return;
+    if (
+      !this.active ||
+      (this.current.id === "attack" && this.attackAdvanceAt > 0)
+    ) {
+      return;
+    }
     const player = this.game.myPlayer();
     if (player) {
       this.refreshBorderTiles(player);
@@ -2120,6 +2145,7 @@ export class TutorialOverlay extends LitElement implements Controller {
       .borderTiles()
       .then((result) => {
         if (!this.active || this.game.myPlayer()?.id() !== player.id()) return;
+        if (this.current.id === "attack" && this.attackAdvanceAt > 0) return;
         this.cacheAdjacentTargets(player, result.borderTiles);
         this.refreshTarget();
       })
@@ -2186,7 +2212,7 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (!this.rect) {
       return "max(56px, calc(env(safe-area-inset-top) + 46px))";
     }
-    const above = this.rect.top - hintHeight;
+    const above = this.rect.top - hintHeight - 18;
     if (above >= safeTop) return `${above}px`;
 
     const below = this.rect.bottom + 16;

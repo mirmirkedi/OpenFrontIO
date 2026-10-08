@@ -165,8 +165,8 @@ export class SpawnExecution implements Execution {
             (player) => player.type() === PlayerType.Bot && player.hasSpawned(),
           ).length;
         if (this.tutorialNukeTarget && spawnedTutorialBots === 1) {
-          const remote = this.getTutorialRemoteSpawn(humanSpawn);
-          if (remote) return remote;
+          const targetSpawn = this.getTutorialNukeSpawn(humanSpawn);
+          if (targetSpawn) return targetSpawn;
         }
 
         if (!this.tutorialNukeTarget && spawnedTutorialBots === 0) {
@@ -274,15 +274,17 @@ export class SpawnExecution implements Execution {
     return this.mg.teamSpawnArea(team);
   }
 
-  private getTutorialRemoteSpawn(humanSpawn: TileRef): Spawn | undefined {
+  private getTutorialNukeSpawn(humanSpawn: TileRef): Spawn | undefined {
     const mapWidth = this.mg.width();
     const mapHeight = this.mg.height();
-    let best: { spawn: Spawn; distanceSquared: number } | undefined;
+    let best: { spawn: Spawn; score: number } | undefined;
     const humanX = this.mg.x(humanSpawn);
     const humanY = this.mg.y(humanSpawn);
 
-    // A coarse deterministic scan picks the farthest small starting area from
-    // the player, keeping the tutorial's nuke target on a remote landmass.
+    // Keep the nuke lesson target in the player's camera neighborhood. Prefer
+    // a valid spawn about 64 tiles away instead of sending the player across
+    // the map to a remote landmass.
+    const preferredDistance = 64;
     for (let y = 8; y < mapHeight - 8; y += 16) {
       for (let x = 8; x < mapWidth - 8; x += 16) {
         const center = this.mg.ref(x, y);
@@ -291,8 +293,9 @@ export class SpawnExecution implements Execution {
         const dx = x - humanX;
         const dy = y - humanY;
         const distanceSquared = dx * dx + dy * dy;
-        if (!best || distanceSquared > best.distanceSquared) {
-          best = { spawn: { center, tiles }, distanceSquared };
+        const score = Math.abs(Math.sqrt(distanceSquared) - preferredDistance);
+        if (!best || score < best.score) {
+          best = { spawn: { center, tiles }, score };
         }
       }
     }

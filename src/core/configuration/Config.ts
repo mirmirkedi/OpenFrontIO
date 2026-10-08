@@ -456,9 +456,10 @@ export class Config {
               Math.min(3_000_000, (numUnits + 1) * 1_500_000),
             UnitType.SAMLauncher,
           ),
-          constructionDuration: this.instantBuild()
-            ? 0
-            : SAM_CONSTRUCTION_TICKS,
+          constructionDuration:
+            this.instantBuild() || this.gameConfig().tutorial
+              ? 0
+              : SAM_CONSTRUCTION_TICKS,
           upgradable: true,
         };
         break;

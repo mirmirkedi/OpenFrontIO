@@ -710,6 +710,7 @@ export async function getPlayerCosmeticsRefs(): Promise<PlayerCosmeticRefs> {
   }
 
   let flag = userSettings.getFlag();
+  const hadStoredFlag = flag !== null;
   if (flag?.startsWith("flag:")) {
     const key = flag.slice("flag:".length);
     const flagData = cosmetics?.flags?.[key];
@@ -731,7 +732,7 @@ export async function getPlayerCosmeticsRefs(): Promise<PlayerCosmeticRefs> {
       }
     }
   }
-  if (flag === null) {
+  if (flag === null && hadStoredFlag) {
     userSettings.clearFlag();
   }
 

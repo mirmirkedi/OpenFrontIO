@@ -4,6 +4,7 @@ const SKIPPED_KEY = "openfront.tutorial.skipped";
 const STEP_KEY = "openfront.tutorial.step";
 
 export const TUTORIAL_LAUNCH_PENDING_KEY = "openfront.tutorial.launch-pending";
+export const TUTORIAL_ATTACK_RATIO = 0.25;
 
 /** Prepare tutorial state for a newly launched single-player match. */
 export function prepareTutorialForGameStart(tutorialMode: boolean) {
