@@ -1,9 +1,12 @@
 import Countries from "resources/countries.json" with { type: "json" };
+import LanguageMetadata from "resources/lang/metadata.json" with { type: "json" };
 import { isOpenTroopApp } from "./AppMode";
+import { getActiveLanguage } from "./CountryLocalization";
 import { UserSettings } from "../core/game/UserSettings";
 
 const COUNTRY_LOOKUP_TIMEOUT_MS = 1500;
 const countries = Countries as { code: string; restricted?: boolean }[];
+const languageMetadata = LanguageMetadata as { code: string; svg: string }[];
 
 function supportedCountry(code: string | undefined): string | undefined {
   const normalizedCode = code?.toLowerCase();
@@ -21,9 +24,28 @@ function supportedCountry(code: string | undefined): string | undefined {
 function countryFromBrowserLocale(): string | undefined {
   if (typeof navigator === "undefined") return undefined;
 
-  for (const locale of navigator.languages?.length
-    ? navigator.languages
-    : [navigator.language]) {
+  const selectedLanguage = getActiveLanguage();
+  try {
+    const region = new Intl.Locale(selectedLanguage).region;
+    const country = supportedCountry(region);
+    if (country) return country;
+  } catch {
+    // Ignore malformed or unsupported locale tags and try the language flag.
+  }
+
+  // The selected UI language can provide a default when its code has no
+  // region (for example, "tr" -> the Turkish flag).
+  const languageFlag = languageMetadata.find(
+    (entry) => entry.code.toLowerCase() === selectedLanguage.toLowerCase(),
+  );
+  const languageCountry = supportedCountry(languageFlag?.svg);
+  if (languageCountry) return languageCountry;
+
+  const browserLocales = [
+    ...(navigator.languages?.length ? navigator.languages : []),
+    navigator.language,
+  ];
+  for (const locale of browserLocales) {
     try {
       const region = new Intl.Locale(locale).region;
       const country = supportedCountry(region);
@@ -46,9 +68,10 @@ export async function initializeDefaultCountryFlag(
     return;
   }
 
-  let country: string | undefined;
-  // The packaged app has no network permission, so use the device locale there.
-  if (!isOpenTroopApp()) {
+  // Prefer the selected game language or device locale. IP-based location is
+  // only a final web fallback because it can be inaccurate (for example, VPNs).
+  let country = countryFromBrowserLocale();
+  if (!country && !isOpenTroopApp()) {
     const controller = new AbortController();
     const timeout = window.setTimeout(
       () => controller.abort(),
@@ -68,7 +91,6 @@ export async function initializeDefaultCountryFlag(
     }
   }
 
-  country ??= countryFromBrowserLocale();
   if (
     !country ||
     settings.isCountryFlagInitializationComplete() ||

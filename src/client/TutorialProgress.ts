@@ -5,21 +5,43 @@ const STEP_KEY = "openfront.tutorial.step";
 
 export const TUTORIAL_LAUNCH_PENDING_KEY = "openfront.tutorial.launch-pending";
 export const TUTORIAL_ATTACK_RATIO = 0.25;
+const TUTORIAL_IDENTITY_PENDING_KEY = "openfront.tutorial.identity-pending";
+const TUTORIAL_IDENTITY_NAME_KEY = "openfront.tutorial.player-name";
 
 /** Prepare tutorial state for a newly launched single-player match. */
-export function prepareTutorialForGameStart(tutorialMode: boolean) {
+export function prepareTutorialForGameStart(
+  tutorialMode: boolean,
+  persistTutorialIdentity = false,
+) {
   sessionStorage.removeItem(TUTORIAL_LAUNCH_PENDING_KEY);
+  sessionStorage.removeItem(TUTORIAL_IDENTITY_PENDING_KEY);
   localStorage.removeItem(STEP_KEY);
 
   if (tutorialMode) {
     localStorage.setItem(ACTIVE_KEY, "true");
     localStorage.removeItem(SKIPPED_KEY);
     sessionStorage.setItem(TUTORIAL_LAUNCH_PENDING_KEY, "true");
+    if (persistTutorialIdentity) {
+      sessionStorage.setItem(TUTORIAL_IDENTITY_PENDING_KEY, "true");
+    }
   } else {
     // A Help-page replay is only active for its current match. Do not let its
     // tutorial restrictions leak into the player's next ordinary game.
     localStorage.removeItem(ACTIVE_KEY);
   }
+}
+
+export function shouldPersistTutorialIdentity(): boolean {
+  return sessionStorage.getItem(TUTORIAL_IDENTITY_PENDING_KEY) === "true";
+}
+
+export function persistTutorialIdentityName(name: string): void {
+  localStorage.setItem(TUTORIAL_IDENTITY_NAME_KEY, name);
+  sessionStorage.removeItem(TUTORIAL_IDENTITY_PENDING_KEY);
+}
+
+export function getPersistedTutorialIdentityName(): string | null {
+  return localStorage.getItem(TUTORIAL_IDENTITY_NAME_KEY);
 }
 
 /** Resolve persisted tutorial flags when a game renderer is initialized. */

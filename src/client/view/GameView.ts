@@ -1074,7 +1074,9 @@ export class GameView implements GameMap {
   }
 
   /** Resolve the nearest map country marker to a selected spawn tile. */
-  countryForTile(tile: TileRef): { name: string; flag?: string } | null {
+  countryForTile(
+    tile: TileRef,
+  ): { code?: string; name: string; flag?: string } | null {
     const x = this.x(tile);
     const y = this.y(tile);
     const countries = [
@@ -1082,7 +1084,7 @@ export class GameView implements GameMap {
       ...this._mapData.additionalNations,
     ];
     let nearest:
-      | { name: string; flag?: string; distanceSquared: number }
+      | { code?: string; name: string; flag?: string; distanceSquared: number }
       | undefined;
     for (const country of countries) {
       const coordinates = country.coordinates;
@@ -1091,11 +1093,17 @@ export class GameView implements GameMap {
       const dy = y - coordinates[1];
       const distanceSquared = dx * dx + dy * dy;
       if (!nearest || distanceSquared < nearest.distanceSquared) {
-        nearest = { name: country.name, flag: country.flag, distanceSquared };
+        nearest = {
+          code: country.flag,
+          name: country.name,
+          flag: country.flag,
+          distanceSquared,
+        };
       }
     }
     if (!nearest) return null;
     return {
+      code: nearest.code,
       name: nearest.name,
       flag: nearest.flag
         ? `/flags/${encodeURIComponent(nearest.flag)}.svg`

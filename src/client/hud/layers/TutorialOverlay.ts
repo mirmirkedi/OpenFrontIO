@@ -10,6 +10,8 @@ import {
   TUTORIAL_NUKE_TARGET_NAME,
   UnitType,
 } from "../../../core/game/Game";
+import { UserSettings } from "../../../core/game/UserSettings";
+import { validateUsername } from "../../../core/validations/username";
 import type { Controller } from "../../Controller";
 import { getLocalizedCountryName } from "../../CountryLocalization";
 import {
@@ -29,6 +31,8 @@ import {
 } from "../../Transport";
 import {
   activateTutorialForGame,
+  persistTutorialIdentityName,
+  shouldPersistTutorialIdentity,
   TUTORIAL_ATTACK_RATIO,
 } from "../../TutorialProgress";
 import type { UIState } from "../../UIState";
@@ -833,6 +837,7 @@ export class TutorialOverlay extends LitElement implements Controller {
       this.complete("attack");
     }
     if (
+      shouldPersistTutorialIdentity() &&
       !this.tutorialCountryIdentityApplied &&
       player.state?.spawnTile !== undefined
     ) {
@@ -841,7 +846,18 @@ export class TutorialOverlay extends LitElement implements Controller {
         player.state!.spawnTile!,
       );
       if (country) {
-        player.setTutorialCountryIdentity(country.name, country.flag);
+        const identityName = validateUsername(country.name).isValid
+          ? country.name
+          : (country.code?.toUpperCase() ?? country.name);
+        player.setTutorialCountryIdentity(identityName, country.flag);
+        if (country.code) {
+          new UserSettings().setFlag(`country:${country.code}`);
+        }
+        const usernameInput = document.querySelector("username-input") as {
+          setTutorialUsername?: (name: string) => boolean;
+        } | null;
+        usernameInput?.setTutorialUsername?.(identityName);
+        persistTutorialIdentityName(identityName);
         this.tutorialCountryIdentityApplied = true;
       }
     }
@@ -911,6 +927,7 @@ export class TutorialOverlay extends LitElement implements Controller {
       : undefined;
     if (selectedCountry) {
       return {
+        code: selectedCountry.code,
         name: getLocalizedCountryName(
           selectedCountry.code,
           selectedCountry.name,

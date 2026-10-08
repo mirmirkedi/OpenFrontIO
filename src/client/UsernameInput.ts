@@ -146,6 +146,15 @@ export class UsernameInput extends LitElement {
     return this.baseUsername.trim();
   }
 
+  /** Persist the country identity chosen during the first tutorial. */
+  public setTutorialUsername(username: string): boolean {
+    if (this.isVerified() || !validateUsername(username).isValid) return false;
+    this.baseUsername = username;
+    this.validateAndStore();
+    this.requestUpdate();
+    return true;
+  }
+
   /** True when the player is playing under their verified account name. */
   public isVerified(): boolean {
     return this.verifiedActive && this.verifiedName() !== null;

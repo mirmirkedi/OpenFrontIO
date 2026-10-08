@@ -28,7 +28,10 @@ import { getPlayerCosmetics } from "./Cosmetics";
 import { crazyGamesSDK } from "./CrazyGamesSDK";
 import { clearActiveLocalGame } from "./LocalPersistantStats";
 import { JoinLobbyEvent } from "./Main";
-import { prepareTutorialForGameStart } from "./TutorialProgress";
+import {
+  getPersistedTutorialIdentityName,
+  prepareTutorialForGameStart,
+} from "./TutorialProgress";
 import { genAnonUsername, UsernameInput } from "./UsernameInput";
 import {
   getBotsForCompactMap,
@@ -935,7 +938,10 @@ export class SinglePlayerModal extends BaseModal {
     await usernameInput?.whenSeeded();
 
     await crazyGamesSDK.requestMidgameAd();
-    prepareTutorialForGameStart(tutorialMode);
+    prepareTutorialForGameStart(
+      tutorialMode,
+      tutorialMode && !this.tutorialRequested,
+    );
     // The Continue Game action is the only route allowed to restore saved
     // turns. Starting a new battle always discards any older local snapshot.
     clearActiveLocalGame();
@@ -949,7 +955,10 @@ export class SinglePlayerModal extends BaseModal {
             players: [
               {
                 clientID,
-                username: usernameInput?.getUsername() ?? genAnonUsername(),
+                username:
+                  usernameInput?.getUsername() ??
+                  getPersistedTutorialIdentityName() ??
+                  genAnonUsername(),
                 clanTag: usernameInput?.getClanTag() ?? null,
                 cosmetics: await getPlayerCosmetics(),
               },
