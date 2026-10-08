@@ -381,6 +381,11 @@ export class TutorialOverlay extends LitElement implements Controller {
     targetX: number;
     targetY: number;
   } | null = null;
+  private pendingTutorialMapClick: {
+    x: number;
+    y: number;
+    expiresAt: number;
+  } | null = null;
   private portTargetRequest: Promise<void> | null = null;
   private portFocusRequested = false;
   private borderTilesRequest: Promise<void> | null = null;
@@ -543,8 +548,14 @@ export class TutorialOverlay extends LitElement implements Controller {
         this.pointInSpotlight(event.clientX, event.clientY) &&
         Math.hypot(event.clientX - mapStart.x, event.clientY - mapStart.y) < 12
       ) {
-        // A tutorial target tap must always open the action menu so the player
-        // can choose the requested action instead of falling through to input.
+        // The context menu opens before the browser dispatches this gesture's
+        // trailing click. If that click is retargeted to a radial-menu sector,
+        // it can accidentally enter the next menu level or activate Attack.
+        this.pendingTutorialMapClick = {
+          x: event.clientX,
+          y: event.clientY,
+          expiresAt: performance.now() + 600,
+        };
         this.eventBus.emit(
           new ContextMenuEvent(mapStart.targetX, mapStart.targetY),
         );
@@ -616,6 +627,22 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   private readonly guardClick = (event: MouseEvent) => {
     if (!this.active) return;
+    const pendingMapClick = this.pendingTutorialMapClick;
+    if (pendingMapClick) {
+      if (performance.now() > pendingMapClick.expiresAt) {
+        this.pendingTutorialMapClick = null;
+      } else if (
+        Math.hypot(
+          event.clientX - pendingMapClick.x,
+          event.clientY - pendingMapClick.y,
+        ) < 12
+      ) {
+        this.pendingTutorialMapClick = null;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
+    }
     const isTutorialButton = event.composedPath().some(
       (node) =>
         node instanceof Element &&
@@ -869,7 +896,9 @@ export class TutorialOverlay extends LitElement implements Controller {
         winner?.[0] === "player" &&
         winner[1] === player?.clientID()
       ) {
-        this.finish();
+        // Persist the win so Play will not relaunch the tutorial, but keep its
+        // overlay and info-panel lock until the player presses Continue.
+        localStorage.setItem(COMPLETED_KEY, "true");
       }
     });
     this.eventBus.on(BuildUnitIntentEvent, (event) => {
@@ -957,14 +986,7 @@ export class TutorialOverlay extends LitElement implements Controller {
         this.tutorialCountryIdentityApplied = true;
       }
     }
-    if (
-      this.current.id === "win" &&
-      player.isAlive() &&
-      this.game.players().filter((candidate) => candidate.isAlive()).length ===
-        1
-    ) {
-      this.finish();
-    } else if (this.current.id === "spawn" && player.hasSpawned()) {
+    if (this.current.id === "spawn" && player.hasSpawned()) {
       this.complete("spawn");
     } else if (
       this.current.id === "expand" &&
@@ -984,6 +1006,7 @@ export class TutorialOverlay extends LitElement implements Controller {
     this.rocketAdvanceAt = 0;
     this.spawnPointer = null;
     this.mapActionPointer = null;
+    this.pendingTutorialMapClick = null;
     this.clearMapTarget();
     this.lockedZoomScale = null;
     this.zoomCenterWorld = null;
@@ -1333,11 +1356,14 @@ export class TutorialOverlay extends LitElement implements Controller {
       score: number;
       tile: number;
       clearance: number;
+      coverage: number;
     } | null = null;
     const siloFallbackCandidates: {
       rect: DOMRect;
       score: number;
       tile: number;
+      clearance: number;
+      coverage: number;
     }[] = [];
     const ownedUnits =
       player && (wantsOwnedLand || this.current.id === "expand")
@@ -1391,14 +1417,22 @@ export class TutorialOverlay extends LitElement implements Controller {
             structureMinDistance,
           );
           if (!structureTileIsValid) {
-            if (
-              isSiloStep &&
-              this.nearestUnitDistance(ownedUnits, point.x, point.y) > 6
-            ) {
+            if (isSiloStep) {
+              const unitClearance = this.nearestUnitDistance(
+                ownedUnits,
+                point.x,
+                point.y,
+              );
               siloFallbackCandidates.push({
                 rect: this.rectAtPoint(point.x, point.y),
                 score: Math.hypot(point.x - targetX, point.y - targetY),
                 tile,
+                clearance: unitClearance,
+                coverage: this.spotlightRegionCoverage(
+                  point.x,
+                  point.y,
+                  (sample) => this.isLandOwnedBy(sample, ownerID),
+                ),
               });
             }
             continue;
@@ -1424,6 +1458,19 @@ export class TutorialOverlay extends LitElement implements Controller {
             point.y,
           );
           if (unitClearance <= (isSiloStep ? 6 : MAP_SPOTLIGHT_RADIUS + 6)) {
+            if (isSiloStep) {
+              siloFallbackCandidates.push({
+                rect: this.rectAtPoint(point.x, point.y),
+                score: Math.hypot(point.x - targetX, point.y - targetY),
+                tile,
+                clearance: unitClearance,
+                coverage: this.spotlightRegionCoverage(
+                  point.x,
+                  point.y,
+                  (sample) => this.isLandOwnedBy(sample, ownerID),
+                ),
+              });
+            }
             continue;
           }
           const borderClearance = this.ownedLandClearance(
@@ -1433,18 +1480,36 @@ export class TutorialOverlay extends LitElement implements Controller {
           );
           clearance = Math.min(borderClearance, unitClearance);
         }
+        const coverage = isSiloStep
+          ? this.spotlightRegionCoverage(point.x, point.y, (sample) =>
+              this.isLandOwnedBy(sample, ownerID),
+            )
+          : 1;
         const score = Math.hypot(point.x - targetX, point.y - targetY);
+        const hasBetterOwnedLandPlacement =
+          best !== null &&
+          wantsOwnedLand &&
+          (isSiloStep
+            ? coverage > best.coverage ||
+              (coverage === best.coverage && clearance > best.clearance)
+            : clearance > best.clearance ||
+              (clearance === best.clearance && coverage > best.coverage));
+        const placementTies =
+          !wantsOwnedLand ||
+          (best !== null &&
+            coverage === best.coverage &&
+            clearance === best.clearance);
         if (
           !best ||
-          (wantsOwnedLand && clearance > best.clearance) ||
-          ((!wantsOwnedLand || clearance === best.clearance) &&
-            score < best.score)
+          hasBetterOwnedLandPlacement ||
+          (placementTies && score < best.score)
         ) {
           best = {
             rect: this.rectAtPoint(point.x, point.y),
             score,
             tile,
             clearance,
+            coverage,
           };
         }
       }
@@ -1626,6 +1691,33 @@ export class TutorialOverlay extends LitElement implements Controller {
     );
   }
 
+  private spotlightRegionCoverage(
+    centerX: number,
+    centerY: number,
+    acceptsTile: (tile: number) => boolean,
+  ) {
+    const radius = MAP_SPOTLIGHT_RADIUS - 2;
+    let accepted = 0;
+    let sampled = 0;
+    for (let y = -radius; y <= radius; y += 6) {
+      for (let x = -radius; x <= radius; x += 6) {
+        if (x * x + y * y > radius * radius) continue;
+        sampled++;
+        const cell = this.transformHandler.screenToWorldCoordinates(
+          centerX + x,
+          centerY + y,
+        );
+        if (
+          this.game.isValidCoord(cell.x, cell.y) &&
+          acceptsTile(this.game.ref(cell.x, cell.y))
+        ) {
+          accepted++;
+        }
+      }
+    }
+    return sampled === 0 ? 0 : accepted / sampled;
+  }
+
   private spotlightMatchesRegion(
     centerX: number,
     centerY: number,
@@ -1674,23 +1766,47 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   private checkSiloBuildableCandidates(
     player: TutorialPlayer,
-    candidates: { rect: DOMRect; score: number; tile: number }[],
+    candidates: {
+      rect: DOMRect;
+      score: number;
+      tile: number;
+      clearance: number;
+      coverage: number;
+    }[],
   ) {
     if (this.siloBuildTargetRequest || candidates.length === 0) return;
 
     const candidatesByTile = new Map<
       number,
-      { rect: DOMRect; score: number; tile: number }
+      {
+        rect: DOMRect;
+        score: number;
+        tile: number;
+        clearance: number;
+        coverage: number;
+      }
     >();
     for (const candidate of candidates) {
       if (this.checkedSiloBuildTargets.has(candidate.tile)) continue;
       const existing = candidatesByTile.get(candidate.tile);
-      if (!existing || candidate.score < existing.score) {
+      if (
+        !existing ||
+        candidate.coverage > existing.coverage ||
+        (candidate.coverage === existing.coverage &&
+          (candidate.clearance > existing.clearance ||
+            (candidate.clearance === existing.clearance &&
+              candidate.score < existing.score)))
+      ) {
         candidatesByTile.set(candidate.tile, candidate);
       }
     }
     const untested = [...candidatesByTile.values()]
-      .sort((a, b) => a.score - b.score)
+      .sort(
+        (a, b) =>
+          b.coverage - a.coverage ||
+          b.clearance - a.clearance ||
+          a.score - b.score,
+      )
       .slice(0, 16);
     if (untested.length === 0) return;
 

@@ -397,7 +397,9 @@ export const infoMenuElement: MenuElement = {
   id: Slot.Info,
   name: "info",
   disabled: (params: MenuElementParams) =>
-    !params.selected || params.game.inSpawnPhase(),
+    !params.selected ||
+    params.game.inSpawnPhase() ||
+    localStorage.getItem("openfront.tutorial.active") === "true",
   icon: infoIcon,
   color: COLORS.info,
   action: (params: MenuElementParams) => {

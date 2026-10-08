@@ -168,6 +168,10 @@ export class PlayerPanel extends LitElement implements Controller {
   }
 
   public show(actions: PlayerActions, tile: TileRef) {
+    if (localStorage.getItem("openfront.tutorial.active") === "true") {
+      this.hide();
+      return;
+    }
     this.actions = actions;
     this.tile = tile;
     this.moderationTarget = null;
