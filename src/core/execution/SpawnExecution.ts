@@ -33,6 +33,7 @@ export class SpawnExecution implements Execution {
     // callers (PlayerSpawner, NationExecution) are trusted and place players
     // deliberately, including at the end of the spawn phase; a client may not.
     private fromIntent: boolean = false,
+    private tutorialNukeTarget: boolean = false,
   ) {
     this.random = new PseudoRandom(
       simpleHash(playerInfo.id) + simpleHash(gameID),
@@ -110,7 +111,9 @@ export class SpawnExecution implements Execution {
     if (!player.hasSpawned()) {
       this.mg.addExecution(new PlayerExecution(player));
       if (player.type() === PlayerType.Bot) {
-        this.mg.addExecution(new TribeExecution(player));
+        this.mg.addExecution(
+          new TribeExecution(player, this.tutorialNukeTarget),
+        );
       }
     }
 
@@ -147,12 +150,7 @@ export class SpawnExecution implements Execution {
 
     if (
       this.mg.config().gameConfig().tutorial &&
-      this.playerInfo.playerType === PlayerType.Bot &&
-      !this.mg
-        .allPlayers()
-        .some(
-          (player) => player.type() === PlayerType.Bot && player.hasSpawned(),
-        )
+      this.playerInfo.playerType === PlayerType.Bot
     ) {
       const human = this.mg
         .allPlayers()
@@ -161,29 +159,41 @@ export class SpawnExecution implements Execution {
         );
       const humanSpawn = human?.spawnTile();
       if (humanSpawn !== undefined) {
-        const distance = 32;
-        // Keep the tutorial opponent on the player's right. If the ideal
-        // point is occupied or unsuitable, search nearby points on that side
-        // instead of flipping the opponent to the left or above/below.
-        const offsets = [
-          [distance, 0],
-          [distance, distance],
-          [distance, -distance],
-          [distance * 1.5, 0],
-          [distance * 1.5, distance],
-          [distance * 1.5, -distance],
-          [distance * 2, 0],
-          [distance * 2, distance],
-          [distance * 2, -distance],
-        ];
-        for (const [dx, dy] of offsets) {
-          const x = this.mg.x(humanSpawn) + dx;
-          const y = this.mg.y(humanSpawn) + dy;
-          if (!this.mg.isValidCoord(x, y)) continue;
-          const candidate = this.mg.ref(x, y);
-          const tiles = getSpawnTiles(this.mg, candidate, true);
-          if (tiles && tiles.length > 0) {
-            return { center: candidate, tiles };
+        const spawnedTutorialBots = this.mg
+          .allPlayers()
+          .filter(
+            (player) => player.type() === PlayerType.Bot && player.hasSpawned(),
+          ).length;
+        if (this.tutorialNukeTarget && spawnedTutorialBots === 1) {
+          const remote = this.getTutorialRemoteSpawn(humanSpawn);
+          if (remote) return remote;
+        }
+
+        if (!this.tutorialNukeTarget && spawnedTutorialBots === 0) {
+          const distance = 32;
+          // Keep the tutorial opponent on the player's right. If the ideal
+          // point is occupied or unsuitable, search nearby points on that side
+          // instead of flipping the opponent to the left or above/below.
+          const offsets = [
+            [distance, 0],
+            [distance, distance],
+            [distance, -distance],
+            [distance * 1.5, 0],
+            [distance * 1.5, distance],
+            [distance * 1.5, -distance],
+            [distance * 2, 0],
+            [distance * 2, distance],
+            [distance * 2, -distance],
+          ];
+          for (const [dx, dy] of offsets) {
+            const x = this.mg.x(humanSpawn) + dx;
+            const y = this.mg.y(humanSpawn) + dy;
+            if (!this.mg.isValidCoord(x, y)) continue;
+            const candidate = this.mg.ref(x, y);
+            const tiles = getSpawnTiles(this.mg, candidate, true);
+            if (tiles && tiles.length > 0) {
+              return { center: candidate, tiles };
+            }
           }
         }
       }
@@ -262,5 +272,30 @@ export class SpawnExecution implements Execution {
       return undefined;
     }
     return this.mg.teamSpawnArea(team);
+  }
+
+  private getTutorialRemoteSpawn(humanSpawn: TileRef): Spawn | undefined {
+    const mapWidth = this.mg.width();
+    const mapHeight = this.mg.height();
+    let best: { spawn: Spawn; distanceSquared: number } | undefined;
+    const humanX = this.mg.x(humanSpawn);
+    const humanY = this.mg.y(humanSpawn);
+
+    // A coarse deterministic scan picks the farthest small starting area from
+    // the player, keeping the tutorial's nuke target on a remote landmass.
+    for (let y = 8; y < mapHeight - 8; y += 16) {
+      for (let x = 8; x < mapWidth - 8; x += 16) {
+        const center = this.mg.ref(x, y);
+        const tiles = getSpawnTiles(this.mg, center, true);
+        if (!tiles?.length) continue;
+        const dx = x - humanX;
+        const dy = y - humanY;
+        const distanceSquared = dx * dx + dy * dy;
+        if (!best || distanceSquared > best.distanceSquared) {
+          best = { spawn: { center, tiles }, distanceSquared };
+        }
+      }
+    }
+    return best?.spawn;
   }
 }

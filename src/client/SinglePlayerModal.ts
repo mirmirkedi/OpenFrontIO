@@ -966,7 +966,7 @@ export class SinglePlayerModal extends BaseModal {
                 ? Difficulty.Easy
                 : this.selectedDifficulty,
               maxTimerValue: tutorialMode ? undefined : finalMaxTimerValue,
-              bots: tutorialMode ? 1 : this.bots,
+              bots: tutorialMode ? 2 : this.bots,
               infiniteGold: tutorialMode || this.infiniteGold,
               donateGold: this.gameMode === GameMode.Team,
               donateTroops: this.gameMode === GameMode.Team,

@@ -19,7 +19,10 @@ export class TribeExecution implements Execution {
   private expandRatio: number;
   private tutorialAttackConsumed = false;
 
-  constructor(private tribe: Player) {
+  constructor(
+    private tribe: Player,
+    private tutorialPassiveTarget = false,
+  ) {
     this.random = new PseudoRandom(simpleHash(tribe.id()));
     this.attackRate = this.random.nextInt(40, 80);
     this.attackTick = this.random.nextInt(0, this.attackRate);
@@ -40,6 +43,10 @@ export class TribeExecution implements Execution {
   }
 
   tick(ticks: number) {
+    if (this.tutorialPassiveTarget) {
+      if (!this.tribe.isAlive()) this.active = false;
+      return;
+    }
     if (this.mg.config().gameConfig().tutorial) {
       const human = this.mg
         .allPlayers()

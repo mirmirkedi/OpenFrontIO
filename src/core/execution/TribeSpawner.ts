@@ -1,4 +1,11 @@
-﻿import { Cell, Game, GameMapSize, PlayerInfo, PlayerType } from "../game/Game";
+﻿import {
+  Cell,
+  Game,
+  GameMapSize,
+  PlayerInfo,
+  PlayerType,
+  TUTORIAL_NUKE_TARGET_NAME,
+} from "../game/Game";
 import { TileRef } from "../game/GameMap";
 import { type CustomTribe } from "../game/Maps.gen";
 import { PseudoRandom } from "../PseudoRandom";
@@ -35,9 +42,10 @@ export class TribeSpawner {
   ): SpawnExecution[] {
     const tribes: SpawnExecution[] = [];
     const { customTribes } = this.tribeNameData;
+    const tutorialMode = this.gs.config().gameConfig().tutorial;
 
     // Spawn positioned custom tribes first (those with coordinates).
-    if (customTribes !== undefined) {
+    if (!tutorialMode && customTribes !== undefined) {
       const positioned = customTribes.filter((ct) => ct.coordinates);
       for (const ct of positioned) {
         if (tribes.length >= numTribes) break;
@@ -73,16 +81,23 @@ export class TribeSpawner {
     let slot = 0;
     while (tribes.length < numTribes) {
       const purchased = purchasedBySlot.get(slot);
-      tribes.push(this.spawnTribe(purchased ?? this.randomTribeName()));
+      const isTutorialNukeTarget = tutorialMode && tribes.length === 1;
+      const name = isTutorialNukeTarget
+        ? TUTORIAL_NUKE_TARGET_NAME
+        : (purchased ?? this.randomTribeName());
+      tribes.push(this.spawnTribe(name, isTutorialNukeTarget));
       slot++;
     }
     return tribes;
   }
 
-  spawnTribe(tribeName: string): SpawnExecution {
+  spawnTribe(tribeName: string, tutorialNukeTarget = false): SpawnExecution {
     return new SpawnExecution(
       this.gameID,
       new PlayerInfo(tribeName, PlayerType.Bot, null, this.random.nextID()),
+      undefined,
+      false,
+      tutorialNukeTarget,
     );
   }
 

@@ -3,7 +3,13 @@ import { customElement, property, state } from "lit/decorators.js";
 import Countries from "resources/countries.json" with { type: "json" };
 import { assetUrl } from "../../../core/AssetUrls";
 import { EventBus } from "../../../core/EventBus";
-import { Cell, GameType, Structures, UnitType } from "../../../core/game/Game";
+import {
+  Cell,
+  GameType,
+  Structures,
+  TUTORIAL_NUKE_TARGET_NAME,
+  UnitType,
+} from "../../../core/game/Game";
 import type { Controller } from "../../Controller";
 import { getLocalizedCountryName } from "../../CountryLocalization";
 import {
@@ -36,7 +42,7 @@ const STEP_KEY = "openfront.tutorial.step";
 const SPEED_STEP_REMOVED_KEY = "openfront.tutorial.speed-step-removed";
 const STEP_INDEX_VERSION_KEY = "openfront.tutorial.step-index-version";
 const TUTORIAL_ZOOM_SCALE = 4.0;
-const TUTORIAL_ATTACK_RATIO = 0.15;
+const TUTORIAL_ATTACK_RATIO = 0.25;
 const TARGET_REFRESH_INTERVAL_MS = 300;
 const MAP_SPOTLIGHT_SIZE = 48;
 const MAP_SPOTLIGHT_RADIUS = MAP_SPOTLIGHT_SIZE / 2;
@@ -327,6 +333,14 @@ export class TutorialOverlay extends LitElement implements Controller {
     y: number;
     zoom: number;
   } | null = null;
+  private rocketCameraRestorePosition: {
+    x: number;
+    y: number;
+    zoom: number;
+  } | null = null;
+  private rocketFocusRequested = false;
+  private rocketLaunched = false;
+  private rocketTargetSmallID: number | null = null;
   private attackNeighborFocusRequested = false;
   private tutorialGestureScale: number | null = null;
   private tutorialAllowedPointers = new Set<number>();
@@ -764,8 +778,12 @@ export class TutorialOverlay extends LitElement implements Controller {
       if (
         event.unit === UnitType.AtomBomb ||
         event.unit === UnitType.HydrogenBomb
-      )
-        this.complete("rocket");
+      ) {
+        if (this.current.id === "rocket") {
+          this.rocketLaunched = true;
+          this.rocketTargetSmallID = this.mapTargetOwnerID;
+        }
+      }
     });
 
     // Keep the first expansion readable with a small default attack ratio.
@@ -790,6 +808,16 @@ export class TutorialOverlay extends LitElement implements Controller {
   tick() {
     if (!this.active || !this.game.myPlayer()) return;
     const player = this.game.myPlayer()!;
+    if (
+      this.current.id === "rocket" &&
+      this.rocketLaunched &&
+      this.rocketTargetSmallID !== null
+    ) {
+      const target = this.game
+        .players()
+        .find((candidate) => candidate.smallID() === this.rocketTargetSmallID);
+      if (!target || !target.isAlive()) this.complete("rocket");
+    }
     if (
       !this.tutorialCountryIdentityApplied &&
       player.state?.spawnTile !== undefined
@@ -823,6 +851,8 @@ export class TutorialOverlay extends LitElement implements Controller {
   }
 
   stop() {
+    this.restoreRocketCamera();
+    this.restoreWarshipCamera();
     this.active = false;
     this.spawnPointer = null;
     this.mapActionPointer = null;
@@ -880,6 +910,12 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (id === "expand") this.zoomOutForAttackStep();
     if (id === "port") this.shiftCameraForWarshipStep();
     if (id === "warship") this.restoreWarshipCamera();
+    if (id === "rocket") this.restoreRocketCamera();
+    if (id === "silo") {
+      this.rocketFocusRequested = false;
+      this.rocketLaunched = false;
+      this.rocketTargetSmallID = null;
+    }
     if (this.stepIndex >= STEPS.length - 1) {
       this.finish();
       return;
@@ -1128,6 +1164,9 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (player && this.current.unit === UnitType.Warship) {
       return this.findPortAdjacentSeaTarget(player);
     }
+    if (this.current.id === "rocket") {
+      return this.findTutorialNukeTarget();
+    }
     const wantsEmptyLand = ["expand", "spawn"].includes(this.current.id);
     const wantsEnemy = ["attack", "ally", "rocket", "win"].includes(
       this.current.id,
@@ -1305,6 +1344,20 @@ export class TutorialOverlay extends LitElement implements Controller {
         !portExists ||
         !this.game.isOcean(targetTile) ||
         !this.game.isOcean(focusTile)
+      ) {
+        return null;
+      }
+      return this.rectAtPoint(point.x, point.y);
+    }
+
+    if (this.current.id === "rocket") {
+      const target = this.game
+        .players()
+        .find((candidate) => candidate.smallID() === this.mapTargetOwnerID);
+      if (
+        !target?.isAlive() ||
+        !this.game.hasOwner(targetTile) ||
+        this.game.ownerID(targetTile) !== this.mapTargetOwnerID
       ) {
         return null;
       }
@@ -1704,6 +1757,60 @@ export class TutorialOverlay extends LitElement implements Controller {
     // the Warship target even when a valid launch tile is visible.
     this.clearMapTarget();
     return null;
+  }
+
+  private findTutorialNukeTarget(): DOMRect | null {
+    const target = this.game
+      .players()
+      .find((candidate) => candidate.static.name === TUTORIAL_NUKE_TARGET_NAME);
+    const targetTile = target?.state.spawnTile;
+    if (!target || !target.isAlive() || targetTile === undefined) {
+      this.clearMapTarget();
+      return null;
+    }
+
+    const point = this.transformHandler.worldToScreenCoordinates(
+      new Cell(this.game.x(targetTile) + 0.5, this.game.y(targetTile) + 0.5),
+    );
+    const inView =
+      point.x >= MAP_SPOTLIGHT_RADIUS &&
+      point.x <= window.innerWidth - MAP_SPOTLIGHT_RADIUS &&
+      point.y >= MAP_SPOTLIGHT_RADIUS &&
+      point.y <= window.innerHeight - MAP_SPOTLIGHT_RADIUS;
+    if (!inView) {
+      if (!this.rocketFocusRequested) {
+        this.rocketFocusRequested = true;
+        const center = this.transformHandler.screenToWorldCoordinatesFloat(
+          window.innerWidth / 2,
+          window.innerHeight / 2,
+        );
+        this.rocketCameraRestorePosition = {
+          ...center,
+          zoom: this.transformHandler.scale,
+        };
+        this.eventBus.emit(
+          new GoToPositionEvent(
+            this.game.x(targetTile) + 0.5,
+            this.game.y(targetTile) + 0.5,
+            this.transformHandler.scale,
+          ),
+        );
+      }
+      return null;
+    }
+
+    this.rememberMapTarget(targetTile, targetTile, target.smallID());
+    return this.rectAtPoint(point.x, point.y);
+  }
+
+  private restoreRocketCamera() {
+    const position = this.rocketCameraRestorePosition;
+    if (!position) return;
+    this.rocketCameraRestorePosition = null;
+    this.rocketFocusRequested = false;
+    this.eventBus.emit(
+      new GoToPositionEvent(position.x, position.y, position.zoom),
+    );
   }
 
   private findAdjacentOpenLandTarget(

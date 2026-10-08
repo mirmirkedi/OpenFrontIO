@@ -367,6 +367,8 @@ export enum PlayerType {
   Nation = "NATION",
 }
 
+export const TUTORIAL_NUKE_TARGET_NAME = "Tutorial Nuke Target";
+
 export interface Execution {
   isActive(): boolean;
   activeDuringSpawnPhase(): boolean;

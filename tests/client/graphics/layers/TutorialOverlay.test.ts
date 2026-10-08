@@ -1353,6 +1353,11 @@ describe("TutorialOverlay deterministic progression", () => {
 
   test("all 14 lessons advance from their intended successful action", async () => {
     const { eventBus, overlay } = createOverlay(0);
+    let nukeTargetAlive = true;
+    const nukeTarget = {
+      smallID: () => 7,
+      isAlive: () => nukeTargetAlive,
+    };
     const player = {
       hasSpawned: () => true,
       clientID: () => 1,
@@ -1365,6 +1370,7 @@ describe("TutorialOverlay deterministic progression", () => {
         gameConfig: () => ({ gameType: GameType.Singleplayer }),
       }),
       myPlayer: () => player,
+      players: () => [nukeTarget],
       width: () => 1000,
     } as unknown as GameView;
     const transformHandler = {
@@ -1416,7 +1422,11 @@ describe("TutorialOverlay deterministic progression", () => {
       expect(localStorage.getItem(STEP_KEY)).toBe(String(step + 1));
     }
 
+    Reflect.set(overlay, "mapTargetOwnerID", 7);
     eventBus.emit(new BuildUnitIntentEvent(UnitType.AtomBomb, 42));
+    expect(localStorage.getItem(STEP_KEY)).toBe("11");
+    nukeTargetAlive = false;
+    overlay.tick();
     expect(localStorage.getItem(STEP_KEY)).toBe("12");
     eventBus.emit(new BuildUnitIntentEvent(UnitType.SAMLauncher, 42));
     expect(localStorage.getItem(STEP_KEY)).toBe("13");
