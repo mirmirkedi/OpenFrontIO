@@ -114,7 +114,12 @@ export class ConfirmDialog extends LitElement {
                 ${this.heading}
               </h2>`
             : ""}
-          <p class="text-sm font-medium ${textColor} mb-5">${this.message}</p>
+          <p
+            class="text-sm font-medium ${textColor} mb-5"
+            style=${`color: ${isDanger ? "#fca5a5" : isWarning ? "#fcd34d" : "#f8fafc"}`}
+          >
+            ${this.message}
+          </p>
           ${this.textareaPlaceholder
             ? html`<textarea
                 .value=${this.text}

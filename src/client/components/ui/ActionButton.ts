@@ -52,11 +52,20 @@ export const actionButton = (props: ActionButtonProps): TemplateResult => {
   } = props;
   const buttonStyles = getButtonStyles();
   const buttonClass = buttonStyles[type];
+  const textColor = {
+    normal: "#f8fafc",
+    red: "#f87171",
+    green: "#34d399",
+    yellow: "#f59e0b",
+    indigo: "#818cf8",
+    sky: "#38bdf8",
+  }[type];
 
   return html`
     <button
       @click=${onClick}
       class="${buttonClass}"
+      style=${`color: ${textColor}`}
       title="${title}"
       type="button"
       aria-label="${title}"

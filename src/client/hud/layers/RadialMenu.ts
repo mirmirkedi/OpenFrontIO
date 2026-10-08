@@ -64,6 +64,7 @@ export class RadialMenu implements Controller {
   private readonly backIconSize: number;
 
   private centerButtonState: CenterButtonState = "default";
+  private centerButtonPointerDown = false;
 
   private isTransitioning: boolean = false;
   private lastHideTime: number = 0;
@@ -194,13 +195,22 @@ export class RadialMenu implements Controller {
       .attr("r", this.config.centerButtonSize)
       .attr("fill", "transparent")
       .style("cursor", "pointer")
+      // A map tap can open the menu while its trailing click is still pending.
+      // Only arm the center action from a fresh press on the visible button.
+      .on("pointerdown", () => {
+        this.centerButtonPointerDown = true;
+      })
       .on("click", (event) => {
         event.stopPropagation();
+        if (!this.centerButtonPointerDown) return;
+        this.centerButtonPointerDown = false;
         this.handleCenterButtonClick();
       })
       .on("touchstart", (event: Event) => {
         event.preventDefault();
         event.stopPropagation();
+        if (!this.centerButtonPointerDown) return;
+        this.centerButtonPointerDown = false;
         this.handleCenterButtonClick();
       })
       .on("mouseover", () => this.onCenterButtonHover(true))
@@ -874,6 +884,7 @@ export class RadialMenu implements Controller {
     if (!this.isReopeningAllowed()) return;
 
     this.resetMenu();
+    this.centerButtonPointerDown = false;
     this.isTransitioning = false;
     this.selectedItemId = null;
     this.anchorX = x;

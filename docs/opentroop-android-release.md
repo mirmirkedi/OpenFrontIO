@@ -8,13 +8,13 @@ provider, ads, or network access to start a game.
 
 ```bash
 npm ci
-npm run build-opentroop
-npx cap sync android
+npm run cap:sync
 ```
 
 The web output is written to `static/`. Capacitor copies it into the generated
-Android project. The map allowlist is intentionally `world` for the first
-release so the package stays small and the game has one well-tested path.
+Android project. The Android sync step removes stale web files from earlier
+builds while keeping every file referenced by the current asset manifest,
+including all maps.
 
 ## Android artifacts
 

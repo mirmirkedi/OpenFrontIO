@@ -825,6 +825,12 @@ export class Config {
     if (playerInfo.playerType === PlayerType.Bot) {
       return 10_000;
     }
+    if (
+      this._gameConfig.tutorial &&
+      playerInfo.playerType === PlayerType.Human
+    ) {
+      return 50_000;
+    }
     if (playerInfo.playerType === PlayerType.Nation) {
       switch (this._gameConfig.difficulty) {
         case Difficulty.Easy:

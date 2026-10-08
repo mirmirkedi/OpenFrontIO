@@ -550,6 +550,7 @@ export class PlayerPanel extends LitElement implements Controller {
         <div class="flex-1 min-w-0">
           <h2
             class="text-xl font-bold tracking-[-0.01em] text-zinc-50 truncate"
+            style="color: #f8fafc"
             title=${other.displayName()}
           >
             ${other.displayName()}
@@ -634,11 +635,15 @@ export class PlayerPanel extends LitElement implements Controller {
       <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
         <div
           class="flex items-center gap-2 text-[15px] font-medium text-zinc-100 leading-snug"
+          style="color: #f1f5f9"
         >
           <span aria-hidden="true">⚠️</span>
           <span>${translateText("player_panel.betrayals")}</span>
         </div>
-        <div class="text-right text-[14px] font-semibold text-zinc-200">
+        <div
+          class="text-right text-[14px] font-semibold text-zinc-200"
+          style="color: #e2e8f0"
+        >
           ${other.betrayals()}
         </div>
       </div>
@@ -647,12 +652,14 @@ export class PlayerPanel extends LitElement implements Controller {
       <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
         <div
           class="flex items-center gap-2 text-[15px] font-medium text-zinc-100 leading-snug"
+          style="color: #f1f5f9"
         >
           <span aria-hidden="true">⚓</span>
           <span>${translateText("player_panel.trading")}</span>
         </div>
         <div
           class="flex items-center justify-end gap-2 text-[14px] font-semibold"
+          style="color: #e2e8f0"
         >
           ${other.hasEmbargoAgainst(my)
             ? html`<span class="text-amber-400"
@@ -980,6 +987,7 @@ export class PlayerPanel extends LitElement implements Controller {
             <div
               class=${`relative w-full bg-zinc-900/95 rounded-2xl text-zinc-100 shadow-2xl shadow-black/50
                  ${other.isTraitor() ? "traitor-ring" : "ring-1 ring-white/5"}`}
+              style="color: #f1f5f9"
             >
               <div class="overflow-visible">
                 <div

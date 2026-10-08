@@ -2,6 +2,7 @@ import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import Countries from "resources/countries.json" with { type: "json" };
 import { assetUrl } from "../../../core/AssetUrls";
+import { HEART_FLAG_PATH, isDenoName } from "../../../core/EasterEggs";
 import { EventBus } from "../../../core/EventBus";
 import {
   Cell,
@@ -11,7 +12,6 @@ import {
   UnitType,
 } from "../../../core/game/Game";
 import { UserSettings } from "../../../core/game/UserSettings";
-import { HEART_FLAG_PATH, isDenoName } from "../../../core/EasterEggs";
 import { validateUsername } from "../../../core/validations/username";
 import type { Controller } from "../../Controller";
 import { getLocalizedCountryName } from "../../CountryLocalization";
@@ -19,7 +19,6 @@ import {
   CloseViewEvent,
   ContextMenuEvent,
   MouseUpEvent,
-  TouchEvent,
   ZOOM_DELTA_DIVISOR,
   ZoomEvent,
 } from "../../InputHandler";
@@ -34,7 +33,6 @@ import {
   activateTutorialForGame,
   persistTutorialIdentityName,
   shouldPersistTutorialIdentity,
-  TUTORIAL_ATTACK_RATIO,
 } from "../../TutorialProgress";
 import type { UIState } from "../../UIState";
 import { translateText } from "../../Utils";
@@ -353,6 +351,8 @@ export class TutorialOverlay extends LitElement implements Controller {
   private attackNeighborFocusRequested = false;
   private tutorialGestureScale: number | null = null;
   private tutorialAllowedPointers = new Set<number>();
+  private tutorialZoomPointers = new Map<number, { x: number; y: number }>();
+  private tutorialPinchDistance: number | null = null;
   private spawnPointer: {
     id: number;
     x: number;
@@ -379,11 +379,9 @@ export class TutorialOverlay extends LitElement implements Controller {
     y: number;
     targetX: number;
     targetY: number;
-    pointerType: PointerEvent["pointerType"];
   } | null = null;
   private portTargetRequest: Promise<void> | null = null;
   private portFocusRequested = false;
-  private mapActionMenuAllowed = false;
   private borderTilesRequest: Promise<void> | null = null;
   private nextBorderTilesRefreshAt = Number.NEGATIVE_INFINITY;
   private expandActionAt = Number.POSITIVE_INFINITY;
@@ -427,9 +425,22 @@ export class TutorialOverlay extends LitElement implements Controller {
       this.current.id === "zoom" &&
       event.pointerType === "touch"
     ) {
-      if (this.canInteractAt(event.clientX, event.clientY, event)) return;
-      if (this.isCanvasEvent(event)) {
-        this.tutorialAllowedPointers.add(event.pointerId);
+      if (
+        !this.isControlEvent(event) &&
+        (this.isCanvasEvent(event) ||
+          this.pointIsOnGameCanvas(event.clientX, event.clientY, event))
+      ) {
+        if (!this.zoomCenterWorld) this.captureZoomCenter();
+        this.tutorialZoomPointers.set(event.pointerId, {
+          x: event.clientX,
+          y: event.clientY,
+        });
+        this.tutorialPinchDistance =
+          this.tutorialZoomPointers.size === 2
+            ? this.getTutorialPinchDistance()
+            : null;
+        event.preventDefault();
+        event.stopImmediatePropagation();
         return;
       }
       event.preventDefault();
@@ -437,15 +448,19 @@ export class TutorialOverlay extends LitElement implements Controller {
       return;
     }
     if (!this.active) return;
+    // A radial/build menu can overlap the map spotlight. Route its presses to
+    // the menu before testing the spotlight, or its buttons get mistaken for
+    // another map tap and never receive pointerdown.
+    if (this.current.mapTarget && this.isActionMenuEvent(event)) {
+      this.tutorialAllowedPointers.add(event.pointerId);
+      return;
+    }
     if (
       this.current.mapTarget &&
       this.current.id !== "spawn" &&
       event.button === 0 &&
       this.mapTargetTile !== null &&
-      this.pointInSpotlight(event.clientX, event.clientY) &&
-      !this.isControlEvent(event) &&
-      (this.isCanvasEvent(event) ||
-        this.pointIsOnGameCanvas(event.clientX, event.clientY, event))
+      this.pointInSpotlight(event.clientX, event.clientY)
     ) {
       const target = this.mapTargetTile;
       const point = this.transformHandler.worldToScreenCoordinates(
@@ -457,20 +472,10 @@ export class TutorialOverlay extends LitElement implements Controller {
         y: event.clientY,
         targetX: point.x,
         targetY: point.y,
-        pointerType: event.pointerType,
       };
-      this.mapActionMenuAllowed = true;
       event.preventDefault();
       event.stopImmediatePropagation();
       return;
-    }
-    if (
-      this.current.mapTarget &&
-      this.current.id !== "spawn" &&
-      this.pointInRect(event.clientX, event.clientY) &&
-      !this.isControlEvent(event)
-    ) {
-      this.mapActionMenuAllowed = true;
     }
     if (this.canInteractAt(event.clientX, event.clientY, event)) {
       // Once a gesture starts on an allowed target, let it finish outside the
@@ -483,6 +488,20 @@ export class TutorialOverlay extends LitElement implements Controller {
   };
 
   private readonly guardPointerEnd = (event: PointerEvent) => {
+    if (
+      this.active &&
+      this.current.id === "zoom" &&
+      this.tutorialZoomPointers.has(event.pointerId)
+    ) {
+      this.tutorialZoomPointers.delete(event.pointerId);
+      this.tutorialPinchDistance =
+        this.tutorialZoomPointers.size === 2
+          ? this.getTutorialPinchDistance()
+          : null;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     if (this.active && this.current.id === "spawn") {
       if (
         event
@@ -523,15 +542,11 @@ export class TutorialOverlay extends LitElement implements Controller {
         this.pointInSpotlight(event.clientX, event.clientY) &&
         Math.hypot(event.clientX - mapStart.x, event.clientY - mapStart.y) < 12
       ) {
-        if (mapStart.pointerType === "mouse") {
-          this.eventBus.emit(
-            new ContextMenuEvent(mapStart.targetX, mapStart.targetY),
-          );
-        } else {
-          this.eventBus.emit(
-            new TouchEvent(mapStart.targetX, mapStart.targetY),
-          );
-        }
+        // A tutorial target tap must always open the action menu so the player
+        // can choose the requested action instead of falling through to input.
+        this.eventBus.emit(
+          new ContextMenuEvent(mapStart.targetX, mapStart.targetY),
+        );
       }
       return;
     }
@@ -600,6 +615,25 @@ export class TutorialOverlay extends LitElement implements Controller {
 
   private readonly guardClick = (event: MouseEvent) => {
     if (!this.active) return;
+    const isTutorialButton = event.composedPath().some(
+      (node) =>
+        node instanceof Element &&
+        (node.classList.contains("skip") || node.classList.contains("continue")),
+    );
+    if (
+      !isTutorialButton &&
+      this.current.mapTarget &&
+      this.current.id !== "spawn" &&
+      this.pointInSpotlight(event.clientX, event.clientY) &&
+      !this.isActionMenuEvent(event)
+    ) {
+      // The pointer-up already opened the action menu at the tutorial target.
+      // Swallow the matching click so a country label under the spotlight
+      // cannot consume it as an info-panel click.
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     if (!this.canInteractAt(event.clientX, event.clientY, event)) {
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -610,9 +644,31 @@ export class TutorialOverlay extends LitElement implements Controller {
     if (
       this.active &&
       this.current.id === "zoom" &&
-      event.pointerType === "touch"
+      (event.pointerType === "touch" ||
+        this.tutorialZoomPointers.has(event.pointerId))
     ) {
-      if (this.tutorialAllowedPointers.has(event.pointerId)) return;
+      const pointer = this.tutorialZoomPointers.get(event.pointerId);
+      if (pointer) {
+        pointer.x = event.clientX;
+        pointer.y = event.clientY;
+        if (this.tutorialZoomPointers.size === 2) {
+          const distance = this.getTutorialPinchDistance();
+          const previousDistance = this.tutorialPinchDistance;
+          this.tutorialPinchDistance = distance;
+          if (previousDistance && previousDistance > 0 && distance > 0) {
+            const ratio = distance / previousDistance;
+            if (Number.isFinite(ratio) && ratio > 0 && ratio !== 1) {
+              this.eventBus.emit(
+                new ZoomEvent(
+                  window.innerWidth / 2,
+                  window.innerHeight / 2,
+                  ZOOM_DELTA_DIVISOR * (1 / ratio - 1),
+                ),
+              );
+            }
+          }
+        }
+      }
       event.preventDefault();
       event.stopImmediatePropagation();
       return;
@@ -635,6 +691,14 @@ export class TutorialOverlay extends LitElement implements Controller {
   private readonly guardGesture = (event: Event) => {
     if (!this.active) return;
     if (this.current.id === "zoom") {
+      if (
+        event.type === "gesturechange" &&
+        this.tutorialZoomPointers.size >= 2
+      ) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
       const gesture = event as Event & { scale: number };
       if (event.type === "gesturestart") {
         this.tutorialGestureScale = gesture.scale;
@@ -674,6 +738,13 @@ export class TutorialOverlay extends LitElement implements Controller {
       window.innerWidth / 2,
       window.innerHeight / 2,
     );
+  }
+
+  private getTutorialPinchDistance() {
+    const [first, second] = Array.from(this.tutorialZoomPointers.values());
+    return first && second
+      ? Math.hypot(second.x - first.x, second.y - first.y)
+      : 0;
   }
 
   init() {
@@ -830,7 +901,10 @@ export class TutorialOverlay extends LitElement implements Controller {
             performance.now() + TUTORIAL_STEP_ADVANCE_DELAY_MS;
         }
       }
-      if (this.rocketAdvanceAt > 0 && performance.now() >= this.rocketAdvanceAt) {
+      if (
+        this.rocketAdvanceAt > 0 &&
+        performance.now() >= this.rocketAdvanceAt
+      ) {
         this.complete("rocket");
       }
     }
@@ -903,8 +977,9 @@ export class TutorialOverlay extends LitElement implements Controller {
     this.lockedZoomScale = null;
     this.zoomCenterWorld = null;
     this.tutorialGestureScale = null;
+    this.tutorialZoomPointers.clear();
+    this.tutorialPinchDistance = null;
     this.tutorialAllowedPointers.clear();
-    this.mapActionMenuAllowed = false;
     if (this.refreshTimer !== undefined)
       window.clearInterval(this.refreshTimer);
     window.removeEventListener("pointerdown", this.guardPointerDown, true);
@@ -973,9 +1048,10 @@ export class TutorialOverlay extends LitElement implements Controller {
     this.portFocusRequested = false;
     this.spawnTargetTile = null;
     this.spawnPointer = null;
-    this.mapActionMenuAllowed = false;
     this.mapActionPointer = null;
     this.clearMapTarget();
+    this.tutorialZoomPointers.clear();
+    this.tutorialPinchDistance = null;
     this.tutorialAllowedPointers.clear();
     localStorage.setItem(STEP_KEY, String(this.stepIndex));
     this.rect = null;
@@ -1134,8 +1210,14 @@ export class TutorialOverlay extends LitElement implements Controller {
       );
     }
     if (this.current.mapTarget) {
-      if (this.isActionMenuEvent(event)) return this.mapActionMenuAllowed;
-      return this.pointInRect(x, y) && !this.isControlEvent(event);
+      // The tutorial restricts which map tiles can open a menu, but once a
+      // radial/build menu is open its controls must remain usable.
+      if (this.isActionMenuEvent(event)) return true;
+      return (
+        this.mapTargetTile !== null &&
+        this.pointInSpotlight(x, y) &&
+        !this.isControlEvent(event)
+      );
     }
     if (this.current.unit) {
       const selector = `[data-tutorial-unit="${this.current.unit}"]`;
